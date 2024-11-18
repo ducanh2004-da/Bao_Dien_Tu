@@ -120,6 +120,7 @@
     display: none;
     position: fixed;
     animation: none;
+    z-index: 9999;
 }
 
 #btn-back-to-top.show {
