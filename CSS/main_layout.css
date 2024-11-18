@@ -27,11 +27,6 @@
     text-overflow: ellipsis;
 }
 
-#main-content {
-    width: 60%; /* Adjust the width as needed */
-    padding: 20px; /* Adjust padding as needed */
-}
-
 #container {
     display: flex;
     flex-direction: row;
@@ -73,14 +68,6 @@
 
 #sidebar-header .active {
     color: white;
-}
-
-
-.card-img-left {
-    width: 100%;
-    height: 100%;
-    border-radius: 3px 0 0 3px;
-    object-fit: cover;
 }
 
 .row .vertical-divider {
