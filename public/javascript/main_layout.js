@@ -29,15 +29,23 @@ function backToTop() {
     });
 }
 
+// Sidebar news
 const slider = document.getElementById("slider");
 const btnLatest = document.getElementById("latest");
 const btnMostViews = document.getElementById("most-views");
+const lastestNews = document.getElementById("latest-news");
+const mostViews = document.getElementById("most-views-news");
 
 btnLatest.addEventListener("click", () => {
     slideTo("left");
+    lastestNews.style.display = "block";
+    mostViews.style.display = "none";
+
 });
 btnMostViews.addEventListener("click", () => {
     slideTo("right");
+    lastestNews.style.display = "none";
+    mostViews.style.display = "block";
 });
 
 function slideTo(position) {
@@ -57,3 +65,4 @@ function slideTo(position) {
         btnLatest.classList.remove("active");
     }
 }
+
