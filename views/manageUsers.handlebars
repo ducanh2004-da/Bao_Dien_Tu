@@ -1,0 +1,146 @@
+<!-- Customer List -->
+<div class="customer-list mt-6">
+    <h3>Danh sách editer</h3>
+    <!-- Thanh tìm kiếm và các nút -->
+    <div class="d-flex justify-content-between mb-3">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Tìm kiếm thông tin...">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button">Tìm kiếm</button>
+            </div>
+        </div>
+        <button class="btn btn-secondary" type="button" onclick="toggleList('editorList',this)">Mở rộng</button>
+    </div>
+    {{!-- content của table --}}
+    <table id="editorList" class="table table-striped" style="display: none;">
+        <thead>
+            <tr>
+                
+                <th>avatar</th>
+                <th>Tên khách hàng</th>
+                <th>Mã khách hàng</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Lê Văn Việt Hoàng</td>
+                <td class="align-middle">001</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Đức Anh</td>
+                <td class="align-middle">002</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Bùi Anh Tú</td>
+                <td class="align-middle">003</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="customer-list mt-4">
+    <h3>Danh sách người dùng trả phí</h3>
+    <div class="d-flex justify-content-between mb-3">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Tìm kiếm thông tin...">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button">Tìm kiếm</button>
+            </div>
+        </div>
+        <button class="btn btn-secondary" type="button" onclick="toggleList('userPremiumList',this)">Mở rộng</button>
+    </div>
+    <table id="userPremiumList" class="table table-striped" style="display: none;">
+        <thead>
+            <tr>
+                
+                <th>avatar</th>
+                <th>Tên khách hàng</th>
+                <th>Mã khách hàng</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Văn A</td>
+                <td class="align-middle">004</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Văn B</td>
+                <td class="align-middle">005</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Văn C</td>
+                <td class="align-middle">006</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="customer-list mt-4">
+    <h3>Danh sách người dùng thường</h3>
+    <div class="d-flex justify-content-between mb-3">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Tìm kiếm thông tin...">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button">Tìm kiếm</button>
+            </div>
+        </div>
+        <button class="btn btn-secondary" type="button" onclick="toggleList('userList',this)">Mở rộng</button>
+    </div>
+    <table id="userList" class="table table-striped" style="display: none;">
+        <thead>
+            <tr>
+                
+                <th>avatar</th>
+                <th>Tên khách hàng</th>
+                <th>Mã khách hàng</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Văn D</td>
+                <td class="align-middle">007</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Văn E</td>
+                <td class="align-middle">008</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+            <tr>
+                <td class="align-middle"><img src="https://i.pinimg.com/736x/11/f4/d6/11f4d67b92c81b9479051e0d5a5c7d6d.jpg" alt="User Avatar" class="avatar"></td>
+                <td class="align-middle">Nguyễn Văn F</td>
+                <td class="align-middle">009</td>
+                <td class="align-middle"><a href="#" class="detail-link">Chi tiết</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- JavaScript để xử lý thu gọn/mở rộng danh sách -->
+<script>
+    function toggleList(tableId,button) {
+        const table = document.getElementById(tableId);
+        
+        if (table.style.display === "none") {
+            table.style.display = "table";
+            button.textContent="Thu gọn";
+        } else {
+            table.style.display = "none";
+            button.textContent="Mở rộng";
+        }
+    }
+</script>

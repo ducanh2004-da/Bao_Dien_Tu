@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReadNews</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom Styles */
+        .article-content {
+            background-color: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .comments-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .sidebar-recommended {
+            background-color: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .recommended-article img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="article-content">
+                    <h2>Các đặc tính chữa bệnh tuyệt vời của khoai lang tím</h2>
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-circle mr-2">
+                        <div>
+                            <p class="font-weight-bold mb-1"><strong>Nguyễn Đức Anh</strong></p>
+                            <p class="text-muted mb-0">19/11/2024 - 15:45</p>
+                        </div>
+                    </div>
+                    <p>Bài viết cung cấp thông tin về các lợi ích sức khỏe của khoai lang tím...</p>
+                    <img src="https://via.placeholder.com/600x300" alt="Image 1">
+                    <p>Khoai lang tím có chứa các chất chống oxy hóa mạnh...</p>
+                    <img src="https://via.placeholder.com/600x300" alt="Image 2">
+                    <p>Với lượng vitamin và khoáng chất phong phú, khoai lang tím là thực phẩm lý tưởng...</p>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section">
+                    <h4>Bình luận</h4>
+                    <textarea class="form-control mb-2" rows="3" placeholder="Viết bình luận..."></textarea>
+                    <button class="btn btn-primary">Gửi bình luận</button>
+                    <hr>
+                    <div class="media mb-3">
+                        <img src="https://via.placeholder.com/40" alt="User Avatar" class="mr-3 rounded-circle">
+                        <div class="media-body">
+                            <h6 class="mt-0">Lê Văn Việt Hoàng</h6>
+                            <p>Bài viết rất hay và hữu ích!</p>
+                        </div>
+                    </div>
+                    <div class="media mb-3">
+                        <img src="https://via.placeholder.com/40" alt="User Avatar" class="mr-3 rounded-circle">
+                        <div class="media-body">
+                            <h6 class="mt-0">Biện Xuân Huy</h6>
+                            <p>Mình sẽ thử ăn khoai lang tím nhiều hơn.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar with Recommended Articles -->
+            <div class="col-lg-4">
+                <div class="sidebar-recommended">
+                    <h4>Đọc thêm các bài viết cùng chủ đề</h4>
+                    <div class="recommended-article d-flex mb-3">
+                        <img src="https://via.placeholder.com/100" alt="Thumbnail" class="mr-3">
+                        <div>
+                            <p><strong>Bài viết khác 1</strong></p>
+                            <p class="text-muted">Tóm tắt nội dung bài viết...</p>
+                        </div>
+                    </div>
+                    <div class="recommended-article d-flex mb-3">
+                        <img src="https://via.placeholder.com/100" alt="Thumbnail" class="mr-3">
+                        <div>
+                            <p><strong>Bài viết khác 2</strong></p>
+                            <p class="text-muted">Tóm tắt nội dung bài viết...</p>
+                        </div>
+                    </div>
+                    <div class="recommended-article d-flex mb-3">
+                        <img src="https://via.placeholder.com/100" alt="Thumbnail" class="mr-3">
+                        <div>
+                            <p><strong>Bài viết khác 3</strong></p>
+                            <p class="text-muted">Tóm tắt nội dung bài viết...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies (Optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
