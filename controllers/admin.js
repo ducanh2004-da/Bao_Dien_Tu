@@ -133,3 +133,24 @@ module.exports.EditUser = (req,res) =>{
         res.redirect('/admin');
     })
 }
+
+module.exports.viewEditPost = (req,res) =>{
+    const id = req.params.id;
+    Post.getPostById(id,(err,post)=>{
+        if(err){
+            return res.status(500).json({ error: err.message });
+        }
+        res.render('admin/editPost',{post:post[0]})
+    })
+
+}
+module.exports.EditPost = (req,res) =>{
+    const id = req.params.id;
+    const post = req.body;
+    Post.updatePost(id,post,(err)=>{
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.redirect('/admin');
+    })
+}

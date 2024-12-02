@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="/stylesheet/admin/showPost.css">
 </head>
 <body>
-
 <div class="post-detail-container">
-    <a style="text-decoration:none;" href="/admin"><=Trở về</a>
+    <a href="/admin" class="btn btn-light mb-3">
+        <i class="bi bi-arrow-left"></i> Trở về
+    </a>
     <h1 class="post-title">{{posts.title}}</h1>
     <p>Trạng thái: {{posts.statusName}}</p>
     <p class="post-meta">Ngày đăng: 10/10/2024 | Tác giả: Nguyễn Văn A</p>
@@ -21,6 +22,7 @@
     </div>
 
     <div class="action-buttons">
+        <a href="/admin/post/{{posts.id}}/edit" class="btn btn-info">Sửa</a>
         <button class="approve-btn" onclick="approvePost()">Duyệt</button>
         <button class="reject-btn" onclick="rejectPost()">Không Duyệt</button>
     </div>

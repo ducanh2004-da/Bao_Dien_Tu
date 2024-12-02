@@ -70,6 +70,7 @@
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha512-AIOTidJAcHBH2G/oZv9viEGXRqDNmfdPVPYOYKGy3fti0xIplnlgMHUGfuNRzC6FkzIo0iIxgFnr9RikFxK+sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -92,6 +93,28 @@
       format: 'd/m/Y',
       mask: true
     });
+    // Giả sử bạn đã gửi một request và nhận được lỗi từ backend
+    fetch('/api/user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            // Dữ liệu yêu cầu
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.details) {
+            // Hiển thị thông báo lỗi với SweetAlert
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: data.details.join('\n') // Hiển thị từng lỗi trên mỗi dòng
+            });
+        }
+    })
+    .catch(error => console.log(error));
   </script>
 </body>
 </html>

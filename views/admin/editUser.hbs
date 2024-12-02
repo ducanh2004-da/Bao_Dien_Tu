@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Danh Mục</title>
+    <title>Chỉnh sửa người dùng</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheet/admin/editUser.css">
 </head>
 <body>
 
 <div class="form-container">
+    <a href="/admin" class="btn btn-light mb-3">
+        <i class="bi bi-arrow-left"></i> Trở về
+    </a>
     <h1 class="form-header">Thay đổi vai trò</h1>
     <form action="/admin/user/{{user.id}}/edit" method="POST">
         <div class="form-group mb-3">

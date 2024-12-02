@@ -1,13 +1,14 @@
 // import express from "express";
 const express = require('express');
 const passport = require('passport');
+const validatePost = require('../validators/postValidator');
 
 const router = express.Router();
 const AuthController = require('../controllers/auth');
 
 router.get('/',AuthController.showForm);
-router.post('/register',AuthController.Register);
-router.post('/login',AuthController.Login);
+router.post('/register',validatePost,AuthController.Register);
+router.post('/login',validatePost,AuthController.Login);
 // Google Auth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/api' }), 
@@ -32,13 +33,13 @@ router.route('/forgot-password')
 
 router.route('/reset-password')
 .get(AuthController.showResetForm)
-.post(AuthController.resetPass)
+.post(validatePost,AuthController.resetPass)
 
 router.route('/verify-otp')
 .get((req,res)=>{
     res.render('checkOtp');
 })
-.post(AuthController.checkOtp)
+.post(validatePost,AuthController.checkOtp)
 
 router.get('/logout', AuthController.Logout);
 

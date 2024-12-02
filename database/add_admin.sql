@@ -6,6 +6,6 @@ WHERE email = 'anhdott1@gmail.com';
 
 -- Thêm dữ liệu vào bảng posts
 INSERT INTO posts (title, abstract, content, statusName) VALUES
-('báo hot 1', 'này là bản tóm tắt', 'Nội dung chi tiết', 'Pending-Publication');
+('báo hot 2', 'này là bản tóm tắt', 'Nội dung chi tiết', 'Pending-Publication');
 
 
