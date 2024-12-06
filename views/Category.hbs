@@ -1,0 +1,100 @@
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang Web</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>/* Reset styles */ * { margin: 0; padding: 0; box-sizing: border-box;
+      } /* Body and fonts */ body { font-family: 'Roboto', sans-serif;
+      background-color: #f4f4f4; color: #333; } /* Header */ .header { display:
+      flex; justify-content: space-between; align-items: center;
+      background-color: #333; color: #fff; padding: 10px 20px; }.logo { display:
+      flex; align-items: center; text-decoration: none; color: #ece5e5;
+      font-family: 'Arial', sans-serif; transition: all 0.3s ease; } .logo h1 {
+      font-size: 2rem; margin: 0; font-weight: bold; } .search-bar input {
+      padding: 5px; width: 300px; border: 1px solid #ccc; } .search-bar button {
+      padding: 5px 10px; background-color: #00bcd4; color: #fff; border: none;
+      cursor: pointer; } .search-bar button:hover { background-color: #0097a7; }
+      /* Main content */ .main-content { display: flex; justify-content:
+      space-between; padding: 20px; } /* Category navigation */ .category-nav {
+      display: flex; flex-direction: column; width: 200px; } .category-nav a {
+      text-decoration: none; color: #333; margin: 10px 0; padding: 10px;
+      background-color: #e0e0e0; border-radius: 5px; text-align: center; }
+      .category-nav a:hover { background-color: #00bcd4; color: #fff; } /*
+      Product list */ .product-list { display: flex; flex-wrap: wrap; gap: 20px;
+      flex: 1; } .product-item { background-color: #fff; padding: 20px;
+      border-radius: 10px; width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0,
+      0.1); } .product-item img { width: 100%; border-radius: 5px; }
+      .product-item h2 { font-size: 18px; margin-top: 10px; } .product-item p {
+      font-size: 14px; margin-top: 10px; } .product-item span { display: block;
+      font-size: 12px; color: #666; margin-top: 10px; } /* Sidebar */ .sidebar {
+      width: 250px; } .tags { background-color: #fff; padding: 20px;
+      border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); } .tags h3
+      { font-size: 18px; margin-bottom: 10px; } .tags button { display: block;
+      width: 100%; padding: 10px; margin: 5px 0; background-color: #00bcd4;
+      color: #fff; border: none; border-radius: 5px; cursor: pointer; } .tags
+      button:hover { background-color: #0097a7; } /* Pagination */ .pagination {
+      text-align: center; margin-top: 20px; } .pagination button { padding:
+      10px; background-color: #e0e0e0; border: none; margin: 0 5px; cursor:
+      pointer; border-radius: 5px; } .pagination button:hover {
+      background-color: #00bcd4; color: #fff; }
+    </style>
+  </head>
+  <body>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="category-nav">
+        <a href="/Category">Chuyên mục 1</a>
+        <a href="/Category">Chuyên mục 2</a>
+        <a href="/Category">Chuyên mục 3</a>
+      </div>
+
+      <div class="product-list">
+        <div class="product-item">
+          <img src="https://via.placeholder.com/300x200" alt="Product 1" />
+          <h2>Đây là tiêu đề</h2>
+          <p>Đây là một phần nội dung</p>
+          <span>Ngày xuất bản</span>
+        </div>
+        <div class="product-item">
+          <img src="https://via.placeholder.com/300x200" alt="Product 2" />
+          <h2>Đây là tiêu đề</h2>
+          <p>Đây là một phần nội dung</p>
+          <span>Ngày xuất bản</span>
+        </div>
+        <div class="product-item">
+          <img src="https://via.placeholder.com/300x200" alt="Product 3" />
+          <h2>Đây là tiêu đề</h2>
+          <p>Đây là một phần nội dung</p>
+          <span>Ngày xuất bản</span>
+        </div>
+        <!-- Thêm các mục sản phẩm ở đây -->
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="tags">
+          <h3>Các nhãn tag phổ biến</h3>
+          <button>Bão</button>
+          <button>Bão miền trung</button>
+          <button>Mưa lớn</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Pagination -->
+    <footer class="pagination">
+      <button>«</button>
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button>4</button>
+      <button>5</button>
+      <button>»</button>
+    </footer>
+  </body>
+</html>
