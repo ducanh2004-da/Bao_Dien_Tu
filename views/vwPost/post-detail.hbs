@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+<header class="bg-dark text-white py-3">
+  <div class="container">
+    <div class="welcome-message">
+      <h2 class="text-center">Chào mừng Master</h2>
+    </div>
+    
+    <div class="header-options d-flex justify-content-between align-items-center">
+      <!-- Category Selection -->
+      <div class="d-flex">
+  <span>Category:</span>
+  {{#each categories}}
+    <div class="category-select mx-3">
+      {{#if this.parent_id}}
+        <!-- Display subcategory with a select dropdown -->
+        <select class="form-select" id="category-{{this.id}}" onchange="window.location.href = '/category/' + this.value;">
+          <a href="/category/{{this.id}}"><option value="{{this.id}}">{{this.name}}</option></a>
+          <!-- Add more subcategories here if necessary -->
+        </select>
+      {{else}}
+        <!-- Display parent category as a label -->
+        <label for="category-{{this.id}}" class="form-label"><a href="/category/{{this.id}}">{{this.name}}</a></label>
+      {{/if}}
+    </div>
+  {{/each}}
+</div>
+
+      
+      <!-- Tag Selection -->
+      <div class="tag-select mx-3">
+        <div class="d-flex">
+            <label for="tag" class="form-label">Tag:</label>
+            <select class="form-select" id="tag">
+              <option value="tag1">Tag 1</option>
+              <option value="tag2">Tag 2</option>
+              <option value="tag3">Tag 3</option>
+            </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<article>
+  <h1>{{posts.title}}</h1>
+  <img src="/public/posts/imgs/{{posts.id}}/thumbnail.jpg" class="card-img-top" alt="Main Image">
+  <p>Đăng vào: {{posts.publishDate}} - Chuyên mục: {{categories.name}}
+  </p>
+  <div>
+    {{posts.content}}
+  </div>
+</article>
+
+<h3>Viết bình luận</h3>
+<form action="/post/{{posts.id}}/comment" method="POST">
+  <div class="mb-3">
+    <label for="content" class="form-label">Nội dung</label>
+    <textarea id="content" name="content" class="form-control" rows="3"></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Bình luận</button>
+</form>
+<a href="/home/view" class="btn btn-success">Back to Post List</a>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/scripts.js"></script>
+</body>
+</html>

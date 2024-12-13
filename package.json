@@ -1,0 +1,49 @@
+{
+  "name": "project01",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+<<<<<<< HEAD
+    "test": "echo \"Error: no test specified\" && exit 1"
+=======
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+>>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.7",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-handlebars": "^8.0.1",
+    "express-session": "^1.18.1",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+<<<<<<< HEAD
+=======
+    "multer": "^1.4.5-lts.1",
+>>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.3",
+    "nodemailer": "^6.9.16",
+    "numeral": "^2.0.6",
+    "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+<<<<<<< HEAD
+    "passport-local": "^1.0.0",
+    "sweetalert2": "^11.14.5"
+=======
+    "passport-local": "^1.0.0"
+>>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
+  }
+}
