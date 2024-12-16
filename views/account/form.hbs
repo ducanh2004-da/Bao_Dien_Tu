@@ -34,15 +34,6 @@
         </div>
     {{/if}}
     </div>
-<<<<<<< HEAD
-    <h2>Đăng nhập/Đăng ký</h2>
-
-    <!-- Form đăng nhập -->
-    <form action="/api/login" method="POST" class="form" id="login-form">
-      <h2>ĐĂNG NHẬP</h2>
-      <input type="email" name="email" id="login-email" placeholder="Email" required>
-      <input type="password" name="password" id="login-password" placeholder="Password" required>
-=======
     <h2>Đăng nhập/ Đăng ký</h2>
 
     <!-- Form đăng nhập Subscriber -->
@@ -50,14 +41,11 @@
       <h2>ĐĂNG NHẬP SUBSCRIBER</h2>
       <input type="email" name="email" id="sub-login-email" placeholder="Email" required>
       <input type="password" name="password" id="sub-login-password" placeholder="Password" required>
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
       <p>Quên mật khẩu: <a href="/api/forgot-password">Click me!</a></p>
       <button type="submit">Đăng nhập</button>
       <p>Chưa có tài khoản? <a id="switch-regis" href="#">Đăng ký ngay</a></p>
     </form>
 
-<<<<<<< HEAD
-=======
     <!-- Form đăng nhập Writer -->
     <form action="/api/login" method="POST" class="form role-form" id="writer-login-form" style="display:none;"> 
       <h2>ĐĂNG NHẬP WRITER</h2>
@@ -85,7 +73,6 @@
       <button type="submit">Đăng nhập</button>
     </form>
 
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
     <!-- Form đăng ký -->
     <form action="/api/register" method="POST" class="form" id="register-form">
       <h2>ĐĂNG KÝ</h2>
@@ -95,10 +82,6 @@
       <input type="text" name="birthday" id="register-birthday" placeholder="Birthday" required>
       <button type="submit">Đăng ký</button>
       <p>Đã có tài khoản? <a id="switch-log" href="#">Đăng nhập ngay</a></p>
-<<<<<<< HEAD
-    </form><hr>
-    
-=======
     </form>
 
     <hr>
@@ -110,7 +93,6 @@
         <a id="switch-to-sub" href="#">Subscriber</a>
       </p>
     <hr>
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
     <div class="link-group">
       <p style="text-align: center;">Đăng nhập/Đăng ký với</p>
       <ul class="link">
@@ -124,54 +106,6 @@
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha512-AIOTidJAcHBH2G/oZv9viEGXRqDNmfdPVPYOYKGy3fti0xIplnlgMHUGfuNRzC6FkzIo0iIxgFnr9RikFxK+sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<<<<<<< HEAD
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    registerForm.style.display = 'none';
-
-    // Chuyển từ form đăng nhập sang đăng ký
-    document.getElementById('switch-regis').addEventListener("click", function() {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-    });
-
-    // Chuyển từ form đăng ký sang đăng nhập
-    document.getElementById('switch-log').addEventListener("click", function() {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-    });
-
-    $('#register-birthday').datetimepicker({
-      timepicker:false,
-      format: 'd/m/Y',
-      mask: true
-    });
-    // Giả sử bạn đã gửi một request và nhận được lỗi từ backend
-    fetch('/api/user', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            // Dữ liệu yêu cầu
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.details) {
-            // Hiển thị thông báo lỗi với SweetAlert
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi!',
-                text: data.details.join('\n') // Hiển thị từng lỗi trên mỗi dòng
-            });
-        }
-    })
-    .catch(error => console.log(error));
-  </script>
-=======
 
   <script>
   // Khai báo tất cả các form cần sử dụng
@@ -228,6 +162,5 @@
     });
   });
 </script>
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 </body>
 </html>

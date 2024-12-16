@@ -26,12 +26,9 @@
         <a href="#" class="btn bg-success greeting-btn">
             Chào mừng, <span>{{user.username}}</span>!
         </a>
-<<<<<<< HEAD
-=======
         <a href="api/logout" class="btn bg-success greeting-btn">
             Log out
         </a>
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
        </div>
 
         <!-- Quản lý bài viết -->
@@ -40,12 +37,8 @@
             <div class="btn-group mb-3">
                 <button class="btn btn-outline-primary" onclick="filterPosts('all')">Tất cả</button>
                 <button class="btn btn-outline-success" onclick="filterPosts('Published')">Đã duyệt</button>
-<<<<<<< HEAD
-                <button class="btn btn-outline-warning" onclick="filterPosts('Pending-Publication')">Chưa duyệt</button>
-=======
                 <button class="btn btn-outline-warning" onclick="filterPosts('Approved')">Chưa duyệt</button>
                 <button class="btn btn-outline-danger" onclick="filterPosts('Pending-Approval')">Chưa chấp nhận</button>
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
             </div>
             <div class="post-list">
                 {{#each posts}}

@@ -4,11 +4,7 @@ const AdminController = require('../controllers/admin');
 //kiểm tra xem có phải admin không
 const authMiddleware = require('../middlewares/auth');
 
-<<<<<<< HEAD
-router.get('/',authMiddleware.isAdmin,AdminController.showAll);
-=======
 router.get('/',AdminController.showAll);
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 router.get('/post/detail',AdminController.viewPost);
 router.post('/post/:id/accept',AdminController.acceptPost);
 router.post('/post/:id/notaccept',AdminController.notAcceptPost);

@@ -11,17 +11,25 @@ module.exports = {
         console.error("Lỗi khi lấy danh mục:", err);
         return res.status(500).send("Lỗi khi lấy danh mục");
       }
+      // create a list of categories with parent categories and their children
+      const filteredCategories = [];
 
-      const filteredCategories = categories.filter(
-        (category) => category.parent_id !== null
-      );
-
+      categories.forEach((category) => {
+        if (category.parent_id === null) {
+          const children = [];
+          categories.forEach((child) => {
+            if (child.parent_id === category.id) {
+              children.push(child);
+            }
+          });
+          filteredCategories.push({ ...category, children });
+        }
+      });
       homeModel.getPostsByNewTime((err, posts) => {
         if (err) {
           console.error("Lỗi khi lấy bài viết:", err);
           return res.status(500).send("Lỗi khi lấy bài viết");
         }
-
         const postsWithCategoryNames = posts.map((post) => {
           const category = categories.find((cat) => cat.id === post.categoryId);
           const categoryName = category ? category.name : "Không xác định";
@@ -31,7 +39,6 @@ module.exports = {
             categoryName: categoryName,
           };
         });
-
         homeModel.getPostsByParrentId((err, results) => {
           const groupedByParent = results.reduce((acc, row) => {
             const parentId = row.parent_id;
@@ -62,6 +69,7 @@ module.exports = {
                   return res.status(500).send("Lỗi khi lấy bài viết");
                 }
 
+          console.log(filteredCategories);
           res.render("vwPost/guest", {
             layout: "main",
             categories: filteredCategories,

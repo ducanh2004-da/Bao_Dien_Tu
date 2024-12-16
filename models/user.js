@@ -102,8 +102,6 @@ const updateRole = (id,user, callback) =>{
     )
 }
 
-<<<<<<< HEAD
-=======
 const editUser = (id,user,callback) =>{
     db.query(
         'UPDATE users SET username = ?, email = ?, penName = ?, birthday = ? WHERE id = ?',
@@ -112,22 +110,18 @@ const editUser = (id,user,callback) =>{
     );
 }
 
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 const deletes = (id,callback) =>{
     db.query('DELETE FROM users WHERE ProID = ?',
         [id],callback
     )
 }
 
-<<<<<<< HEAD
-=======
 const getEditor = (callback) =>{
     db.query("SELECT * FROM users WHERE role = 'editor'", 
         callback
     );
 }
 
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 module.exports = {
     getAllUser, 
     findById,
@@ -140,11 +134,7 @@ module.exports = {
     verifyOtp,
     resetPassword,
     updateRole,
-<<<<<<< HEAD
-    deletes
-=======
     deletes,
     getEditor,
     editUser
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 };

@@ -26,27 +26,6 @@ passport.use(new LocalStrategy(
 ));
 
 passport.use(
-<<<<<<< HEAD
-    new GithubStrategy({
-        clientID: process.env.GITHUB_APP_ID,
-        clientSecret: process.env.GITHUB_APP_SECRET,
-        callbackURL: '/api/github/callback',
-        profileFields: ['id', 'displayName', 'emails']
-    },
-    (accessToken, refreshToken, profile, done) => {
-        User.findByGithubId(profile.id, (err, user) => {
-            if (err) return done(err);
-            if (!user) {
-                const newUser = {
-                    username: profile.displayName,
-                    email: profile.emails[0].value,
-                    githubId: profile.id,
-                    role: 'guest'
-                };
-                User.add(newUser, (err, addedUser) => {
-                    if (err) return done(err);
-                    return done(null, addedUser);
-=======
     new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -66,7 +45,6 @@ passport.use(
                 User.add(newUser, (err, createdUser) => {
                     if (err) return done(err);
                     return done(null, createdUser);
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
                 });
             } else {
                 return done(null, user);
@@ -75,38 +53,6 @@ passport.use(
     })
 );
 
-<<<<<<< HEAD
-
-passport.use(
-    new GoogleStrategy({
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: '/api/google/callback'
-    },
-    (accessToken, refreshToken, profile, done) => {
-        User.findByGoogleId(profile.id, (err, user) => {
-            if (err) {
-                console.error('Error finding user by Google ID:', err);
-                return done(err);
-            }
-            if (!user) {
-                const newUser = {
-                    username: profile.displayName,
-                    email: profile.emails[0].value,
-                    googleId: profile.id,
-                    role: 'subscriber' // Default role for new users
-                };
-                User.add(newUser, (err, addedUser) => {
-                    if (err) {
-                        console.error('Error adding new user:', err);
-                        return done(err);
-                    }
-                    console.log('New user added:', addedUser);
-                    return done(null, addedUser);
-                });
-            } else {
-                console.log('User found:', user);
-=======
 passport.use(
     new GithubStrategy({
         clientID: process.env.GITHUB_APP_ID,
@@ -129,7 +75,6 @@ passport.use(
                     return done(null, createdUser);
                 });
             } else {
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
                 return done(null, user);
             }
         });
@@ -138,11 +83,7 @@ passport.use(
 
 passport.serializeUser((user, done) => {
     if (!user || !user.id) {
-<<<<<<< HEAD
-        console.error('Tạo tài khoản thành công, trở về lại form đăng nhập băng google thử xem:', user);
-=======
         console.error('Tạo tài khoản thành công, trở về lại form và đăng nhập băng google lần nữa thử xem:', user);
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
         return done(new Error('Tạo tài khoản thành công, trở về lại form đăng nhập băng google thử xem'));
     }
     console.log('Serializing user:', user);

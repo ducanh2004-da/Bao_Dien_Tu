@@ -9,20 +9,13 @@ const AuthController = require('../controllers/auth');
 router.get('/',AuthController.showForm);
 router.post('/register',validatePost,AuthController.Register);
 router.post('/login',validatePost,AuthController.Login);
-<<<<<<< HEAD
-=======
 router.post('/login-writer',validatePost,AuthController.LoginWriter);
 router.post('/login-editor',validatePost,AuthController.LoginEditor);
 router.post('/login-admin',validatePost,AuthController.LoginAdmin);
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 // Google Auth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/api' }), 
 (req, res) => {
-<<<<<<< HEAD
-    req.session.user = req.user;
-    res.redirect('/main');
-=======
     req.session.user = req.user; // Lưu thông tin người dùng vào session
     const role = req.user.role; // Lấy vai trò người dùng
     switch (role) {
@@ -39,18 +32,10 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
             res.redirect('/main'); // Đường dẫn mặc định nếu không xác định được role
             break;
     }
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 });
 // github Auth
 router.get('/github', passport.authenticate('github', { scope: ['email'] }));
 router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/api' }), 
-<<<<<<< HEAD
-    (req, res) => {
-        req.session.user = req.user; // Lưu thông tin người dùng trong session
-        res.redirect('/main'); // Chuyển hướng sau khi đăng nhập thành công
-    }
-);
-=======
 (req, res) => {
     req.session.user = req.user; // Lưu thông tin người dùng vào session
     const role = req.user.role; // Lấy vai trò người dùng
@@ -69,7 +54,6 @@ router.get('/github/callback', passport.authenticate('github', { failureRedirect
             break;
     }
 });
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
 
 
 //OTP

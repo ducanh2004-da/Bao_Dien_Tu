@@ -24,14 +24,10 @@
     </div>
 
     <div class="user-actions">
-<<<<<<< HEAD
-        <a href="/admin/user/{{users.id}}/edit" class="btn btn-edit">Chỉnh Sửa</a>
-=======
         <a href="/admin/user/{{users.id}}/edit" class="btn btn-edit">Chỉnh Sửa vai Trò</a>
             {{#ifEquals users.role "subscriber"}}
                 <a href="/admin/user/{{users.id}}/delay" class="btn btn-success">Gia hạn tài khoản</a>
             {{/ifEquals}}
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
         <form action="/admin/user/{{users.id}}/delete" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
             <button type="submit" class="btn btn-delete">Xóa Người Dùng</button>
         </form>

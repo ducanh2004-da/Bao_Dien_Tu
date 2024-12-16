@@ -61,12 +61,6 @@ module.exports.viewEditCategory = (req,res) =>{
     })
 }
 module.exports.viewAddCategory = (req,res) =>{
-<<<<<<< HEAD
-    res.render('admin/addCategory', { layout:false });
-}
-module.exports.addCategory = (req,res) =>{
-    const newCat = req.body;
-=======
     User.getEditor((err,user)=>{
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -89,16 +83,11 @@ module.exports.addCategory = (req,res) =>{
     const newCat = req.body;
     const editorId = req.body.editorId === "" ? null : req.body.editorId;
     const parentId = req.body.parentId === "" ? null : req.body.parentId;
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
     if (!newCat || !newCat.name) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
-<<<<<<< HEAD
-    Category.add(newCat,(err)=>{
-=======
     Category.add(editorId,parentId,newCat,(err)=>{
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -182,8 +171,4 @@ module.exports.EditPost = (req,res) =>{
         }
         res.redirect('/admin');
     })
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1095213 (Hoan thien dang ki dang nhap,admin,guest,editor,writer)

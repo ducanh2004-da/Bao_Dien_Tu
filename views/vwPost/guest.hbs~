@@ -67,12 +67,17 @@
             {{#each categories}}
                  <li class="nav-item dropdown">
                      <a class="nav-link" href="/category/{{this.id}}" id="category1">{{this.name}}</a>
-                     <div class="dropdown-menu" aria-labelledby="{{this.name}}">
-                     {{#each children}}
-                        <a class="dropdown-item" href="/category/{{this.id}}">{{this.name}}</a>
-                     {{/each}}
-                     </div>
-                 </li>
+                     <div class="dropdown-menu" aria-labelledby="{{this.name}}}">
+                    <!-- Display subcategory with a select dropdown -->
+                        <select class="form-select" id="category-{{this.id}}" onchange="window.location.href = '/category/' + this.value;">
+                            <a href="/category/{{this.id}}"><option value="{{this.id}}">{{this.name}}</option></a>
+                            <!-- Add more subcategories here if necessary -->
+                        </select>
+                {{else}}
+                    <!-- Display parent category as a label -->
+                 <a href="/category/{{this.id}}">{{this.name}}</a>
+                {{/if}}
+                </div>
             {{/each}}
         </ul>
     </div>
