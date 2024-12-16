@@ -89,7 +89,7 @@
                     <div class="carousel-item {{#if @first}}active{{/if}}">
                         <div class="card">
                             <div class="row no-gutters">
-                                <div class="col-md-4 text-center">
+                                <div class="col-md-4">
                                     <a href="/home/post/{{this.id}}">
                                         <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" class="card-img" alt="{{this.title}}">
                                     </a>
@@ -118,7 +118,7 @@
                                                         <div class='heart-animation-1'></div>
                                                         <div class='heart-animation-2'></div>
                                                     </span>
-                                                        Like
+                                                        Thích
                                                     </a>
                                                 </button>
                                             </form>
@@ -154,10 +154,11 @@
                     {{@key}}
                 </a>
             </h4> <!-- Tên danh mục cha -->
+            {{#if (ifCond (length this) ">=" 2)}}
             <div class="row vertical-divider">
                 <!-- Main Article (Bài viết chính) -->
+                {{#with this.[0]}} <!-- Lấy bài viết đầu tiên trong nhóm -->
                 <div class="col-md-8">
-                    {{#with this.[0]}} <!-- Lấy bài viết đầu tiên trong nhóm -->
                     <div class="card border-0">
                         <a href="#">
                             <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="card-img-top" alt="Main Image">
@@ -171,9 +172,9 @@
                             <p class="text-muted">{{publish_date}}</p>
                         </div>
                     </div>
-                    {{/with}}
                 </div>
-        
+                {{/with}}
+
                 <!-- Side Articles (Các bài viết phụ) -->
                 <div class="col-md-4">
                     {{#each this}}
@@ -195,6 +196,26 @@
                     {{/each}}
                 </div>
             </div>
+            {{else}}
+            <div class="row">
+                {{#each this}}
+                <div class="col">
+                    <div class="card mb-3">
+                        <a href="/home/post/{{id}}">
+                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="..." width="100%" height="100%" class="img-fluid">
+                        </a>
+                        <div class="card-body">
+                            <a href="/home/post/{{id}}" class="text-decoration-none text-dark">
+                                <h5 class="font-weight-bold">{{title}}:
+                                    <span class="font-italic">{{abstract}}</span>
+                                </h5>                            </a>
+                            <p class="card-text"><small class="text-muted">{{publish_date}}</small></p>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
         </div>
         {{/each}}
 
@@ -227,41 +248,60 @@
                     </div>
                 </div>
                 {{/each}} --}}
-                <div class="mostview">
-                    <h2 class="text-center mt-4">Bài viết xem nhiều nhất</h2>
-          <div id="mostViewedPostsCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {{#each mostViewPost}}
-                <div class="carousel-item {{#if @first}}active{{/if}}">
-                  <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="d-block w-100" alt="{{this.title}}">
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5>{{this.title}}</h5>
-                    <p>{{this.abstract}}</p>
-                    <p>Lượt xem: {{this.views}}</p>
-                    <a href="/home/post/{{this.id}}" class="btn btn-primary">Xem chi tiết</a>
-                  </div>
+                <div id="latest-news" style="display: block">
+                    {{#each latestPost}}
+                        <div class="card mb-3">
+                            <a href="#">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..."
+                                     width="100%" height="100%" class="img-fluid card-img-top">
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="#" class="text-decoration-none text-dark">
+                                        {{this.title}}
+                                    </a>
+                                </h5>
+                                <a href="#" class="text-decoration-none text-dark">
+                                    <p class="card-text">{{this.categoryName}}</p>
+                                </a>
+                                <a href="#" class="text-decoration-none text-dark">
+                                    <p class="card-text truncate-multi-line w-100">
+                                        {{this.abstract}}
+                                    </p>
+                                    <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
+                                </a>
+                            </div>
+                        </div>
+                    {{/each}}
                 </div>
-              {{/each}}
+                <div id="most-views-news" style="display: none">
+                    {{#each mostViewPost}}
+                        <div class="card mb-3">
+                            <a href="#">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..."
+                                     width="100%" height="100%" class="img-fluid card-img-top">
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="#" class="text-decoration-none text-dark">
+                                        {{this.title}}
+                                    </a>
+                                </h5>
+                                <a href="#" class="text-decoration-none text-dark">
+                                    <p class="card-text">{{this.categoryName}}</p>
+                                </a>
+                                <a href="#" class="text-decoration-none text-dark">
+                                    <p class="card-text truncate-multi-line w-100">
+                                        {{this.abstract}}
+                                    </p>
+                                    <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
+                                </a>
+                            </div>
+                        </div>
+                    {{/each}}
                 </div>
-          <div class="latestpost">
-              <h2 class="text-center mt-4">Bài viết mới nhất</h2>
-          <div id="latestPostsCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {{#each latestPost}}
-                <div class="carousel-item {{#if @first}}active{{/if}}">
-                  <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="d-block w-100" alt="{{this.title}}">
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5>{{this.title}}</h5>
-                    <p>{{this.abstract}}</p>
-                    <a href="/home/post/{{this.id}}" class="btn btn-primary">Xem chi tiết</a>
-                  </div>
-                </div>
-              {{/each}}
             </div>
-                </div>
-          </div>
         </div>
-
     </div>
 </main>
 
