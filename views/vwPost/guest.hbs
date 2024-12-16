@@ -208,7 +208,8 @@
                             <a href="/home/post/{{id}}" class="text-decoration-none text-dark">
                                 <h5 class="font-weight-bold">{{title}}:
                                     <span class="font-italic">{{abstract}}</span>
-                                </h5>                            </a>
+                                </h5>
+                            </a>
                             <p class="card-text"><small class="text-muted">{{publish_date}}</small></p>
                         </div>
                     </div>
@@ -251,25 +252,25 @@
                 <div id="latest-news" style="display: block">
                     {{#each latestPost}}
                         <div class="card mb-3">
-                            <a href="#">
+                            <a href="/home/post/{{this.id}}">
                                 <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..."
                                      width="100%" height="100%" class="img-fluid card-img-top">
                             </a>
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="#" class="text-decoration-none text-dark">
+                                    <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                                         {{this.title}}
                                     </a>
                                 </h5>
-                                <a href="#" class="text-decoration-none text-dark">
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                                     <p class="card-text">{{this.categoryName}}</p>
                                 </a>
-                                <a href="#" class="text-decoration-none text-dark">
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                                     <p class="card-text truncate-multi-line w-100">
                                         {{this.abstract}}
                                     </p>
-                                    <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
                                 </a>
+                                <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
                             </div>
                         </div>
                     {{/each}}
@@ -277,25 +278,25 @@
                 <div id="most-views-news" style="display: none">
                     {{#each mostViewPost}}
                         <div class="card mb-3">
-                            <a href="#">
+                            <a href="/home/post/{{this.id}}">
                                 <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..."
                                      width="100%" height="100%" class="img-fluid card-img-top">
                             </a>
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="#" class="text-decoration-none text-dark">
+                                    <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                                         {{this.title}}
                                     </a>
                                 </h5>
-                                <a href="#" class="text-decoration-none text-dark">
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                                     <p class="card-text">{{this.categoryName}}</p>
                                 </a>
-                                <a href="#" class="text-decoration-none text-dark">
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                                     <p class="card-text truncate-multi-line w-100">
                                         {{this.abstract}}
                                     </p>
-                                    <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
                                 </a>
+                                <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
                             </div>
                         </div>
                     {{/each}}
