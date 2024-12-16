@@ -1,34 +1,4 @@
-//Get the button
-let btnScrollToTop = document.getElementById("btn-back-to-top");
-
-// When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function () {
-    scrollFunction();
-};
-
-function scrollFunction() {
-    if (
-        document.body.scrollTop > 20 ||
-        document.documentElement.scrollTop > 20
-    ) {
-        if (!btnScrollToTop.classList.contains("show")) {
-            btnScrollToTop.classList.add("show");
-        }
-    } else {
-        btnScrollToTop.classList.remove("show");
-    }
-}
-
-// When the user clicks on the button, scroll to the top of the document
-btnScrollToTop.addEventListener("click", backToTop);
-
-function backToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
+// <========================Slider========================>
 const slider = document.getElementById("slider");
 const btnLatest = document.getElementById("latest");
 const btnMostViews = document.getElementById("most-views");
