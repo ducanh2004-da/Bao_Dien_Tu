@@ -61,24 +61,15 @@
                     </svg>
                 </a>
             </li>
-            {{!-- {{#each categories}}
-            <li class="nav-item">
-                <a class="nav-link" href="#">{{name}}</a>
-            </li>
-            {{/each}} --}}
             {{#each categories}}
-                <div class="category-select mx-3">
-                 {{#if this.parent_id}}
-                    <!-- Display subcategory with a select dropdown -->
-                        <select class="form-select" id="category-{{this.id}}" onchange="window.location.href = '/category/' + this.value;">
-                            <a href="/category/{{this.id}}"><option value="{{this.id}}">{{this.name}}</option></a>
-                            <!-- Add more subcategories here if necessary -->
-                        </select>
-                {{else}}
-                    <!-- Display parent category as a label -->
-                 <a href="/category/{{this.id}}">{{this.name}}</a>
-                {{/if}}
-                </div>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="/category/{{this.id}}" id="category{{this.id}}">{{this.name}}</a>
+                    <div class="dropdown-menu" aria-labelledby="category{{this.id}}">
+                        {{#each this.children}}
+                            <a class="dropdown-item" href="/category/{{this.id}}">{{this.name}}</a>
+                        {{/each}}
+                    </div>
+                </li>
             {{/each}}
         </ul>
     </div>
@@ -94,33 +85,56 @@
                         <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                     </ol>
                     <div id="featured-news" class="carousel-inner">
-                    {{#each mostLikePost}}
-                    <div class="carousel-item {{#if @first}}active{{/if}}">
-                        <div class="card">
-                            <div class="row no-gutters">
-                                <div class="col-md-4 text-center">
-                                    <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..." height="100%" class="img-fluid rounded-left">
-                                </div>
-                                <div class="col-md-8 p-4 no-gutters d-flex flex-column">
-                                    <h2 class="card-title">{{this.title}}</h2>
-                                    <p class="card-text">{{this.categoryName}}</p>
-                                    <p class="card-text truncate-2-line w-100">
-                                        {{this.abstract}}
-                                    </p>
-                                    <p>like: {{this.likes}}</p>
-                                    <p>Lượt xem: {{this.views}}</p>
-                                    <p class="card-text"><small class="text-muted">{{publish_date}}</small></p>
-                                    <a href="/main/post/{{this.id}}" class="btn btn-primary">Xem chi tiết</a>
-                                    <form action="/main/post/like/{{this.id}}" method="POST" class="like-form">
-                                        <button class="like-button">
-                                            <span class="like-icon">❤️</span> LIKE
-                                        </button>
-                                    </form>
+                        {{#each mostLikePost}}
+                            <div class="carousel-item {{#if @first}}active{{/if}}">
+                                <div class="card">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4">
+                                            <a href="/home/post/{{this.id}}">
+                                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" class="card-img" alt="{{this.title}}">
+                                            </a>
+                                        </div>
+                                        <div class="col-md-8 p-4 no-gutters d-flex flex-column">
+                                            <h2 class="card-title">
+                                                <a href="/home/post/{{this.id}}" class="text-decoration-none">
+                                                    {{this.title}}
+                                                </a>
+                                            </h2>
+                                            <a href="" class="text-decoration-none text-dark">
+                                                <p class="card-text">{{this.categoryName}}</p>
+                                            </a>
+                                            <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                                <p class="card-text truncate-2-line w-100">
+                                                    {{this.abstract}}
+                                                </p>
+                                                <p class="card-text"><small class="text-muted">Ngày đăng: {{publish_date}}</small></p>
+                                            </a>
+                                            <div class="row pt-4">
+                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                    <form action="/home/post/like/{{this.id}}" method="POST" class="like-form">
+                                                        <button style="all: unset;">
+                                                            <a class='like-button text-decoration-none'>
+                                                    <span class='like-icon'>
+                                                        <div class='heart-animation-1'></div>
+                                                        <div class='heart-animation-2'></div>
+                                                    </span>
+                                                                Thích
+                                                            </a>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                    <p class="card-text text-center">Likes: {{this.likes}}</p>
+                                                </div>
+                                                <div class="col d-flex align-items-end flex-column justify-content-end">
+                                                    <p class="card-text">Lượt xem: {{this.views}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    {{/each}}
+                        {{/each}}
                     </div>
                     <button class="carousel-control-prev" type="button" data-target="#carouselExampleIndicators" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -133,57 +147,78 @@
                 </div>
             </div>
 
-        {{#each groupedByParent}}
-        <div class="container mt-4">
-            <h4 class="mb-3 text-primary">{{@key}}</h4> <!-- Tên danh mục cha -->
-            <div class="row vertical-divider">
-        
-                <!-- Main Article (Bài viết chính) -->
-                <div class="col-md-8">
-                    {{#with this.[0]}} <!-- Lấy bài viết đầu tiên trong nhóm -->
-                    <div class="card border-0">
-                        <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="card-img-top" alt="Main Image">
-                        <div class="card-body p-0 mt-2">
-                            <h5 class="font-weight-bold">{{title}}:
-                                <span class="font-italic">{{abstract}}</span>
-                            </h5>
-                            <p class="text-muted">{{publish_date}}</p>
-                            <a href="/main/post/{{id}}" class="btn btn-primary">Xem chi tiết</a>
-                            <form action="/main/post/like/{{id}}" method="POST" class="like-form">
-                                <button class="like-button">
-                                    <span class="like-icon">❤️</span> LIKE
-                                 </button>
-                            </form>
-                            <p class="card-text">like: {{likes}}</p>
-                            <p>Lượt xem: {{views}}</p>
+            {{#each groupedByParent}}
+                <div class="container mt-4">
+                    <h4 class="mb-3 text-primary">
+                        <a href="#" class="text-decoration-none">
+                            {{@key}}
+                        </a>
+                    </h4> <!-- Tên danh mục cha -->
+                    {{#if (ifCond (length this) ">=" 2)}}
+                        <div class="row vertical-divider">
+                            <!-- Main Article (Bài viết chính) -->
+                            {{#with this.[0]}} <!-- Lấy bài viết đầu tiên trong nhóm -->
+                                <div class="col-md-8">
+                                    <div class="card border-0">
+                                        <a href="#">
+                                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="card-img-top" alt="Main Image">
+                                        </a>
+                                        <div class="card-body p-0 mt-2">
+                                            <a href="#" class="text-decoration-none text-dark">
+                                                <h5 class="font-weight-bold">{{title}}:
+                                                    <span class="font-italic">{{abstract}}</span>
+                                                </h5>
+                                            </a>
+                                            <p class="text-muted">{{publish_date}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/with}}
+
+                            <!-- Side Articles (Các bài viết phụ) -->
+                            <div class="col-md-4">
+                                {{#each this}}
+                                    {{#unless @first}} <!-- Kiểm tra nếu không phải bài viết đầu tiên -->
+                                        <div class="mb-3">
+                                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="img-fluid rounded" alt="/public/posts/imgs/{{id}}/thumbnail.jpg">
+                                            <h6 class="mt-2 font-weight-bold">{{title}}</h6>
+                                            <p class="text-muted">{{publish_date}}</p>
+                                            <p class="card-text">like: {{likes}}</p>
+                                            <p>Lượt xem: {{views}}</p>
+                                            <a href="/home/post/{{id}}" class="btn btn-primary">Xem chi tiết</a>
+                                            <form action="/home/post/like/{{id}}" method="POST" class="like-form">
+                                                <button class="like-button">
+                                                    <span class="like-icon">❤️</span> LIKE
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {{/unless}}
+                                {{/each}}
+                            </div>
                         </div>
-                    </div>
-                    {{/with}}
+                    {{else}}
+                        <div class="row">
+                            {{#each this}}
+                                <div class="col">
+                                    <div class="card mb-3">
+                                        <a href="/home/post/{{id}}">
+                                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="..." width="100%" height="100%" class="img-fluid">
+                                        </a>
+                                        <div class="card-body">
+                                            <a href="/home/post/{{id}}" class="text-decoration-none text-dark">
+                                                <h5 class="font-weight-bold">{{title}}:
+                                                    <span class="font-italic">{{abstract}}</span>
+                                                </h5>
+                                            </a>
+                                            <p class="card-text"><small class="text-muted">{{publish_date}}</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+                    {{/if}}
                 </div>
-        
-                <!-- Side Articles (Các bài viết phụ) -->
-                <div class="col-md-4">
-                    {{#each this}}
-                    {{#unless @first}} <!-- Kiểm tra nếu không phải bài viết đầu tiên -->
-                    <div class="mb-3">
-                        <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="img-fluid rounded" alt="/public/posts/imgs/{{id}}/thumbnail.jpg">
-                        <h6 class="mt-2 font-weight-bold">{{title}}</h6>
-                        <p class="text-muted">{{publish_date}}</p>
-                        <p class="card-text">like: {{likes}}</p>
-                            <p>Lượt xem: {{views}}</p>
-                        <a href="/main/post/{{id}}" class="btn btn-primary">Xem chi tiết</a>
-                        <form action="/main/post/like/{{id}}" method="POST" class="like-form">
-                                <button class="like-button">
-                                    <span class="like-icon">❤️</span> LIKE
-                                 </button>
-                        </form>
-                    </div>
-                    {{/unless}}
-                    {{/each}}
-                </div>
-            </div>
-        </div>
-        {{/each}}
+            {{/each}}
 
 
 
@@ -214,41 +249,60 @@
                     </div>
                 </div>
                 {{/each}} --}}
-                <div class="mostview">
-                    <h2 class="text-center mt-4">Bài viết xem nhiều nhất</h2>
-          <div id="mostViewedPostsCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {{#each mostViewPost}}
-                <div class="carousel-item {{#if @first}}active{{/if}}">
-                  <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="d-block w-100" alt="{{this.title}}">
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5>{{this.title}}</h5>
-                    <p>{{this.abstract}}</p>
-                    <p>Lượt xem: {{this.views}}</p>
-                    <a href="/main/post/{{this.id}}" class="btn btn-primary">Xem chi tiết</a>
-                  </div>
+                <div id="latest-news" style="display: block">
+                    {{#each latestPost}}
+                        <div class="card mb-3">
+                            <a href="/home/post/{{this.id}}">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..."
+                                     width="100%" height="100%" class="img-fluid card-img-top">
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                        {{this.title}}
+                                    </a>
+                                </h5>
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                    <p class="card-text">{{this.categoryName}}</p>
+                                </a>
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                    <p class="card-text truncate-multi-line w-100">
+                                        {{this.abstract}}
+                                    </p>
+                                </a>
+                                <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
+                            </div>
+                        </div>
+                    {{/each}}
                 </div>
-              {{/each}}
+                <div id="most-views-news" style="display: none">
+                    {{#each mostViewPost}}
+                        <div class="card mb-3">
+                            <a href="/home/post/{{this.id}}">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="..."
+                                     width="100%" height="100%" class="img-fluid card-img-top">
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                        {{this.title}}
+                                    </a>
+                                </h5>
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                    <p class="card-text">{{this.categoryName}}</p>
+                                </a>
+                                <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
+                                    <p class="card-text truncate-multi-line w-100">
+                                        {{this.abstract}}
+                                    </p>
+                                </a>
+                                <p class="card-text"><small class="text-muted">Ngày đăng: {{this.publish_date}}</small></p>
+                            </div>
+                        </div>
+                    {{/each}}
                 </div>
-          <div class="latestpost">
-              <h2 class="text-center mt-4">Bài viết mới nhất</h2>
-          <div id="latestPostsCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {{#each latestPost}}
-                <div class="carousel-item {{#if @first}}active{{/if}}">
-                  <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" class="d-block w-100" alt="{{this.title}}">
-                  <div class="carousel-caption d-none d-md-block">
-                    <h5>{{this.title}}</h5>
-                    <p>{{this.abstract}}</p>
-                    <a href="/main/post/{{this.id}}" class="btn btn-primary">Xem chi tiết</a>
-                  </div>
-                </div>
-              {{/each}}
             </div>
-                </div>
-          </div>
         </div>
-
     </div>
 </main>
 
