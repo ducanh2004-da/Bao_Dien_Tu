@@ -1,131 +1,153 @@
+const path = require("path");
 const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
-const path = require("path");
 const homeModel = require("../models/home.js");
-const { post } = require("../routes/writer.js");
 
 module.exports = {
-  showHomePage: (req, res) => {
-    categoryModel.getAllCategories((err, categories) => {
-      if (err) {
-        console.error("Lỗi khi lấy danh mục:", err);
-        return res.status(500).send("Lỗi khi lấy danh mục");
-      }
-      // create a list of categories with parent categories and their children
-      const filteredCategories = [];
-
-      categories.forEach((category) => {
-        if (category.parent_id === null) {
-          const children = [];
-          categories.forEach((child) => {
-            if (child.parent_id === category.id) {
-              children.push(child);
-            }
-          });
-          filteredCategories.push({ ...category, children });
-        }
-      });
-      homeModel.getPostsByNewTime((err, posts) => {
-        if (err) {
-          console.error("Lỗi khi lấy bài viết:", err);
-          return res.status(500).send("Lỗi khi lấy bài viết");
-        }
-        const postsWithCategoryNames = posts.map((post) => {
-          const category = categories.find((cat) => cat.id === post.categoryId);
-          const categoryName = category ? category.name : "Không xác định";
-
-          return {
-            ...post,
-            categoryName: categoryName,
-          };
-        });
-        homeModel.getPostsByParrentId((err, results) => {
-          const groupedByParent = results.reduce((acc, row) => {
-            const parentId = row.parent_id;
-
-            const parentCategory = categories.find(
-              (cat) => cat.id === parentId
-            );
-            const parentName = parentCategory
-              ? parentCategory.name
-              : "Không xác định";
-
-            if (!acc[parentName]) {
-              acc[parentName] = [];
-            }
-
-            acc[parentName].push(row);
-
-            return acc;
-          }, {});
-          homeModel.getMostViewPost((err,mostViewPost)=>{
+    // Show the homepage
+    showHomePage: (req, res) => {
+        categoryModel.getAllCategories((err, categories) => {
             if (err) {
-              console.error("Lỗi khi lấy bài viết:", err);
-              return res.status(500).send("Lỗi khi lấy bài viết");
+                console.error("Error fetching categories:", err);
+                return res.status(500).send("Error fetching categories");
             }
-              homeModel.getMostLikePost((err,mostLikePost)=>{
+
+            // Build a hierarchical structure of categories
+            const filteredCategories = categories
+                .filter((category) => category.parent_id === null)
+                .map((parent) => ({
+                    ...parent,
+                    children: categories.filter((child) => child.parent_id === parent.id),
+                }));
+
+            // Fetch posts by new time, filtered to "Published" only
+            homeModel.getPostsByNewTime((err, latestPost) => {
                 if (err) {
-                  console.error("Lỗi khi lấy bài viết:", err);
-                  return res.status(500).send("Lỗi khi lấy bài viết");
+                    console.error("Error fetching posts:", err);
+                    return res.status(500).send("Error fetching posts");
                 }
 
-          console.log(filteredCategories);
-          res.render("vwPost/guest", {
-            layout: "main",
-            categories: filteredCategories,
-            posts: postsWithCategoryNames,
-            hotPost: posts[0],
-            latestPost: posts,
-            groupedByParent: groupedByParent,
-            mostViewPost,
-            mostLikePost
-          });
+                // Filter "Published" posts
+                const publishedLatestPosts = latestPost.filter((post) => post.statusName === "Published");
+
+                // Map posts with category names
+                const postsWithCategoryNames = publishedLatestPosts.map((post) => {
+                    const category = categories.find((cat) => cat.id === post.categoryId);
+                    return {
+                        ...post,
+                        categoryName: category ? category.name : "Unknown",
+                    };
+                });
+
+                // Fetch grouped posts, filtered to "Published" only
+                homeModel.getPostsByParrentId((err, results) => {
+                    if (err) {
+                        console.error("Error fetching grouped posts:", err);
+                        return res.status(500).send("Error fetching grouped posts");
+                    }
+
+                    // Filter "Published" posts
+                    const publishedResults = results.filter((row) => row.statusName === "Published");
+
+                    // Group posts by parent categories
+                    const groupedByParent = publishedResults.reduce((acc, row) => {
+                        const parentCategory = categories.find((cat) => cat.id === row.parent_id);
+                        const parentName = parentCategory ? parentCategory.name : "Unknown";
+
+                        if (!acc[parentName]) acc[parentName] = [];
+                        acc[parentName].push(row);
+
+                        return acc;
+                    }, {});
+
+                    // Fetch most viewed posts, filtered to "Published" only
+                    homeModel.getPostsByMostView((err, mostViewPost) => {
+                        if (err) {
+                            console.error("Error fetching most viewed posts:", err);
+                            return res.status(500).send("Error fetching most viewed posts");
+                        }
+
+                        const publishedMostViewPost = mostViewPost.filter((post) => post.statusName === "Published");
+
+                        // Fetch most liked posts, filtered to "Published" only
+                        homeModel.getMostLikePost((err, mostLikePost) => {
+                            if (err) {
+                                console.error("Error fetching most liked posts:", err);
+                                return res.status(500).send("Error fetching most liked posts");
+                            }
+
+                            const publishedMostLikePost = mostLikePost.filter((post) => post.statusName === "Published");
+
+                            // Render the homepage view
+                            res.render("vwPost/guest", {
+                                layout: "main",
+                                categories: filteredCategories,
+                                posts: postsWithCategoryNames,
+                                latestPost: publishedLatestPosts,
+                                groupedByParent,
+                                mostViewPost: publishedMostViewPost,
+                                mostLikePost: publishedMostLikePost,
+                            });
+                        });
+                    });
+                });
+            });
         });
-      });
+    },
+
+    // Show post details
+    showDetail: (req, res) => {
+        const id = req.params.id;
+
+        // Increment view count for the post
+        homeModel.updateView(id, (err) => {
+            if (err) {
+                console.error("Error updating view count:", err);
+                return res.status(500).send("Error updating view count");
+            }
         });
-      });
-    });
-  },
+
+        // Fetch post details
+        postModel.getPostById(id, (err, posts) => {
+            if (err) {
+                console.error("Error fetching post details:", err);
+                return res.status(500).send("Error fetching post details");
+            }
+
+            // Ensure post is "Published"
+            const publishedPost = posts.find((post) => post.statusName === "Published");
+            if (!publishedPost) {
+                return res.status(404).send("Post not found or not published");
+            }
+
+            // Fetch category details for the post
+            categoryModel.getCatById(publishedPost.categoryId, (err, categories) => {
+                if (err) {
+                    console.error("Error fetching category details:", err);
+                    return res.status(500).send("Error fetching category details");
+                }
+
+                // Render post detail view
+                res.render("vwPost/post-detail", {
+                    posts: publishedPost, // Single post data
+                    categories: categories[0], // Category information
+                });
+            });
+        });
+    },
+
+    // Like a post
+    likePost: (req, res) => {
+        const id = req.params.id;
+
+        homeModel.updateLike(id, (err) => {
+            if (err) {
+                console.error("Error updating like count:", err);
+                return res.status(500).send("Error updating like count");
+            }
+
+            // Redirect to home view after liking
+            res.redirect("/home/view");
+        });
+    },
 };
-
-module.exports.showDetail = (req, res, next) => {
-  const id = req.params.id;
-  
-  homeModel.updateView(id,(err)=>{
-    if (err) {
-      console.error("Lỗi khi lấy bài viết:", err);
-      return res.status(500).send("Lỗi khi lấy bài viết");
-    }
-  })
-  // Fetch the post by ID
-  postModel.getPostById(id, (err, posts) => {
-    if (err) {
-      console.error("Lỗi khi lấy bài viết:", err);
-      return res.status(500).send("Lỗi khi lấy bài viết");
-    }
-
-      // Assuming you have a function to fetch category by ID
-      categoryModel.getCatById(posts.categoryId, (err, categories) => {
-        if (err) {
-          console.error("Lỗi khi lấy bài viết:", err);
-          return res.status(500).send("Lỗi khi lấy bài viết");
-        }
-          // Pass both post and category data to the view
-          res.render("vwPost/post-detail", { 
-              posts: posts[0],            // Single post data
-              categories: categories[0]         // Category information (name, etc.)
-          });
-      });
-  });
-}
-module.exports.likePost = (req,res) =>{
-  const id = req.params.id;
-
-  homeModel.updateLike(id,(err)=>{
-    if (err) {
-      console.error("Lỗi khi lấy bài viết:", err);
-      return res.status(500).send("Lỗi khi lấy bài viết");
-    }
-      res.redirect("/home/view");
-  })
-}
