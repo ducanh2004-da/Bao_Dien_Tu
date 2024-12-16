@@ -5,120 +5,127 @@ const homeModel = require("../models/home.js");
 const { post } = require("../routes/writer.js");
 
 module.exports = {
-  showMainPage: (req, res) => {
-    categoryModel.getAllCategories((err, categories) => {
-      if (err) {
-        console.error("Lỗi khi lấy danh mục:", err);
-        return res.status(500).send("Lỗi khi lấy danh mục");
-      }
-
-      const filteredCategories = categories.filter(
-        (category) => category.parent_id !== null
-      );
-
-      homeModel.getPostsByNewTime((err, posts) => {
-        if (err) {
-          console.error("Lỗi khi lấy bài viết:", err);
-          return res.status(500).send("Lỗi khi lấy bài viết");
-        }
-
-        const postsWithCategoryNames = posts.map((post) => {
-          const category = categories.find((cat) => cat.id === post.categoryId);
-          const categoryName = category ? category.name : "Không xác định";
-
-          return {
-            ...post,
-            categoryName: categoryName,
-          };
-        });
-
-        homeModel.getPostsByParrentId((err, results) => {
-          const groupedByParent = results.reduce((acc, row) => {
-            const parentId = row.parent_id;
-
-            const parentCategory = categories.find(
-              (cat) => cat.id === parentId
-            );
-            const parentName = parentCategory
-              ? parentCategory.name
-              : "Không xác định";
-
-            if (!acc[parentName]) {
-              acc[parentName] = [];
-            }
-
-            acc[parentName].push(row);
-
-            return acc;
-          }, {});
-          homeModel.getMostViewPost((err,mostViewPost)=>{
+    // Show the subscriber main page
+    showMainPage: (req, res) => {
+        // Fetch all categories
+        categoryModel.getAllCategories((err, categories) => {
             if (err) {
-              console.error("Lỗi khi lấy bài viết:", err);
-              return res.status(500).send("Lỗi khi lấy bài viết");
+                console.error("Lỗi khi lấy danh mục:", err);
+                return res.status(500).send("Không thể lấy danh mục");
             }
-              homeModel.getMostLikePost((err,mostLikePost)=>{
+
+            // Build hierarchical categories
+            const filteredCategories = categories
+                .filter((category) => category.parent_id === null)
+                .map((parent) => ({
+                    ...parent,
+                    children: categories.filter((child) => child.parent_id === parent.id),
+                }));
+
+            // Fetch highlighted posts (most liked in the past week)
+            homeModel.getHighlightedPosts((err, highlightedPosts) => {
                 if (err) {
-                  console.error("Lỗi khi lấy bài viết:", err);
-                  return res.status(500).send("Lỗi khi lấy bài viết");
+                    console.error("Lỗi khi lấy bài viết nổi bật:", err);
+                    return res.status(500).send("Không thể lấy bài viết nổi bật");
                 }
 
-          res.render("subsPage/subscriber_main.hbs", {
-            layout: "main",
-            categories: filteredCategories,
-            posts: postsWithCategoryNames,
-            hotPost: posts[0],
-            latestPost: posts,
-            groupedByParent: groupedByParent,
-            mostViewPost,
-            mostLikePost,
-            user: req.session.user
-          });
+                // Fetch top categories with newest posts
+                homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy bài viết theo danh mục:", err);
+                        return res.status(500).send("Không thể lấy bài viết theo danh mục");
+                    }
+
+                    // Group posts by category name
+                    const topCategories = posts.reduce((grouped, post) => {
+                        const { category_name, ...data } = post;
+                        if (!grouped[category_name]) grouped[category_name] = [];
+                        grouped[category_name].push(data);
+                        return grouped;
+                    }, {});
+
+                    // Fetch the latest 10 posts
+                    homeModel.getTop10NewestPosts((err, latestPosts) => {
+                        if (err) {
+                            console.error("Lỗi khi lấy bài viết mới nhất:", err);
+                            return res.status(500).send("Không thể lấy bài viết mới nhất");
+                        }
+
+                        // Fetch the 10 most viewed posts
+                        homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
+                            if (err) {
+                                console.error("Lỗi khi lấy bài viết được xem nhiều nhất:", err);
+                                return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                            }
+
+                            // Render the subscriber main page
+                            res.render("subsPage/subscriber_main", {
+                                layout: "main",
+                                categories: filteredCategories,   // Hierarchical categories
+                                highlightedPosts,                // Highlighted posts
+                                topCategories,                   // Top categories with newest posts
+                                latestPosts,                      // Latest posts
+                                mostViewPosts,                    // Most viewed posts
+                                user: req.session.user,          // Subscriber user data
+                            });
+                        });
+                    });
+                });
+            });
         });
-      });
+    },
+
+    // Show post details (similar to guest)
+    showDetail: (req, res) => {
+        const id = req.params.id;
+
+        // Increment view count for the post
+        homeModel.updateView(id, (err) => {
+            if (err) {
+                console.error("Lỗi khi tăng lượt xem:", err);
+                return res.status(500).send("Không thể tăng lượt xem");
+            }
         });
-      });
-    });
-  },
+
+        // Fetch post details
+        postModel.getPostById(id, (err, posts) => {
+            if (err) {
+                console.error("Lỗi khi lấy bài viết:", err);
+                return res.status(500).send("Không thể lấy bài viết");
+            }
+
+            // Ensure only published posts are displayed
+            const publishedPost = posts.find((post) => post.statusName === "Published");
+            if (!publishedPost) {
+                return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
+            }
+
+            // Fetch category details for the post
+            categoryModel.getCatById(publishedPost.categoryId, (err, categories) => {
+                if (err) {
+                    console.error("Lỗi khi lấy danh mục:", err);
+                    return res.status(500).send("Không thể lấy danh mục");
+                }
+
+                res.render("vwPost/post-detail", {
+                    posts: publishedPost, // Single post data
+                    categories: categories[0], // Category information
+                });
+            });
+        });
+    },
+
+    // Like a post (similar to guest)
+    likePost: (req, res) => {
+        const id = req.params.id;
+
+        homeModel.updateLike(id, (err) => {
+            if (err) {
+                console.error("Lỗi khi tăng lượt thích:", err);
+                return res.status(500).send("Không thể tăng lượt thích");
+            }
+
+            res.redirect("/subscriber/main");
+        });
+    },
 };
-
-module.exports.showDetail = (req, res, next) => {
-  const id = req.params.id;
-  
-  homeModel.updateView(id,(err)=>{
-    if (err) {
-      console.error("Lỗi khi lấy bài viết:", err);
-      return res.status(500).send("Lỗi khi lấy bài viết");
-    }
-  })
-  // Fetch the post by ID
-  postModel.getPostById(id, (err, posts) => {
-    if (err) {
-      console.error("Lỗi khi lấy bài viết:", err);
-      return res.status(500).send("Lỗi khi lấy bài viết");
-    }
-
-      // Assuming you have a function to fetch category by ID
-      categoryModel.getCatById(posts.categoryId, (err, categories) => {
-        if (err) {
-          console.error("Lỗi khi lấy bài viết:", err);
-          return res.status(500).send("Lỗi khi lấy bài viết");
-        }
-          // Pass both post and category data to the view
-          res.render("vwPost/post-detail", { 
-              posts: posts[0],            // Single post data
-              categories: categories[0]         // Category information (name, etc.)
-          });
-      });
-  });
-}
-module.exports.likePost = (req,res) =>{
-  const id = req.params.id;
-
-  homeModel.updateLike(id,(err)=>{
-    if (err) {
-      console.error("Lỗi khi lấy bài viết:", err);
-      return res.status(500).send("Lỗi khi lấy bài viết");
-    }
-      res.redirect("/home/view");
-  })
-}
