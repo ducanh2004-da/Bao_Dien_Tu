@@ -18,6 +18,17 @@ const getPostsByParrentId = (callback) => {
 
   db.query(query, callback);
 };
+
+const getPostsByMostView = (callback) => {
+  const query = `
+    SELECT *
+    FROM posts
+    ORDER BY views DESC
+    LIMIT 4;
+  `;
+  db.query(query, callback);
+};
+
 const updateView = (id,callback) =>{
   db.query("UPDATE posts SET views = views + 1  WHERE id = ?",
       [id],callback
@@ -45,6 +56,7 @@ const updateLike = (id, callback) =>{
 module.exports = {
   getPostsByNewTime,
   getPostsByParrentId,
+  getPostsByMostView,
   updateView,
   getMostViewPost,
   getMostLikePost,
