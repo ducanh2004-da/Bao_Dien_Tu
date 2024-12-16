@@ -11,6 +11,12 @@
     width: 100%;
 }
 
+.card-img {
+    height: 100%;
+    object-fit: cover;
+}
+
+
 .truncate-3-line {
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -48,19 +54,19 @@
         padding-top: 20px;
     }
 
-    /* <==================== Slider Part ====================> */
-    .row .vertical-divider:has(> div:nth-child(2)) > div[class^="col-"] + div[class^="col-"] {
+    .row .vertical-divider > div[class^="col-"] + div[class^="col-"] {
         text-align: center;
         padding-bottom: 100px;
         margin-bottom: -100px;
         border-left: 3px solid #F0F0F0;
+
     }
 
-    .row .vertical-divider:has(> div:nth-child(2)) > div[class^="col-"]:first-child {
+    .row .vertical-divider > div[class^="col-"]:first-child {
         border-left: none;
     }
 
-    .row .vertical-divider:has(> div:nth-child(2)) > div[class^="col-"]:last-child {
+    .row .vertical-divider > div[class^="col-"]:last-child {
         border-right: none;
     }
 }
