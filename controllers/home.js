@@ -67,33 +67,44 @@ module.exports = {
         });
 
         // Fetch post details
-        postModel.getPostById(id, (err, posts) => {
+        postModel.getPostById(id, (err, post) => {
             if (err) {
                 console.error("Lỗi khi lấy chi tiết bài viết:", err);
                 return res.status(500).send("Không thể lấy chi tiết bài viết");
             }
 
-            // Ensure only published posts are displayed
-            const publishedPost = posts.find((post) => post.statusName === "Published");
-            if (!publishedPost) {
+            // Ensure that the post is published
+            if (post.statusName == "published") {
                 return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
             }
 
-            // Fetch category details for the post
-            categoryModel.getCatById(publishedPost.categoryId, (err, categories) => {
+            // Fetch Author information
+
+            postModel.getPostAuthorInfo(post.id, (err, author) => {
                 if (err) {
-                    console.error("Lỗi khi lấy danh mục:", err);
-                    return res.status(500).send("Không thể lấy danh mục");
+                    console.error("Lỗi khi lấy thông tin tác giả:", err);
+                    return res.status(500).send("Không thể lấy thông tin tác giả");
                 }
 
-                // Render post detail view
-                res.render("vwPost/post-detail", {
-                    posts: publishedPost, // Single post data
-                    categories: categories[0], // Category information
+                // Fetch category details for the post
+                categoryModel.getCatById(post.categoryId, (err, categories) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy danh mục:", err);
+                        return res.status(500).send("Không thể lấy danh mục");
+                    }
+
+                    // Render post detail view
+                    res.render("vwPost/post-detail", {
+                        layout: "main",
+                        post: post, // Single post data
+                        category: categories[0], // Category information
+                        author: author, // Author information
+                    });
                 });
             });
         });
     },
+
 
     // Like a post
     likePost: (req, res) => {
@@ -105,8 +116,8 @@ module.exports = {
                 return res.status(500).send("Không thể tăng lượt thích");
             }
 
-            // Redirect to home view after liking
-            res.redirect("/home/view");
+            // Return to referer page
+            res.redirect(req.headers.referer);
         });
     },
 };
