@@ -51,6 +51,15 @@ const getArticlesByStatus = (statusName, userId, callback) => {
   }
 };
 
+const getArticlesByUserId = (userId, callback) => {
+    const query = `
+        SELECT * FROM posts
+        WHERE userId = ?
+    `;
+
+    db.query(query, [userId], callback);
+}
+
 const getArticlesById = (id, callback) => {
   const query = `
    SELECT * FROM posts
@@ -89,6 +98,7 @@ module.exports = {
   insertArticle,
   getNextId,
   getArticlesByStatus,
+  getArticlesByUserId,
   getArticlesById,
   updateArticle,
   getCategoryById,
