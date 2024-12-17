@@ -264,6 +264,6 @@ module.exports.Logout = (req, res) => {
         console.log(err);
         return res.send('Không thể đăng xuất');
     }
-    res.redirect('/home/view'); // Quay lại trang đăng nhập
+    res.redirect('/home'); // Quay lại trang đăng nhập
 });
 };
