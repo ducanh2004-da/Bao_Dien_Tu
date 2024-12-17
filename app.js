@@ -1,5 +1,6 @@
 const express = require("express");
 const { engine } = require("express-handlebars");
+const hbs_sections = require("express-handlebars-sections");
 const cookieParser = require("cookie-parser");
 const app = express();
 const dotenv = require("dotenv");
@@ -75,6 +76,7 @@ app.engine(
             return false;
         };
       },
+      section: hbs_sections(),
     },
   })
 );
