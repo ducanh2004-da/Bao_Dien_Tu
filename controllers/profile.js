@@ -12,15 +12,17 @@ module.exports.show = (req,res) =>{
             user.birthday = formattedBirthday; 
         }
         res.render('user/profile',{
-            layout: false, 
+            layout: "main",
             user: user
         })
     })
 }
 
 module.exports.viewEdit = (req,res) =>{
+    console.log(req.headers.referer);
+    req.session.retUrl = req.headers.referer;
     res.render('user/editProfile',{
-        layout: false, 
+        layout: "main",
         user: req.session.user
     })
 }
@@ -32,6 +34,6 @@ module.exports.Edit = (req,res) =>{
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.redirect('/profile');
+        res.redirect(req.session.retUrl);
     })
 }
