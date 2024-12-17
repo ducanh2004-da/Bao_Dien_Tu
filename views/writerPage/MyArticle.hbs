@@ -1,104 +1,96 @@
-<html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bài viết của tôi</title>
-    <style>
-      body { font-family: Arial, sans-serif; margin: 0; padding: 0;
-      background-color: #f0f0f0; } header { display: flex; justify-content:
-      center; align-items: center; background-color: #333; color: white;
-      padding: 50px 0; position: relative; } .logo { position: absolute; left:
-      50%; transform: translateX(-50%); } .logo a { text-decoration: none;
-      color: white; font-size: 24px; font-weight: bold; } .search-container {
-      position: absolute; left: 10px; } .search-container input { padding: 10px;
-      font-size: 14px; border: 1px solid #ccc; border-radius: 5px; width: 200px;
-      } .login-button { position: absolute; right: 10px; top: 50%; transform:
-      translateY(-50%); padding: 8px 20px; background-color: #00bcd4; border:
-      none; color: white; cursor: pointer; font-size: 16px; border-radius: 4px;
-      } .login-button:hover { background-color: #0097a7; } .nav-menu {
-      background-color: white; padding: 15px; margin-bottom: 20px; box-shadow: 0
-      2px 4px rgba(0, 0, 0, 0.1); } .nav-menu a { margin-right: 20px;
-      text-decoration: none; color: #333; font-size: 16px; } .home-icon { color:
-      #00bcd4; } .action-buttons { margin: 20px; } .action-buttons button {
-      padding: 8px 20px; margin-right: 10px; background-color: #00bcd4; border:
-      none; border-radius: 4px; cursor: pointer; color: white; font-size: 14px;
-      } .action-buttons button:hover { background-color: #0097a7; } .tab-menu {
-      margin: 20px; border-bottom: 1px solid #ddd; } .tab-menu a {
-      text-decoration: none; color: #666; margin-right: 30px; padding-bottom:
-      10px; display: inline-block; font-size: 16px; } .tab-menu a.active {
-      color: #333; font-weight: bold; border-bottom: 2px solid #00bcd4; }
-      .article-list { margin: 20px; background-color: white; padding: 20px;
-      border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-      .article-item { display: flex; align-items: center; padding: 20px;
-      border-bottom: 1px solid #eee; background-color: #fff; margin-bottom:
-      15px; border-radius: 4px; transition: background-color 0.2s; }
-      .article-item:hover { background-color: #f8f9fa; } .article-image { width:
-      60px; height: 60px; margin-right: 20px; border-radius: 4px; }
-      .article-info { flex-grow: 1; } .article-info h3 { margin: 0 0 5px 0;
-      font-size: 18px; color: #333; } .article-info p { margin: 5px 0; color:
-      #666; font-size: 14px; } .article-actions { color: #00bcd4; }
-      .article-actions a { text-decoration: none; color: #00bcd4; margin-left:
-      20px; font-size: 14px; } .article-actions a:hover { text-decoration:
-      underline; }
-    </style>
-  </head>
-  <body>
-    <div class="tab-menu">
-      <a href="/writer/my-article?statusName=Approved" data-status="Approved">Đã duyệt và chờ xuất bản</a>
-      <a href="/writer/my-article?statusName=Published" data-status="Published">Đã đăng</a>
-      <a href="/writer/my-article?statusName=Rejected" data-status="Rejected">Bị từ chối</a>
-      <a href="/writer/my-article?statusName=Pending-Approval" data-status="Pending-Approval">chờ duyệt</a>
-    </div>
-    
-    <div class="article-list">
-      {{#each articles}}
-      {{#if (eq statusName 'Published')}}
-      <div class="article-item">
-        <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="article-image" />
-        <div class="article-info">
-          <h3>{{title}}</h3>
-          <p>{{statusName}}</p>
-          <p>Ngày đăng: {{#if publish_date}}{{publish_date}}{{else}}No{{/if}}</p>
-        </div>
-      </div>
-      {{/if}}
-        {{#if (eq statusName 'Rejected' statusFilter)}}
-          <div class="article-item">
-            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="article-image" />
-            <div class="article-info">
-              <h3>{{title}}</h3>
-              <p>{{statusName}}</p>
-              <p>Lần cuối sửa: {{#if updated_at}}{{updated_at}}{{else}}No{{/if}}</p>
-            </div>
-          </div>
-            <div class="article-actions">
-              <a href="/writer/refuse-article?id={{id}}">Xem lý do</a>
-            </div>
-        {{/if}}
-        {{#if (eq statusName 'Pending-Approval' statusFilter)}}
-        <a href="/writer/fix-article?id={{id}}">
-          <div class="article-item">
-            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="article-image" />
-            <div class="article-info">
-              <h3>{{title}}</h3>
-              <p>{{statusName}}</p>
-              <p>Lần cuối sửa: {{#if updated_at}}{{updated_at}}{{else}}No{{/if}}</p>
-            </div>
-          </div>
-        </a>
-        {{/if}}
-        {{#if (eq statusName 'Approved' statusFilter)}}
-            <div class="article-item">
-              <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="article-image" />
-              <div class="article-info">
-                <h3>{{title}}</h3>
-                <p>{{statusName}}</p>
-                <p>Lần cuối sửa: {{#if updated_at}}{{updated_at}}{{else}}No{{/if}}</p>
-              </div>
-            </div>
-        {{/if}}
-      {{/each}}
-    </div>
+<div class="container my-5">
+    <!-- Tab navigation with Flexbox to spread tabs evenly -->
+    <ul class="nav nav-pills nav-fill" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Đã duyệt và chờ xuất bản</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-profile-tab" data-toggle="pill" data-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Đã đăng</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-contact-tab" data-toggle="pill" data-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Bị từ chối</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-pending-tab" data-toggle="pill" data-target="#pills-pending" type="button" role="tab" aria-controls="pills-pending" aria-selected="false">Chờ duyệt</button>
+        </li>
+    </ul>
 
-  </body>
-</html>
+    <!-- Tab content -->
+    <div class="tab-content" id="pills-tabContent">
+        {{#each articles}}
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+            <div class="list-group">
+                {{#each published}}
+                    {{#if (eq statusName 'Published')}}
+                        <div class="list-group-item d-flex align-items-center">
+                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{title}}</h5>
+                                <p class="mb-1">{{statusName}}</p>
+                                <p class="mb-0">Ngày đăng: {{#if publish_date}}{{publish_date}}{{else}}No{{/if}}</p>
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <div class="list-group">
+                {{#each approved}}
+                    {{#if (eq statusName 'Approved')}}
+                        <div class="list-group-item d-flex align-items-center">
+                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{title}}</h5>
+                                <p class="mb-1">{{statusName}}</p>
+                                <p class="mb-0">Lần cuối sửa: {{#if updated_at}}{{updated_at}}{{else}}No{{/if}}</p>
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+            <div class="list-group">
+                {{#each rejected}}
+                    {{#if (eq statusName 'Rejected' statusFilter)}}
+                        <div class="list-group-item d-flex align-items-center">
+                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{title}}</h5>
+                                <p class="mb-1">{{statusName}}</p>
+                                <p class="mb-0">Lần cuối sửa: {{#if updated_at}}{{updated_at}}{{else}}No{{/if}}</p>
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <a href="/writer/refuse-article?id={{id}}" class="btn btn-outline-danger btn-sm">Xem lý do</a>
+                        </div>
+                    {{/if}}
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab">
+            <div class="list-group">
+                {{#each pending}}
+                    {{#if (eq statusName 'Pending-Approval' statusFilter)}}
+                        <a href="/writer/fix-article?id={{id}}" class="text-decoration-none">
+                        <div class="list-group-item d-flex align-items-center">
+                            <img src="/public/posts/imgs/{{id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{title}}</h5>
+                                <p class="mb-1">{{statusName}}</p>
+                                <p class="mb-0">Lần cuối sửa: {{#if updated_at}}{{updated_at}}{{else}}No{{/if}}</p>
+                            </div>
+                        </div>
+                        </a>
+                    {{/if}}
+                {{/each}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
+

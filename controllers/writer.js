@@ -6,8 +6,8 @@ const writerModel = require("../models/writer.js");
 
 module.exports = {
   showMainPage: (req, res) => {
-    res.render("layouts/user", {
-      layout: false,
+    res.render("writerPage/main", {
+      layout: "main",
       user: req.session.user
     });
   },
@@ -24,7 +24,7 @@ module.exports = {
       );
 
       res.render("writerPage/PostArticle", {
-        layout: "user",
+        layout: "main",
         user: req.session.user,
         categories: filteredCategories,
       });
@@ -32,17 +32,24 @@ module.exports = {
   },
 
   showMyArticlePage: (req, res) => {
-    const statusFilter = req.query.statusName;
     const userId = req.session.user.id;
-    writerModel.getArticlesByStatus(statusFilter, userId, (err, articles) => {
+    writerModel.getArticlesByUserId(userId, (err, articles) => {
       if (err) {
         console.error(err);
         return res.status(500).send("Lỗi khi lấy bài viết.");
       }
+
+      const groupedArticles = {
+        published: articles.filter(article => article.statusName === 'Published'),
+        approved: articles.filter(article => article.statusName === 'Approved'),
+        rejected: articles.filter(article => article.statusName === 'Rejected'),
+        pending: articles.filter(article => article.statusName === 'Pending-Approval')
+      };
+
       res.render("writerPage/MyArticle", {
-        layout: "user",
+        layout: "main",
         user: req.session.user,
-        articles: articles,
+        articles: groupedArticles,
       });
     });
   },
@@ -63,7 +70,7 @@ module.exports = {
           (category) => category.parent_id !== null
         );
         res.render("writerPage/FixArticle", {
-          layout: "user",
+          layout: "main",
           categories: filteredCategories,
           user: req.session.user,
           article: article[0],
@@ -88,7 +95,7 @@ module.exports = {
           (category) => category.parent_id !== null
         );
         res.render("writerPage/RefuseArticle", {
-          layout: "user",
+          layout: "main",
           categories: filteredCategories,
           user: req.session.user,
           article: article[0],
@@ -99,7 +106,7 @@ module.exports = {
 
   showCategoryPage: (req, res) => {
     res.render("Category", {
-      layout: "user",
+      layout: "main",
     });
   },
 
@@ -108,11 +115,6 @@ module.exports = {
       if (err) {
         console.error("Lỗi khi lấy ID tiếp theo:", err);
         return res.status(500).send("Lỗi khi lấy ID tiếp theo");
-      }
-
-      if (!req.session || !req.session.user.id) {
-        console.error("Không tồn tại user");
-        return res.status(401).send("Bạn chưa đăng nhập.");
       }
 
       const storage = multer.diskStorage({
