@@ -86,7 +86,6 @@ passport.serializeUser((user, done) => {
         console.error('Tạo tài khoản thành công, trở về lại form và đăng nhập băng google lần nữa thử xem:', user);
         return done(new Error('Tạo tài khoản thành công, trở về lại form đăng nhập băng google thử xem'));
     }
-    console.log('Serializing user:', user);
     done(null, user.id); // Sử dụng `user.id` làm khóa session
 });
 
@@ -101,7 +100,6 @@ passport.deserializeUser((id, done) => {
             console.error('User not found during deserialization');
             return done(new Error('User not found'));
         }
-        console.log('Deserialized user:', user);
         done(null, user);
     });
 });
