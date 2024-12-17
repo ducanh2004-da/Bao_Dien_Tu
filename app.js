@@ -114,7 +114,17 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.redirect('/home/view');
+   if (!req.session.user) {
+    return res.redirect('/home');
+   } else if (req.session.user.role === 'admin') {
+     return res.redirect('/admin');
+   } else if (req.session.user.role === 'editor') {
+     return res.redirect('/editor');
+   } else if (req.session.user.role === 'writer') {
+     return res.redirect('/writer');
+   } else {
+     return res.redirect('/main');
+   }
 });
 
 // // Define routes
@@ -124,7 +134,6 @@ app.use("/editor", editorRoutes);
 app.use("/home", homeRoutes);
 app.use("/api", authRoutes);
 app.use("/admin", adminRoutes);
-app.use("/profile", profileRoutes);
 
 // Start the server
 
