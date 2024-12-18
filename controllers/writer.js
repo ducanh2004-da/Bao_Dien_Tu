@@ -20,14 +20,13 @@ module.exports = {
       }
 
       // Group categories by parent_id
-        const filteredCategories = categories
-            .filter((category) => category.parent_id === null)
-            .map((parent) => ({
-                ...parent,
-                children: categories.filter((child) => child.parent_id === parent.id),
-            }));
+      const filteredCategories = categories
+          .filter((category) => category.parent_id === null)
+          .map((parent) => ({
+            ...parent,
+            children: categories.filter((child) => child.parent_id === parent.id),
+          }));
 
-      console.log(filteredCategories);
 
       res.render("writerPage/PostArticle", {
         layout: "main",
@@ -47,18 +46,19 @@ module.exports = {
 
       // Group articles by statusName
       const groupedArticles = [];
-        articles.forEach((article) => {
-            const { statusName, ...data } = article;
-            const group = groupedArticles.find((group) => group.statusName === statusName);
-            if (group) {
-            group.articles.push(data);
-            } else {
-            groupedArticles.push({
-                statusName: statusName,
-                articles: [data],
-            });
-            }
-        });
+      articles.forEach((article) => {
+        const { statusName, ...data } = article;
+        const group = groupedArticles.find((group) => group.statusName === statusName);
+        if (group) {
+          group.articles.push(data);
+        } else {
+          groupedArticles.push({
+            statusName: statusName,
+            articles: [data],
+          });
+        }
+      });
+
 
       res.render("writerPage/MyArticle", {
         layout: "main",
@@ -80,9 +80,15 @@ module.exports = {
           console.error("Lỗi khi lấy danh mục:", err);
           return res.status(500).send("Lỗi khi lấy danh mục");
         }
-        const filteredCategories = categories.filter(
-          (category) => category.parent_id !== null
-        );
+
+        // Group categories by parent_id
+        const filteredCategories = categories
+            .filter((category) => category.parent_id === null)
+            .map((parent) => ({
+              ...parent,
+              children: categories.filter((child) => child.parent_id === parent.id),
+            }));
+
         res.render("writerPage/FixArticle", {
           layout: "main",
           categories: filteredCategories,
@@ -92,6 +98,7 @@ module.exports = {
       });
     });
   },
+
 
   showRefuseArticlePage: (req, res) => {
     const id = req.query.id;
@@ -176,7 +183,7 @@ module.exports = {
               return res.status(500).send("Lỗi khi thêm bài viết");
             }
 
-            res.redirect(`/writer/my-article`);
+            res.redirect(`/writer/my-articles`);
           }
         );
       });
@@ -222,7 +229,9 @@ module.exports = {
             return res.status(500).send("Lỗi khi sửa bài viết");
           }
 
-          res.redirect(`/writer/my-article`);
+          writer
+
+          res.redirect(`/writer/my-articles`);
         }
       );
     });
