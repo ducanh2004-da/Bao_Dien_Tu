@@ -6,6 +6,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" integrity="sha512-xcDt7DSauTW0phgQwrJ+RJz6k1YqvmatCkkUiOlWYSL2MQ4zjc1xwn+l0SwZAEu79WncTiAJEt+8T6qDdqfizQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link rel="stylesheet" href="/stylesheet/main_layout.css" type="text/css">
     <link rel="stylesheet" href="/stylesheet/general_components.css" type="text/css">
@@ -38,14 +39,14 @@
                             <li><a class="dropdown-item" href="main/profile/">Profile</a></li>
                             <li><a class="dropdown-item" href="#">Manage subscriptions</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="api/logout">Log out</a></li>
+                            <li><a class="dropdown-item" href="/api/logout">Log out</a></li>
                         </ul>
                     </li>
                 </ul>
             {{else}}
                 <div class="btn-group ml-auto" role="group" aria-label="Basic example">
-                    <a type="button" class="btn btn-outline-primary" href="/api/"><i class="fa-solid fa-users-gear"></i>Đăng nhập</a>
-                    <a type="button" class="btn btn-outline-secondary" href="/api/"><i class="fa-solid fa-user-plus"></i>Đăng kí</a>
+                    <a type="button" class="btn btn-outline-primary" href="/api/">Đăng nhập</a>
+                    <a type="button" class="btn btn-outline-secondary" href="/api/">Đăng kí</a>
                 </div>
             {{/if}}
         </div>
