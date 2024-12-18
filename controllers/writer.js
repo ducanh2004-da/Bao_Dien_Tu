@@ -39,12 +39,20 @@ module.exports = {
         return res.status(500).send("Lỗi khi lấy bài viết.");
       }
 
-      const groupedArticles = {
-        published: articles.filter(article => article.statusName === 'Published'),
-        approved: articles.filter(article => article.statusName === 'Approved'),
-        rejected: articles.filter(article => article.statusName === 'Rejected'),
-        pending: articles.filter(article => article.statusName === 'Pending-Approval')
-      };
+      // Group articles by statusName
+      const groupedArticles = [];
+        articles.forEach((article) => {
+            const { statusName, ...data } = article;
+            const group = groupedArticles.find((group) => group.statusName === statusName);
+            if (group) {
+            group.articles.push(data);
+            } else {
+            groupedArticles.push({
+                statusName: statusName,
+                articles: [data],
+            });
+            }
+        });
 
       res.render("writerPage/MyArticle", {
         layout: "main",
