@@ -10,6 +10,7 @@ const MainController = require('../controllers/main');
 router.get('/',authMiddleware.isUser, MainController.showMainPage);
 router.get('/post/:id', authMiddleware.isUser, MainController.showDetail);
 router.post('/post/like/:id', authMiddleware.isUser, MainController.likePost);
+router.get('/search', authMiddleware.isUser, MainController.search);
 router.get('/profile',authMiddleware.isUser, profileController.show);
 router.get('/profile/edit', authMiddleware.isUser, profileController.viewEdit);
 router.post('/profile/update',authMiddleware.isUser,profileController.Edit);

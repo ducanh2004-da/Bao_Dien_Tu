@@ -158,6 +158,18 @@ const updateLike = (id, callback) => {
   );
 };
 
+const searchContent = (content, callback) => {
+  const query = `
+    SELECT
+      *
+    FROM
+      posts
+    WHERE
+      statusName = 'Published'
+        AND MATCH(abstract) AGAINST (?)
+  `;
+  db.query(query, [content], callback);
+};
 module.exports = {
   getPostsByNewTime,
   getPostsByParrentId,
@@ -165,6 +177,7 @@ module.exports = {
   getTop10MostViewedPosts,
   getTop10NewestPosts,
   getTopCategoriesWithNewestPosts,
+  searchContent,
   updateView,
   getMostViewPost,
   getMostLikePost,
