@@ -4,6 +4,6 @@ const homeController = require("../controllers/home.js");
 
 router.get("/", homeController.showHomePage);
 router.get('/post/:id',homeController.showDetail);
-router.post('/post/like/:id',homeController.likePost);
+// router.post('/post/like/:id',homeController.likePost);
 
 module.exports = router;
