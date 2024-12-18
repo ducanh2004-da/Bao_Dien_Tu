@@ -39,7 +39,7 @@ module.exports = {
                             if (err) return res.status(500).send("Cannot fetch most viewed posts");
 
                             // Render the homepage view
-                            res.render("vwPost/guest", {
+                            res.render("vwGuest/guest", {
                                 layout: "main",
                                 categories: filteredCategories,    // Hierarchical categories
                                 highlightedPosts,        // Highlighted posts
@@ -94,7 +94,7 @@ module.exports = {
                     }
 
                     // Render post detail view
-                    res.render("vwPost/post-detail", {
+                    res.render("vwGuest/post-detail", {
                         layout: "main",
                         post: post, // Single post data
                         category: categories[0], // Category information
