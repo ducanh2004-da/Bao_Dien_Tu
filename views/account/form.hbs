@@ -3,164 +3,327 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha512-f0tzWhCwVFS3WeYaofoLWkTP62ObhewQ1EZn65oSYDZUg1+CyywGKkWzm8BxaJj5HGKI72PnMH9jYyIFz+GH7g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="/stylesheet/form.css">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-  <title>Login & Register</title>
+  <title>Báo Điện Tử - Đăng Nhập</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4a6cf7;
+      --secondary-color: #6c757d;
+      --background-light: #f4f6f9;
+      --text-dark: #333;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .login-container {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      padding: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .login-container:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .site-title {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #3a5aef;
+      transform: translateY(-3px);
+    }
+
+    .role-switcher {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .role-switcher a {
+      color: var(--secondary-color);
+      margin: 0 10px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .role-switcher a:hover {
+      color: var(--primary-color);
+    }
+
+    .social-login {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .social-login a {
+      color: var(--secondary-color);
+      font-size: 24px;
+      transition: color 0.3s ease;
+    }
+
+    .social-login a:hover {
+      color: var(--primary-color);
+    }
+
+    .form-switch-link {
+      color: var(--primary-color);
+      text-align: center;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    .message-container {
+      margin-bottom: 20px;
+    }
+
+   .snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  font-family: Arial, sans-serif;
+  text-shadow: 0 0 5px #000;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1000;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+  </style>
 </head>
 <body>
-  <header>
-    <h1 style="text-align: center; color:rgb(72, 221, 171); cursor:pointer;">
-      <a style="text-decoration: none;" href="/">Báo Điện Tử</a>
-    </h1>
-  </header>
-  
-  <div class="containers">
-    <div id="message">
-    {{#if success_msg}}
-        <div class="alert alert-success" role="alert">
-  <h4 class="alert-heading">Thành công!</h4>
-  <p>{{success_msg}}</p>
-  <hr>
-</div>
-    {{/if}}
-
-    {{#if error_msg}}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-  <strong>Lỗi!</strong> {{error_msg}}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-        </div>
-    {{/if}}
+  <div class="login-container">
+    <div class="site-title">
+      <h1>Báo Điện Tử</h1>
     </div>
-    <h2>Đăng nhập/ Đăng ký</h2>
+
+    <div class="message-container">
+      {{#if success_msg}}
+      <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> {{success_msg}}
+      </div>
+      {{/if}}
+
+      {{#if error_msg}}
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {{error_msg}}
+      </div>
+      {{/if}}
+    </div>
 
     <!-- Form đăng nhập Subscriber -->
     <form action="/api/login" method="POST" class="form role-form" id="sub-login-form">
-      <h2>ĐĂNG NHẬP SUBSCRIBER</h2>
-      <input type="email" name="email" id="sub-login-email" placeholder="Email" required>
-      <input type="password" name="password" id="sub-login-password" placeholder="Password" required>
-      <p>Quên mật khẩu: <a href="/api/forgot-password">Click me!</a></p>
-      <button type="submit">Đăng nhập</button>
-      <p>Chưa có tài khoản? <a id="switch-regis" href="#">Đăng ký ngay</a></p>
+      <h3 class="text-center mb-4">Đăng Nhập Subscriber</h3>
+      <input type="email" name="email" class="form-control" id="sub-login-email" placeholder="Email" required>
+      <input type="password" name="password" class="form-control" id="sub-login-password" placeholder="Mật khẩu" required>
+      <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+      <div class="text-center mt-3">
+        <a href="/api/forgot-password" class="text-muted">Quên mật khẩu?</a>
+      </div>
     </form>
 
     <!-- Form đăng nhập Writer -->
     <form action="/api/login-writer" method="POST" class="form role-form" id="writer-login-form" style="display:none;">
-      <h2>ĐĂNG NHẬP WRITER</h2>
-      <input type="email" name="email" id="writer-login-email" placeholder="Email" required>
-      <input type="password" name="password" id="writer-login-password" placeholder="Password" required>
-      <p>Quên mật khẩu: <a href="/api/forgot-password">Click me!</a></p>
-      <button type="submit">Đăng nhập</button>
+      <h3 class="text-center mb-4">Đăng Nhập Writer</h3>
+      <input type="email" name="email" class="form-control" id="writer-login-email" placeholder="Email" required>
+      <input type="password" name="password" class="form-control" id="writer-login-password" placeholder="Mật khẩu" required>
+      <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+      <div class="text-center mt-3">
+        <a href="/api/forgot-password" class="text-muted">Quên mật khẩu?</a>
+      </div>
     </form>
 
     <!-- Form đăng nhập Editor -->
     <form action="/api/login-editor" method="POST" class="form role-form" id="editor-login-form" style="display:none;">
-      <h2>ĐĂNG NHẬP EDITOR</h2>
-      <input type="email" name="email" id="editor-login-email" placeholder="Email" required>
-      <input type="password" name="password" id="editor-login-password" placeholder="Password" required>
-      <p>Quên mật khẩu: <a href="/api/forgot-password">Click me!</a></p>
-      <button type="submit">Đăng nhập</button>
+      <h3 class="text-center mb-4">Đăng Nhập Editor</h3>
+      <input type="email" name="email" class="form-control" id="editor-login-email" placeholder="Email" required>
+      <input type="password" name="password" class="form-control" id="editor-login-password" placeholder="Mật khẩu" required>
+      <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+      <div class="text-center mt-3">
+        <a href="/api/forgot-password" class="text-muted">Quên mật khẩu?</a>
+      </div>
     </form>
 
     <!-- Form đăng nhập Admin -->
     <form action="/api/login-admin" method="POST" class="form role-form" id="admin-login-form" style="display:none;">
-      <h2>ĐĂNG NHẬP ADMIN</h2>
-      <input type="email" name="email" id="admin-login-email" placeholder="Email" required>
-      <input type="password" name="password" id="admin-login-password" placeholder="Password" required>
-      <p>Quên mật khẩu: <a href="/api/forgot-password">Click me!</a></p>
-      <button type="submit">Đăng nhập</button>
+      <h3 class="text-center mb-4">Đăng Nhập Admin</h3>
+      <input type="email" name="email" class="form-control" id="admin-login-email" placeholder="Email" required>
+      <input type="password" name="password" class="form-control" id="admin-login-password" placeholder="Mật khẩu" required>
+      <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+      <div class="text-center mt-3">
+        <a href="/api/forgot-password" class="text-muted">Quên mật khẩu?</a>
+      </div>
     </form>
 
     <!-- Form đăng ký -->
-    <form action="/api/register" method="POST" class="form" id="register-form">
-      <h2>ĐĂNG KÝ</h2>
-      <input type="text" name="username" id="register-username" placeholder="Username" required>
-      <input type="email" name="email" id="register-email" placeholder="Email" required>
-      <input type="password" name="password" id="register-password" placeholder="Password" required>
-      <input type="text" name="birthday" id="register-birthday" placeholder="Birthday" required>
-      <button type="submit">Đăng ký</button>
-      <p>Đã có tài khoản? <a id="switch-log" href="#">Đăng nhập ngay</a></p>
+    <form action="/api/register" method="POST" class="form" id="register-form" style="display:none;">
+      <h3 class="text-center mb-4">Đăng Ký</h3>
+      <input type="text" name="username" class="form-control" id="register-username" placeholder="Tên người dùng" required>
+      <input type="email" name="email" class="form-control" id="register-email" placeholder="Email" required>
+      <input type="password" name="password" class="form-control" id="register-password" placeholder="Mật khẩu" required>
+      <input type="text" name="birthday" class="form-control" id="register-birthday" placeholder="Ngày sinh" required>
+      <button type="submit" class="btn btn-primary">Đăng Ký</button>
     </form>
 
-    <hr>
+    <div class="role-switcher mt-3">
+      <a href="#" id="switch-to-sub"><i class="fas fa-user"></i> Subscriber</a>
+      <a href="#" id="switch-to-writer"><i class="fas fa-pen"></i> Writer</a>
+      <a href="#" id="switch-to-editor"><i class="fas fa-edit"></i> Editor</a>
+      <a href="#" id="switch-to-admin"><i class="fas fa-user-shield"></i> Admin</a>
+    </div>
 
-    <p>Chọn vai trò đăng nhập? 
-        <a id="switch-to-writer" href="#">Writer</a> | 
-        <a id="switch-to-editor" href="#">Editor</a> |
-        <a id="switch-to-admin" href="#">Admin</a> |
-        <a id="switch-to-sub" href="#">Subscriber</a>
-      </p>
-    <hr>
-    <div class="link-group">
-      <p style="text-align: center;">Đăng nhập/Đăng ký với</p>
-      <ul class="link">
-        <li class="link-list"><a href="/api/github"><img src="/github.jpg" alt="Github"></a></li>
-        <li class="link-list"><a href="/api/google"><img src="/google.jpg" alt="Google"></a></li>
-      </ul>
+    <div class="form-switch-link">
+      <span id="switch-regis">Chưa có tài khoản? Đăng ký ngay</span>
+      <span id="switch-log" style="display:none;">Đã có tài khoản? Đăng nhập</span>
+    </div>
+
+    <div class="social-login">
+      <a href="/api/github"><i class="fab fa-github"></i></a>
+      <a href="/api/google"><i class="fab fa-google"></i></a>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha512-AIOTidJAcHBH2G/oZv9viEGXRqDNmfdPVPYOYKGy3fti0xIplnlgMHUGfuNRzC6FkzIo0iIxgFnr9RikFxK+sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
   <script>
-  // Khai báo tất cả các form cần sử dụng
-  const forms = {
-    subForm: document.getElementById('sub-login-form'),
-    writerForm: document.getElementById('writer-login-form'),
-    editorForm: document.getElementById('editor-login-form'),
-    adminForm: document.getElementById('admin-login-form'),
-    registerForm: document.getElementById('register-form')
-  };
+    const forms = {
+      subForm: document.getElementById('sub-login-form'),
+      writerForm: document.getElementById('writer-login-form'),
+      editorForm: document.getElementById('editor-login-form'),
+      adminForm: document.getElementById('admin-login-form'),
+      registerForm: document.getElementById('register-form')
+    };
 
-  // Ẩn tất cả các form
-  function hideAllForms() {
-    Object.values(forms).forEach(form => form.style.display = 'none');
-  }
-
-  // Hiển thị form cụ thể
-  function showForm(formName) {
-    hideAllForms();
-    if (forms[formName]) {
-      forms[formName].style.display = 'block';
+    function hideAllForms() {
+      Object.values(forms).forEach(form => form.style.display = 'none');
+      document.getElementById('switch-regis').style.display = 'block';
+      document.getElementById('switch-log').style.display = 'none';
     }
-  }
 
-  // Đặt form đăng ký ẩn khi load trang
-  showForm('subForm'); // Mặc định hiển thị form Subscriber
-
-  // Gán sự kiện cho các liên kết chuyển đổi
-  const switchLinks = {
-    'switch-regis': 'registerForm',
-    'switch-log': 'subForm',
-    'switch-to-sub': 'subForm',
-    'switch-to-writer': 'writerForm',
-    'switch-to-editor': 'editorForm',
-    'switch-to-admin': 'adminForm'
-  };
-
-  // Lắng nghe sự kiện click cho tất cả các nút chuyển đổi form
-  document.addEventListener('click', function(event) {
-    const target = event.target;
-    if (target && target.id in switchLinks) {
-      event.preventDefault();
-      const formToShow = switchLinks[target.id];
-      showForm(formToShow);
+    function showForm(formName) {
+      hideAllForms();
+      if (forms[formName]) {
+        forms[formName].style.display = 'block';
+        
+        if (formName === 'registerForm') {
+          document.getElementById('switch-regis').style.display = 'none';
+          document.getElementById('switch-log').style.display = 'block';
+        }
+      }
     }
-  });
 
-  // Cài đặt datetimepicker cho trường birthday
-  $(document).ready(function() {
-    $('#register-birthday').datetimepicker({
-      timepicker: false,
-      format: 'd/m/Y',
-      mask: true
+    showForm('subForm');
+
+    const switchLinks = {
+      'switch-regis': 'registerForm',
+      'switch-log': 'subForm',
+      'switch-to-sub': 'subForm',
+      'switch-to-writer': 'writerForm',
+      'switch-to-editor': 'editorForm',
+      'switch-to-admin': 'adminForm'
+    };
+
+    document.addEventListener('click', function(event) {
+      const target = event.target;
+      if (target && target.id in switchLinks) {
+        event.preventDefault();
+        const formToShow = switchLinks[target.id];
+        showForm(formToShow);
+      }
     });
-  });
-</script>
+
+    $(document).ready(function() {
+      $('#register-birthday').datetimepicker({
+        timepicker: false,
+        format: 'd/m/Y',
+        mask: true
+      });
+    });
+
+   
+    function createSnowflake() {
+      const snowflake = document.createElement('div');
+      snowflake.classList.add('snowflake');
+      snowflake.innerHTML = '❄️'; 
+      snowflake.style.left = Math.random() * 100 + 'vw';
+      snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+      snowflake.style.opacity = Math.random();
+      snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+      
+      document.body.appendChild(snowflake);
+
+    
+      setTimeout(() => {
+        snowflake.remove();
+      }, 5000);
+    }
+
+   
+    function startSnowEffect() {
+      const snowflakeInterval = setInterval(() => {
+        createSnowflake();
+      }, 50);
+
+     
+      setTimeout(() => {
+        clearInterval(snowflakeInterval);
+      }, 5000);
+    }
+
+  
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        startSnowEffect();
+      
+        setTimeout(() => {
+          this.submit();
+        }, 5000);
+      });
+    });
+  </script>
 </body>
 </html>
