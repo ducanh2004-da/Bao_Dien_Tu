@@ -1,4 +1,5 @@
 const postModel = require("../models/post.js");
+const validator = require('validator');
 const categoryModel = require("../models/category.js");
 const path = require("path");
 const homeModel = require("../models/home.js");
@@ -121,6 +122,29 @@ module.exports = {
 
             // Redirect back to referer
             res.redirect(req.headers.referer);
+        });
+    },
+
+    // Search for posts
+    search: (req, res) => {
+        let query = req.query.q;
+
+        // Sanitize the input to prevent SQL injection
+        query = validator.escape(query);
+
+        // Perform search
+        homeModel.searchContent(query, (err, results) => {
+            if (err) {
+                console.error("Lỗi khi tìm kiếm bài viết:", err);
+                return res.status(500).send("Không thể tìm kiếm bài viết");
+            };
+
+            // Render search results
+            res.render("subsPage/search", {
+                layout: "main",
+                posts: results,
+                user: req.session.user,
+            });
         });
     },
 };
