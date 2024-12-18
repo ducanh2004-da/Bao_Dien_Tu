@@ -83,8 +83,7 @@ passport.use(
 
 passport.serializeUser((user, done) => {
     if (!user || !user.id) {
-        console.error('Tạo tài khoản thành công, trở về lại form và đăng nhập băng google lần nữa thử xem:', user);
-        return done(new Error('Tạo tài khoản thành công, trở về lại form đăng nhập băng google thử xem'));
+        return done(new Error('User or user ID not found, your account will be created'));
     }
     done(null, user.id); // Sử dụng `user.id` làm khóa session
 });
