@@ -320,7 +320,13 @@
             <select class="form-control" id="category" name="category" required>
                 <option value="" selected disabled>Chọn chuyên mục</option>
                 {{#each categories}}
-                    <option value="{{id}}">{{name}}</option>
+                    <optgroup label="{{this.name}}">
+                        {{#if (length this.children)}}
+                            {{#each this.children}}
+                                <option value="{{this.id}}">{{this.name}}</option>
+                            {{/each}}
+                        {{/if}}
+                    </optgroup>
                 {{/each}}
             </select>
         </div>

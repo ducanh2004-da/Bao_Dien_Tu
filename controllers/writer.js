@@ -19,9 +19,15 @@ module.exports = {
         return res.status(500).send("Lỗi khi lấy danh mục");
       }
 
-      const filteredCategories = categories.filter(
-        (category) => category.parent_id !== null
-      );
+      // Group categories by parent_id
+        const filteredCategories = categories
+            .filter((category) => category.parent_id === null)
+            .map((parent) => ({
+                ...parent,
+                children: categories.filter((child) => child.parent_id === parent.id),
+            }));
+
+      console.log(filteredCategories);
 
       res.render("writerPage/PostArticle", {
         layout: "main",
