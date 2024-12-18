@@ -14,62 +14,52 @@ router.post('/login-editor',validatePost,AuthController.LoginEditor);
 router.post('/login-admin',validatePost,AuthController.LoginAdmin);
 // Google Auth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/api' }), 
-(req, res) => {
-    req.session.user = req.user; // Lưu thông tin người dùng vào session
-    const role = req.user.role; // Lấy vai trò người dùng
-    switch (role) {
-        case 'admin':
-            res.redirect('/admin');
-            break;
-        case 'editor':
-            res.redirect('/editor');
-            break;
-        case 'writer':
-            res.redirect('/writer');
-            break;
-        default:
-            res.redirect('/main'); // Đường dẫn mặc định nếu không xác định được role
-            break;
-    }
-});
+router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/api' }),
+    (req, res) => {
+        req.session.user = req.user; // Store user info in session
+        const role = req.user.role;  // Get user role
+        // Redirect based on role
+        redirectUserByRole(role, res);
+    });
 // github Auth
 router.get('/github', passport.authenticate('github', { scope: ['email'] }));
-router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/api' }), 
-(req, res) => {
-    req.session.user = req.user; // Lưu thông tin người dùng vào session
-    const role = req.user.role; // Lấy vai trò người dùng
+router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/login' }),
+    (req, res) => {
+        req.session.user = req.user; // Store user info in session
+        const role = req.user.role;  // Get user role
+        // Redirect based on role
+        redirectUserByRole(role, res);
+    });
+
+// Helper function for redirecting users based on role
+function redirectUserByRole(role, res) {
     switch (role) {
         case 'admin':
-            res.redirect('/admin');
-            break;
+            return res.redirect('/admin');
         case 'editor':
-            res.redirect('/editor');
-            break;
+            return res.redirect('/editor');
         case 'writer':
-            res.redirect('/writer');
-            break;
+            return res.redirect('/writer');
         default:
-            res.redirect('/main'); // Đường dẫn mặc định nếu không xác định được role
-            break;
+            return res.redirect('/main'); // Default route if role is unknown
     }
-});
+}
 
 
 //OTP
 router.route('/forgot-password')
-.get(AuthController.showForgotForm)
-.post(AuthController.sendOtp)
+    .get(AuthController.showForgotForm)
+    .post(AuthController.sendOtp)
 
 router.route('/reset-password')
-.get(AuthController.showResetForm)
-.post(validatePost,AuthController.resetPass)
+    .get(AuthController.showResetForm)
+    .post(validatePost,AuthController.resetPass)
 
 router.route('/verify-otp')
-.get((req,res)=>{
-    res.render('checkOtp');
-})
-.post(validatePost,AuthController.checkOtp)
+    .get((req,res) => {
+        res.render('checkOtp');
+        })
+    .post(validatePost,AuthController.checkOtp)
 
 router.get('/logout', AuthController.Logout);
 
