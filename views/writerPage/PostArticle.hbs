@@ -1,36 +1,12 @@
 {{#section "css"}}
-    <style>
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            padding: 0.3rem 0.8rem;
-        }
-
-        .tag .remove-tag {
-            display: flex;
-            margin-left: 0.5rem;
-            color: #dc3545;
-        }
-
-        .tag .remove-tag:hover {
-            color: #a71d2a;
-            cursor: pointer;
-        }
-    </style>
     <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.5.0/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
 {{/section}}
 
 {{#section 'js'}}
     <script src="https://cdn.tiny.cloud/1/0su44cyz9o7c5h25fgma5227lueuup5jenu9qrhfmid4kdqh/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.5.0/js/fileinput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.5.0/js/locales/vi.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.5.0/themes/fa4/theme.min.js"></script>
     <script>
         // Initialize TinyMCE
         tinymce.init({
@@ -45,53 +21,6 @@
                     editor.save();
                 });
             }
-        });
-        // Add tag functionality
-        document.addEventListener("DOMContentLoaded", () => {
-            const tagInput = document.getElementById("tag-input");
-            const addTagButton = document.getElementById("add-tag-btn");
-            const tagContainer = document.getElementById("tag-container");
-
-            function createTagElement(tagText) {
-                const tag = document.createElement("div");
-                tag.classList.add("tag");
-
-                const tagContent = document.createElement("span");
-                tagContent.textContent = tagText;
-                tag.appendChild(tagContent);
-
-                const removeButton = document.createElement("span");
-                removeButton.classList.add("remove-tag");
-                removeButton.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-x-lg\" viewBox=\"0 0 16 16\">\n" +
-                        "  <path d=\"M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z\"/>\n" +
-                        "</svg>";
-                removeButton.addEventListener("click", () => {
-                    tagContainer.removeChild(tag);
-                });
-
-                tag.appendChild(removeButton);
-
-                return tag;
-            }
-
-            function addTag() {
-                const tagText = tagInput.value.trim();
-                if (tagText) {
-                    const tagElement = createTagElement(tagText);
-                    tagContainer.appendChild(tagElement);
-                    tagInput.value = "";
-                    tagInput.focus();
-                }
-            }
-
-            addTagButton.addEventListener("click", addTag);
-
-            tagInput.addEventListener("keypress", (event) => {
-                if (event.key === "Enter") {
-                    addTag();
-                    event.preventDefault();
-                }
-            });
         });
         // Preview functionality
         document.addEventListener("DOMContentLoaded", () => {
@@ -121,17 +50,6 @@
                 // Submit the form programmatically
                 form.submit();
             });
-
-            function getAllTags() {
-                const tags = [];
-                const tagContainer = document.getElementById("tag-container");
-                const tagElements = tagContainer.getElementsByClassName("tag");
-                for (let tagElement of tagElements) {
-                    const tagText = tagElement.querySelector("span").textContent;
-                    tags.push(tagText);
-                }
-                return tags;
-            }
 
             const previewButton = document.getElementById("preview");
 
@@ -277,19 +195,45 @@
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.5.0/js/fileinput.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.5.0/js/locales/vi.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.5.0/themes/fa4/theme.min.js"></script>
     <script>
         $("#thumbnail").fileinput({
             dropZoneEnabled: false,
+            showUpload: false,
+            showCaption: true,
+            fileActionSettings: {
+                showZoom: false,
+                showDrag: true,
+            },
+            overwriteInitial: false,
             maxFileCount: 1,
             allowedFileExtensions: ["jpg"],
+            maxFileSize: 2000,
             theme: "fa4",
             language: "vi",
         });
     </script>
 {{/section}}
+<!-- Sidebar -->
+<div class="sidebar-overlay" id="sidebar">
+    <button class="sidebar-toggle-btn" id="toggle-sidebar" aria-label="Toggle Sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
+        </svg>
+    </button>
+    <nav class="nav flex-column p-4">
+        <a class="nav-link text-white glow-on-hover" href="./post-article">Viết bài mới&nbsp;
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>
+            </svg>
+        </a>
+        <a class="nav-link text-white glow-on-hover" href="./my-articles">Bài viết của tôi&nbsp;
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text-fill" viewBox="0 0 16 16">
+                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1z"/>
+            </svg>
+        </a>
+    </nav>
+</div>
+
 <main class="container my-4">
     <form action="/writer/submit-article" method="POST" enctype="multipart/form-data" id="post-article-form">
         <div class="form-group">
@@ -320,7 +264,13 @@
             <select class="form-control" id="category" name="category" required>
                 <option value="" selected disabled>Chọn chuyên mục</option>
                 {{#each categories}}
-                    <option value="{{id}}">{{name}}</option>
+                    <optgroup label="{{this.name}}">
+                        {{#if (length this.children)}}
+                            {{#each this.children}}
+                                <option value="{{this.id}}">{{this.name}}</option>
+                            {{/each}}
+                        {{/if}}
+                    </optgroup>
                 {{/each}}
             </select>
         </div>
@@ -342,6 +292,7 @@
             <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-primary" id="preview">Xem trước</button>
                 <button type="submit" class="btn btn-success">Đăng chờ duyệt</button>
+                <a href="/writer" class="btn btn-secondary">Hủy</a>
             </div>
         </div>
     </form>
