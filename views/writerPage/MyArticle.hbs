@@ -2,13 +2,13 @@
     <!-- Tab navigation with Flexbox to spread tabs evenly -->
     <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Đã duyệt và chờ xuất bản</button>
+            <button class="nav-link active" id="pills-approval-tab" data-toggle="pill" data-target="#pills-approval" type="button" role="tab" aria-controls="pills-approval" aria-selected="true">Đã duyệt / Chờ xuất bản</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pills-profile-tab" data-toggle="pill" data-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Đã đăng</button>
+            <button class="nav-link" id="pills-published-tab" data-toggle="pill" data-target="#pills-published" type="button" role="tab" aria-controls="pills-published" aria-selected="false">Đã đăng</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pills-contact-tab" data-toggle="pill" data-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Bị từ chối</button>
+            <button class="nav-link" id="pills-rejected-tab" data-toggle="pill" data-target="#pills-rejected" type="button" role="tab" aria-controls="pills-rejected" aria-selected="false">Từ chối</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="pills-pending-tab" data-toggle="pill" data-target="#pills-pending" type="button" role="tab" aria-controls="pills-pending" aria-selected="false">Chờ duyệt</button>
@@ -18,79 +18,78 @@
     <!-- Tab content -->
     <div class="tab-content" id="pills-tabContent">
         {{#each articles}}
-        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-            <div class="list-group">
-                {{#if (eq this.statusName 'Published')}}
-                    {{#each this.articles}}
-                        <div class="list-group-item d-flex align-items-center">
-                            <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">{{this.title}}</h5>
-                                <p class="mb-1">{{this.statusName}}</p>
-                                <p class="mb-0">Ngày đăng: {{#if this.publish_date}}{{this.publish_date}}{{else}}No{{/if}}</p>
+            <div class="tab-pane fade" id="pills-published" role="tabpanel" aria-labelledby="pills-published-tab">
+                <div class="list-group">
+                    {{#if (eq this.statusName 'Published')}}
+                        {{#each this.articles}}
+                            <div class="list-group-item d-flex align-items-center">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">{{this.title}}</h5>
+                                    <p class="mb-1">{{this.statusName}}</p>
+                                    <p class="mb-0">Ngày đăng: {{#if this.publish_date}}{{this.publish_date}}{{else}}No{{/if}}</p>
+                                </div>
                             </div>
-                        </div>
-                    {{/each}}
-                {{/if}}
+                        {{/each}}
+                    {{/if}}
+                </div>
             </div>
-        </div>
 
-        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-            <div class="list-group">
-                {{#if (eq this.statusName 'Approved')}}
-                    {{#each this.articles}}
-                        <div class="list-group-item d-flex align-items-center">
-                            <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">{{this.title}}</h5>
-                                <p class="mb-1">{{this.statusName}}</p>
-                                <p class="mb-0">Lần cuối sửa: {{#if this.updated_at}}{{this.updated_at}}{{else}}No{{/if}}</p>
+            <div class="tab-pane fade show active" id="pills-approval" role="tabpanel" aria-labelledby="pills-approval-tab">
+                <div class="list-group">
+                    {{#if (eq this.statusName 'Approved')}}
+                        {{#each this.articles}}
+                            <div class="list-group-item d-flex align-items-center">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">{{this.title}}</h5>
+                                    <p class="mb-1">{{this.statusName}}</p>
+                                    <p class="mb-0">Lần cuối sửa: {{#if this.updated_at}}{{this.updated_at}}{{else}}No{{/if}}</p>
+                                </div>
                             </div>
-                        </div>
-                    {{/each}}
-                {{/if}}
+                        {{/each}}
+                    {{/if}}
+                </div>
             </div>
-        </div>
 
-        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-            <div class="list-group">
-                {{#if (eq this.statusName 'Rejected')}}
-                    {{#each this.articles}}
-                        <div class="list-group-item d-flex align-items-center">
-                            <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">{{this.title}}</h5>
-                                <p class="mb-1">{{this.statusName}}</p>
-                                <p class="mb-0">Lần cuối sửa: {{#if this.updated_at}}{{this.updated_at}}{{else}}No{{/if}}</p>
+            <div class="tab-pane fade" id="pills-rejected" role="tabpanel" aria-labelledby="pills-rejected-tab">
+                <div class="list-group">
+                    {{#if (eq this.statusName 'Rejected')}}
+                        {{#each this.articles}}
+                            <div class="list-group-item d-flex align-items-center">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">{{this.title}}</h5>
+                                    <p class="mb-1">{{this.statusName}}</p>
+                                    <p class="mb-0">Lần cuối sửa: {{#if this.updated_at}}{{this.updated_at}}{{else}}No{{/if}}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="ml-3">
-                            <a href="/writer/refuse-article?id={{this.id}}" class="btn btn-outline-danger btn-sm">Xem lý do</a>
-                        </div>
-                    {{/each}}
-                {{/if}}
+                            <div class="ml-3">
+                                <a href="/writer/refuse-article?id={{this.id}}" class="btn btn-outline-danger btn-sm">Xem lý do</a>
+                            </div>
+                        {{/each}}
+                    {{/if}}
+                </div>
             </div>
-        </div>
 
-        <div class="tab-pane fade" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab">
-            <div class="list-group">
-                {{#if (eq this.statusName 'Pending-Approval')}}
-                    {{#each this.articles}}
-                        <a href="/writer/fix-article?id={{this.id}}" class="text-decoration-none">
-                        <div class="list-group-item d-flex align-items-center">
-                            <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">{{this.title}}</h5>
-                                <p class="mb-1">{{this.statusName}}</p>
-                                <p class="mb-0">Lần cuối sửa: {{#if this.updated_at}}{{this.updated_at}}{{else}}No{{/if}}</p>
+            <div class="tab-pane fade" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab">
+                <div class="list-group">
+                    {{#if (eq this.statusName 'Pending-Approval')}}
+                        {{#each this.articles}}
+                            <a href="/writer/fix-article?id={{this.id}}" class="text-decoration-none">
+                            <div class="list-group-item d-flex align-items-center">
+                                <img src="/public/posts/imgs/{{this.id}}/thumbnail.jpg" alt="Article thumbnail" class="rounded mr-3" style="width: 60px; height: 60px;">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">{{this.title}}</h5>
+                                    <p class="mb-1">{{this.statusName}}</p>
+                                    <p class="mb-0">Lần cuối sửa: {{#if this.updated_at}}{{this.updated_at}}{{else}}No{{/if}}</p>
+                                </div>
                             </div>
-                        </div>
-                        </a>
-                    {{/each}}
-                {{/if}}
+                            </a>
+                        {{/each}}
+                    {{/if}}
+                </div>
             </div>
-        </div>
         {{/each}}
     </div>
 </div>
-
