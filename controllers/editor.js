@@ -4,8 +4,56 @@ const path = require("path");
 
 module.exports = {
   showMainPage: (req, res) => {
-    res.render("editorPage/editor_review",{
-      user: req.session.user
+    const statusFilter = "Approved";
+
+    editorModel.getArticlesByStatus(statusFilter, (err, articles) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Lỗi khi lấy bài viết.");
+      }
+
+      const listCategoryId = articles.map((article) => article.categoryId);
+      const listUserId = articles.map((article) => article.userId);
+      if (articles && articles.length > 0) {
+        editorModel.getCategoriesByIds(listCategoryId, (err, categories) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send("Lỗi khi lấy danh mục.");
+          }
+
+          editorModel.getUsersByIds(listUserId, (err, users) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).send("Lỗi khi lấy thông tin người dùng.");
+            }
+
+            const articlesWithNames = articles.map((article) => {
+              const categoryName =
+                  categories.find((cat) => cat.id === article.categoryId)?.name ||
+                  "Không xác định";
+
+              const userName =
+                  users.find((user) => user.id === article.userId)?.username ||
+                  "Không xác định";
+
+              return {
+                ...article,
+                categoryName: categoryName,
+                userName: userName,
+              };
+            });
+            res.render("editorPage/editor_review", {
+              articles: articlesWithNames,
+              user: req.session.user
+            });
+          });
+        });
+      } else {
+        res.render("editorPage/editor_review", {
+          articles: null,
+          user: req.session.user
+        });
+      }
     });
   },
 
@@ -79,15 +127,22 @@ module.exports = {
   },
 
   articleApproved: (req, res) => {
-    const id = req.query.id;
+    const { id } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "Thiếu ID bài viết." });
+    }
+
     editorModel.updateStatusName("Approved", id, "", (err) => {
       if (err) {
-        return;
+        console.error("Error updating status:", err);
+        return res
+          .status(500)
+          .json({ message: "Có lỗi xảy ra khi cập nhật trạng thái." });
       }
-      res.render("editorPage/editor_review", {
-        articles: null,
-        user: req.session.user
-      });
+      return res
+        .status(200)
+        .json({ message: "Cập nhật trạng thái thành công." });
     });
   },
   articleRejected: (req, res) => {
