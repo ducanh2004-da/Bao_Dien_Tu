@@ -3,7 +3,6 @@ const categoryModel = require("../models/category.js");
 const path = require("path");
 const homeModel = require("../models/home.js");
 const { post } = require("../routes/writer.js");
-const validator = require("validator");
 
 module.exports = {
     // Show the homepage
@@ -126,8 +125,7 @@ module.exports = {
 
     // Search for posts
     search: (req, res) => {
-        // Sanitize the input to prevent SQL injection
-        const query = validator.escape(req.query.q);
+        const query = req.query.q || "";
 
         // Ensure page is within valid range
         if (!req.query.page) {
@@ -211,7 +209,7 @@ module.exports = {
                     totalPages,
                     pages,
                     query,
-                    message: "Tìm thấy " + count + " kết quả phù hợp",
+                    message: "Tìm thấy " + nRows + " kết quả phù hợp",
                 });
             });
         });

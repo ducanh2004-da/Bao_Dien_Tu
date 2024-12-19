@@ -3,6 +3,8 @@ const express = require('express');
 const authMiddleware = require('../middlewares/auth');
 const AuthController = require('../controllers/auth');
 const profileController = require('../controllers/profile');
+const { validateQuery } = require('../validators/validators');
+
 
 const router = express.Router();
 const MainController = require('../controllers/main');
@@ -10,7 +12,7 @@ const MainController = require('../controllers/main');
 router.get('/',authMiddleware.isUser, MainController.showMainPage);
 router.get('/post/:id', authMiddleware.isUser, MainController.showDetail);
 router.post('/post/like/:id', authMiddleware.isUser, MainController.likePost);
-router.get('/search', authMiddleware.isUser, MainController.search);
+router.get('/search', validateQuery, authMiddleware.isUser, MainController.search);
 router.get('/profile',authMiddleware.isUser, profileController.show);
 router.get('/profile/edit', authMiddleware.isUser, profileController.viewEdit);
 router.post('/profile/update',authMiddleware.isUser,profileController.Edit);

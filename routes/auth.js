@@ -1,7 +1,7 @@
 // import express from "express";
 const express = require('express');
 const passport = require('passport');
-const validatePost = require('../validators/postValidator');
+const { validatePost } = require('../validators/validators');
 
 const router = express.Router();
 const AuthController = require('../controllers/auth');
