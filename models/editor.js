@@ -43,34 +43,6 @@ const getArticlesById = (id, callback) => {
     db.query(query, [id], callback);
 };
 
-const updateArticle = (article, callback) => {
-    const query = `
-        UPDATE posts
-        SET title = ?, abstract = ?, content = ?, updated_at = NOW()
-        WHERE id = ?
-    `;
-
-    db.query(
-        query,
-        [article.title, article.summary, article.content, article.id],
-        (err, result) => {
-            if (err) return callback(err);
-
-            // Handle category updates
-            const categoryQuery = `
-                DELETE FROM post_categories WHERE postId = ?;
-                INSERT INTO post_categories (postId, categoryId)
-                VALUES ?
-            `;
-            const categoryValues = article.categories.map((catId) => [
-                article.id,
-                catId,
-            ]);
-            db.query(categoryQuery, [article.id, categoryValues], callback);
-        }
-    );
-};
-
 const getCategoriesByIds = (ids, callback) => {
     const query = "SELECT id, name FROM categories WHERE id IN (?)";
     db.query(query, [ids], callback);
@@ -113,7 +85,6 @@ module.exports = {
     updatePublished,
     getArticlesByStatus,
     getArticlesById,
-    updateArticle,
     getCategoriesByIds,
     getUsersByIds,
     getCategoryById,
