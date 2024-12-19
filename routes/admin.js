@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/admin');
-//kiểm tra xem có phải admin không
-const authMiddleware = require('../middlewares/auth');
 
 router.get('/',AdminController.showAll);
 router.get('/post/detail',AdminController.viewPost);
