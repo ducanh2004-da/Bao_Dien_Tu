@@ -44,7 +44,7 @@ module.exports.acceptPost = (req,res) =>{
 }
 module.exports.notAcceptPost = (req,res) =>{
     const id = req.params.id;
-    Post.deletes(id,(err)=>{
+    Post.deletePost(id,(err)=>{
         if (err) {
             return res.status(500).json({ error: err.message });
         }
