@@ -134,21 +134,6 @@ const getTopCategoriesWithNewestPosts = (callback) => {
     db.query(query, callback);
 };
 
-
-const searchContent = (content, limit, offset, callback) => {
-    const query = `
-    SELECT
-      *
-    FROM
-      posts
-    WHERE
-      statusName = 'Published'
-        AND MATCH(abstract) AGAINST (?)
-    LIMIT ? OFFSET ?;
-    `;
-    db.query(query, [content, limit, offset], callback);
-};
-
 const getPostsByParrentId = (callback) => {
   const query = `
     SELECT c.*, p.*
@@ -200,6 +185,21 @@ const updateLike = (id, callback) => {
   );
 };
 
+const searchContent = (content, limit, offset, callback) => {
+  const query = `
+  SELECT
+    id, title, abstract, publish_date, views, likes
+  FROM
+    posts
+  WHERE
+    statusName = 'Published'
+      AND (abstract LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%'))
+  ORDER BY publish_date DESC
+  LIMIT ? OFFSET ?;
+  `;
+  db.query(query, [content, content, limit, offset], callback);
+};
+
 const searchContentCount = (content, callback) => {
   const query = `
   SELECT
@@ -208,9 +208,9 @@ const searchContentCount = (content, callback) => {
     posts
   WHERE
     statusName = 'Published'
-      AND MATCH(abstract) AGAINST (?);
+      AND (abstract LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%'));
   `;
-  db.query(query, [content], callback);
+  db.query(query, [content, content], callback);
 };
 module.exports = {
   // getPostsByNewTime,
