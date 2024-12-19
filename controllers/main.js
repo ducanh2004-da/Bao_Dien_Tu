@@ -43,7 +43,7 @@ module.exports = {
                         homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
                             if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
 
-                            res.render("subsPage/subscriber_main", {
+                            res.render("vwSubscriber/subscriber_main", {
                                 layout: "main",
                                 categories: filteredCategories,
                                 highlightedPosts,
@@ -98,7 +98,7 @@ module.exports = {
                     }
 
                     // Render post detail view
-                    res.render("subsPage/post-detail", {
+                    res.render("vwSubscriber/post-detail", {
                         layout: "main",
                         post: post, // Single post data
                         category: categories[0], // Category information
@@ -153,7 +153,7 @@ module.exports = {
             }
 
             if (results.length === 0) {
-                return res.render("subsPage/search", {
+                return res.render("vwSubscriber/search", {
                     layout: "main",
                     posts: results,
                     user: req.session.user,
@@ -203,7 +203,7 @@ module.exports = {
                 };
 
                 // Render search results
-                res.render("subsPage/search", {
+                res.render("vwSubscriber/search", {
                     layout: "main",
                     posts: results,
                     user: req.session.user,

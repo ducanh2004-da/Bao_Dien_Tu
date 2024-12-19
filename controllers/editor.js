@@ -42,14 +42,14 @@ module.exports = {
                 userName: userName,
               };
             });
-            res.render("editorPage/editor_review", {
+            res.render("vwEditor/editor_review", {
               articles: articlesWithNames,
               user: req.session.user
             });
           });
         });
       } else {
-        res.render("editorPage/editor_review", {
+        res.render("vwEditor/editor_review", {
           articles: null,
           user: req.session.user
         });
@@ -63,7 +63,7 @@ module.exports = {
       if (err) {
         return;
       }
-      res.render("editorPage/editor_postreview", {
+      res.render("vwEditor/editor_postreview", {
         article: article[0],
         user: req.session.user
       });
@@ -111,14 +111,14 @@ module.exports = {
                 userName: userName,
               };
             });
-            res.render("editorPage/editor_review", {
+            res.render("vwEditor/editor_review", {
               articles: articlesWithNames,
               user: req.session.user
             });
           });
         });
       } else {
-        res.render("editorPage/editor_review", {
+        res.render("vwEditor/editor_review", {
           articles: null,
           user: req.session.user
         });

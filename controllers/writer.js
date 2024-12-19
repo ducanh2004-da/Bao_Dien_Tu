@@ -6,7 +6,7 @@ const writerModel = require("../models/writer.js");
 
 module.exports = {
   showMainPage: (req, res) => {
-    res.render("writerPage/main", {
+    res.render("vwWriter/main", {
       layout: "main",
       user: req.session.user
     });
@@ -28,7 +28,7 @@ module.exports = {
           }));
 
 
-      res.render("writerPage/PostArticle", {
+      res.render("vwWriter/PostArticle", {
         layout: "main",
         user: req.session.user,
         categories: filteredCategories,
@@ -60,7 +60,7 @@ module.exports = {
       });
 
 
-      res.render("writerPage/MyArticle", {
+      res.render("vwWriter/MyArticle", {
         layout: "main",
         user: req.session.user,
         articles: groupedArticles,
@@ -89,7 +89,7 @@ module.exports = {
               children: categories.filter((child) => child.parent_id === parent.id),
             }));
 
-        res.render("writerPage/FixArticle", {
+        res.render("vwWriter/FixArticle", {
           layout: "main",
           categories: filteredCategories,
           user: req.session.user,
@@ -115,7 +115,7 @@ module.exports = {
         const filteredCategories = categories.filter(
           (category) => category.parent_id !== null
         );
-        res.render("writerPage/RefuseArticle", {
+        res.render("vwWriter/RefuseArticle", {
           layout: "main",
           categories: filteredCategories,
           user: req.session.user,
