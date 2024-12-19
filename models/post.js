@@ -7,7 +7,7 @@ const getPostById = (id, callback) => {
     db.query("SELECT * FROM posts WHERE id = ?", [id], (err, results) => {
         if (err) return callback(err);
         callback(null, results[0]);
-    })
+    });
 };
 
 const updatePublished = (id, callback) => {
