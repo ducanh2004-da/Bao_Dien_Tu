@@ -39,7 +39,7 @@ const updatePost = (id, post, callback) => {
         callback
     );
 };
-const deletes = (id, callback) => {
+const deletePost = (id, callback) => {
     db.query("DELETE FROM posts WHERE id = ?", [id], callback);
 };
 
@@ -62,13 +62,30 @@ const updateLike = (id, callback) => {
     );
 };
 
+
+const getPostByCategory = (categoryId, callback) => {
+    const query = `
+    SELECT 
+      p.*, 
+      c.name AS category_name
+    FROM posts p
+    JOIN post_categories pc ON p.id = pc.postId
+    JOIN categories c ON pc.categoryId = c.id
+    WHERE c.id = ?
+      AND p.statusName = 'Published'
+    ORDER BY p.created_at DESC;
+  `;
+    db.query(query, [categoryId], callback);
+};
+
 module.exports = {
     getAllPosts,
     getPostById,
     getPostAuthorInfo,
+    getPostByCategory,
     updatePublished,
     updatePost,
     updateView,
     updateLike,
-    deletes,
+    deletePost,
 };
