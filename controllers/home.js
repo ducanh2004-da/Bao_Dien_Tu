@@ -3,6 +3,7 @@ const categoryModel = require("../models/category.js");
 const path = require("path");
 const homeModel = require("../models/home.js");
 const { post } = require("../routes/writer.js");
+const validator = require("validator");
 
 module.exports = {
     // Show the homepage
@@ -120,4 +121,95 @@ module.exports = {
             res.redirect(req.headers.referer);
         });
     },
+
+    // Search for posts
+    search: (req, res) => {
+        // Sanitize the input to prevent SQL injection
+        const query = validator.escape(req.query.q);
+
+        // Ensure page is within valid range
+        if (!req.query.page) {
+            return res.redirect("./search?q=" + query + "&page=1");
+        }
+
+        let page = req.query.page;
+        if (page < 1) page = 1;
+
+
+        // Limit the number of results per page
+        const limit = 10;
+
+        // Calculate start index for pagination
+        const startIndex = (page - 1) * limit;
+
+        // Fetch search results
+        homeModel.searchContent(query, limit, startIndex, (err, results) => {
+            if (err) {
+                console.error("Lỗi khi tìm kiếm bài viết:", err);
+                return res.status(500).send("Không thể tìm kiếm bài viết");
+            }
+
+            if (results.length === 0) {
+                return res.render("vwGuest/search", {
+                    layout: "main",
+                    posts: results,
+                    user: req.session.user,
+                    message: "Không tìm thấy kết quả phù hợp",
+                });
+            }
+
+            // Fetch total number of results
+            homeModel.searchContentCount(query, (err, count) => {
+                if (err) {
+                    console.error("Lỗi khi đếm số kết quả:", err);
+                    return res.status(500).send("Không thể đếm số kết quả");
+                }
+
+                const nRows = count[0].total;
+
+                // Calculate total number of pages
+                const totalPages = Math.ceil(nRows / limit);
+
+                // Ensure that the page is within the valid range
+                if (page > totalPages) {
+                    return res.status(404).send("Không tìm thấy trang");
+                }
+
+                pages = [];
+                const dotsIndex = page + 3;
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === dotsIndex) {
+                        pages.push({
+                            value: "...",
+                        });
+                        break;
+                    };
+                    if (i <= totalPages) {
+                        pages.push({
+                            value: i,
+                        });
+                    };
+                };
+
+                for (let i = totalPages - 3; i <= totalPages; i++) {
+                    if (i > dotsIndex) {
+                        pages.push({
+                            value: i,
+                        });
+                    }
+                };
+
+                // Render search results
+                res.render("vwGuest/search", {
+                    layout: "main",
+                    posts: results,
+                    currentPage: page,
+                    totalPages,
+                    pages,
+                    query,
+                    message: "Tìm thấy " + count + " kết quả phù hợp",
+                });
+            });
+        });
+    }
 };
