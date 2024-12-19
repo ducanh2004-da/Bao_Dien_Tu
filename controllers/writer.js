@@ -223,14 +223,13 @@ module.exports = {
                     summary: summary,
                     content: content,
                     id: id,
+
                 },
                 (insertErr, result) => {
                     if (insertErr) {
                         console.error("Lỗi khi sửa bài viết:", insertErr);
                         return res.status(500).send("Lỗi khi sửa bài viết");
                     }
-
-                    writer
 
                     res.redirect(`/writer/my-articles`);
                 }
