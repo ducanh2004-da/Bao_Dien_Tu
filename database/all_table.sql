@@ -10,8 +10,9 @@ CREATE TABLE users (
     password VARCHAR(255),  -- Có thể để null nếu dùng OAuth
     githubId VARCHAR(255) UNIQUE,  
     googleId VARCHAR(255) UNIQUE,  
-    role ENUM('subscriber', 'writer', 'editor', 'admin') DEFAULT 'subscriber',  
-    penName VARCHAR(50),  
+    role ENUM('subscriber', 'writer', 'editor', 'admin') DEFAULT 'subscriber',
+    penName VARCHAR(50),
+    expiry_date DATE,
     birthday DATE,  
     otp_code VARCHAR(6),                   
     otp_expires_at DATETIME,               
@@ -33,9 +34,9 @@ CREATE TABLE categories (
 CREATE TABLE posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    categoryId INT,
     thumbnail VARCHAR(255),  
-    publish_date DATE,  
+    publish_date DATE,
+    premium BOOLEAN,
     abstract TEXT,  
     content LONGTEXT,  
     statusName ENUM('Published', 'Rejected', 'Pending-Approval', 'Approved') NOT NULL, 
@@ -46,7 +47,6 @@ CREATE TABLE posts (
     refuse VARCHAR(255),
     views INT DEFAULT 0,
     likes INT DEFAULT 0,
-    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -74,4 +74,12 @@ CREATE TABLE comments (
     CONSTRAINT fk_comments_post
         FOREIGN KEY (postId) REFERENCES posts(id)
         ON DELETE CASCADE  
+);
+
+-- Bảng lưu trữ gói premium !! time là ngày => tính sang phút
+CREATE TABLE Packs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    price INT,
+    name VARCHAR(100),
+    time INT
 );

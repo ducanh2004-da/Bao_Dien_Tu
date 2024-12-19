@@ -11,10 +11,10 @@
             </li>
             {{#each categories}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link" href="/category/{{this.id}}" id="category{{this.id}}">{{this.name}}</a>
+                    <a class="nav-link" href="home/category?id={{this.id}}" id="category{{this.id}}">{{this.name}}</a>
                     <div class="dropdown-menu" aria-labelledby="category{{this.id}}">
                         {{#each this.children}}
-                            <a class="dropdown-item" href="/category/{{this.id}}">{{this.name}}</a>
+                            <a class="dropdown-item" href="home/category?id={{this.id}}">{{this.name}}</a>
                         {{/each}}
                     </div>
                 </li>

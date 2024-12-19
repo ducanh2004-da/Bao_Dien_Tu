@@ -3,6 +3,7 @@ const categoryModel = require("../models/category.js");
 const path = require("path");
 const homeModel = require("../models/home.js");
 const { post } = require("../routes/writer.js");
+const { showCategoryPage } = require("./writer.js");
 
 module.exports = {
     // Hiển thị trang chủ
@@ -49,7 +50,34 @@ module.exports = {
                     });
                 });
             });
-        });
+        }); 
+    },
+    showCategory: (req, res) => {
+        const id = parseInt(req.query.id || 0);
+        categoryModel.getAllCategories((err, categories) => {
+            if (err) return res.status(500).send("Cannot fetch categories");
+
+            const filteredCategories = categories
+                .filter((category) => category.parent_id === null)
+                .map((parent) => ({
+                    ...parent,
+                    children: categories.filter((child) => child.parent_id === parent.id),
+                }));
+
+            homeModel.getPostByCategory(id, (err, posts) => {
+                if (err) return res.status(500).send("Cannot get post of this category");
+                homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
+                    if (err) return res.status(500).send("Cannot get hot post of this categorys");
+                    // Render the homepage view
+                    res.render("vwPost/category", {
+                        layout: "main",
+                        categories: filteredCategories,    // Hierarchical categories
+                        posts,
+                        hotPosts
+                    });
+                });
+            });
+        }); 
     },
 
     // Hiển thị chi tiết bài viết
