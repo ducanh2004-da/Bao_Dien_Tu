@@ -1,5 +1,10 @@
 <!-- Articles List -->
 <div class="container-fluid py-3 bg-light rounded-lg">
+    Display messages
+    <div class="alert alert-info" role="alert">
+        <p>{{message}}</p>
+    </div>
+
     {{#each posts}}
         <div class="card mb-3">
             <div class="row no-gutters">
@@ -26,4 +31,39 @@
             </div>
         </div>
     {{/each}}
+
+    <!-- Pagination -->
+    <nav aria-label="...">
+        <ul class="pagination">
+            {{#if (ifCond currentPage "==" '1')}}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+            {{else}}
+                <li class="page-item">
+                    <a class="page-link" href="/main/search?q={{query}}&page={{math currentPage "-" 1}}">Previous</a>
+                </li>
+            {{/if}}
+            {{#each pages}}
+                {{#if (ifCond this.value "===" ../currentPage)}}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{this.value}}</span>
+                    </li>
+                {{else}}
+                    <li class="page-item">
+                        <a class="page-link" href="/main/search?q={{../query}}&page={{this.value}}">{{this.value}}</a>
+                    </li>
+                {{/if}}
+            {{/each}}
+            {{#if (ifCond currentPage "==" totalPages)}}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            {{else}}
+                <li class="page-item">
+                    <a class="page-link" href="/main/search?q={{query}}&page={{math currentPage "+" 1}}">Next</a>
+                </li>
+            {{/if}}
+        </ul>
+    </nav>
 </div>

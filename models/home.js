@@ -158,7 +158,7 @@ const updateLike = (id, callback) => {
   );
 };
 
-const searchContent = (content, callback) => {
+const searchContent = (content, limit, offset, callback) => {
   const query = `
     SELECT
       *
@@ -167,9 +167,24 @@ const searchContent = (content, callback) => {
     WHERE
       statusName = 'Published'
         AND MATCH(abstract) AGAINST (?)
-  `;
+    LIMIT ? OFFSET ?;
+    `;
+  db.query(query, [content, limit, offset], callback);
+};
+
+const searchContentCount = (content, callback) => {
+  const query = `
+    SELECT
+      COUNT(*) AS total
+    FROM
+      posts
+    WHERE
+      statusName = 'Published'
+        AND MATCH(abstract) AGAINST (?);
+    `;
   db.query(query, [content], callback);
 };
+
 module.exports = {
   getPostsByNewTime,
   getPostsByParrentId,
@@ -178,6 +193,7 @@ module.exports = {
   getTop10NewestPosts,
   getTopCategoriesWithNewestPosts,
   searchContent,
+  searchContentCount,
   updateView,
   getMostViewPost,
   getMostLikePost,
