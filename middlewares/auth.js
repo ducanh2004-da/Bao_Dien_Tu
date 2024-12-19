@@ -32,7 +32,7 @@ module.exports.isWriter = (req, res, next) => {
 }
 //kiểm tra người dùng đã đăng kí
 module.exports.isSubscriber = (req, res, next) => {
-    if (req.session.user && req.user.role === 'subscriber') {
+    if (req.session.user && req.user.role === 'subscriber' || req.user.role === 'admin' || req.user.role === 'editor' || req.user.role === 'writer') {
         req.session.isSubscriber = true;
         return next();
     }
