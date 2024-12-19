@@ -98,6 +98,9 @@ module.exports = {
                         return res.status(500).send("Không thể lấy danh mục");
                     }
 
+                    // Splits the tags string into an array of tags
+                    // post.tags = post.tags.split(",").map((tag) => tag.trim());
+
                     // Render post detail view
                     res.render("vwSubscriber/post-detail", {
                         layout: "main",

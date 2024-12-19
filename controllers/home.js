@@ -86,7 +86,7 @@ module.exports = {
                     }
 
                     // Splits the tags string into an array of tags
-                    post.tags = post.tags.split(",").map((tag) => tag.trim());
+                    // post.tags = post.tags.split(",").map((tag) => tag.trim());
 
                     res.render("vwGuest/post-detail", {
                         layout: "main",
