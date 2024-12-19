@@ -27,7 +27,7 @@ const insertArticle = (article, callback) => {
             article.abstract,
             article.content,
             article.tags,
-            article.statusName,
+            "Pending-Approval",
             article.userId,
         ],
         (err, result) => {
