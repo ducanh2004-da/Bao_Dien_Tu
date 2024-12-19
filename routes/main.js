@@ -14,5 +14,6 @@ router.get('/search', validateQuery, MainController.search);
 router.get('/profile', profileController.show);
 router.get('/profile/edit', profileController.viewEdit);
 router.post('/profile/update', profileController.Edit);
+router.get('/subscription', MainController.showSubscription);
 
 module.exports = router;

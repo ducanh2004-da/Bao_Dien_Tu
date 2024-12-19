@@ -1,7 +1,7 @@
 const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
-const path = require("path");
 const homeModel = require("../models/home.js");
+const subscriptionModel = require("../models/subscription.js");
 
 
 module.exports = {
@@ -268,5 +268,44 @@ module.exports = {
                 });
             });
         });
+    },
+
+    // Subscription page
+    showSubscription: (req, res) => {
+        const { isSubscriber, user } = req.session;
+
+        if (isSubscriber) {
+            
+            // Fetch subscription details
+            subscriptionModel.getSubscriptionByUserId(user.id, (err, subscription) => {
+                if (err) {
+                    console.error("Lỗi khi lấy thông tin đăng ký:", err);
+                    return res.status(500).send("Không thể lấy thông tin đăng ký");
+                }
+
+                // Get subscription days left
+                subscriptionModel.getUserSubscriptionDaysLeft(user.id, (err, daysLeft) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy số ngày còn lại của đăng ký:", err);
+                        return res.status(500).send("Không thể lấy số ngày còn lại của người dùng");
+                    }
+
+                    // Render subscription page
+                    res.render("vwUser/subscription", {
+                        layout: "main",
+                        title: "Đăng ký",
+                        user,
+                        subscription,
+                        daysLeft,
+                    });
+                });
+            });
+        } else {
+            res.render("vwUser/subscription", {
+                layout: "main",
+                title: "Quản lý gói đăng ký",
+                user,
+            });
+        }
     },
 };

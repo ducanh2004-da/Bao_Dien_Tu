@@ -1,0 +1,27 @@
+<div class="card m-5">
+    <div class="card-header bg-primary text-white">
+        Thông tin đăng ký
+    </div>
+    <div class="card-body">
+        <!-- Kiểm tra nếu người dùng là người đăng ký -->
+        {{#if isSubscriber}}
+            <p class="text-success">Bạn là <strong>subscriber</strong>.</p>
+            <p>Đăng ký của bạn có hiệu lực đến: <strong>{{subscription.end_date}}</strong></p>
+            <p class="text-muted">Tận hưởng nội dung và lợi ích cao cấp!</p>
+
+            <!-- Cảnh báo người dùng nếu đăng ký của họ sắp hết hạn -->
+            {{#if (ifCond daysLeft "<=" 3)}}
+                <div class="alert alert-warning" role="alert">
+                    Đăng ký của bạn sẽ hết hạn trong {{daysLeft}} ngày. Gia hạn ngay để tránh gián đoạn!
+                    <a href="#" class="btn btn-warning">Gia hạn</a>
+                </div>
+
+
+            {{/if}}
+        {{else}}
+            <p class="text-danger">Bạn không phải là subscriber.</p>
+            <p class="text-muted">Đăng ký ngay để mở khóa các tính năng và nội dung cao cấp.</p>
+            <a href="#" class="btn btn-primary">Đăng ký ngay</a>
+        {{/if}}
+    </div>
+</div>

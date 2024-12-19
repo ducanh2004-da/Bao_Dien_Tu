@@ -8,21 +8,33 @@ module.exports.isUser = function(req, res, next) {
 
 //Kiểm tra admin
 module.exports.isAdmin = (req, res, next) => {
-    if (req.session.user && req.user.role === 'admin') return next();
+    if (req.session.user && req.user.role === 'admin') {
+        req.session.isSubscriber = true;
+        return next();
+    }
     res.status(403).send('Access Denied! Wrong Role');
 }
 //kiểm tra editor
 module.exports.isEditor = (req, res, next) => {
-    if (req.session.user && req.user.role === 'editor') return next();
+    if (req.session.user && req.user.role === 'editor') {
+        req.session.isSubscriber = true;
+        return next();
+    }
     res.status(403).send('Access Denied! Wrong Role');
 }
 //kiểm tra phóng viên
 module.exports.isWriter = (req, res, next) => {
-    if (req.session.user && req.user.role === 'writer') return next();
+    if (req.session.user && req.user.role === 'writer') {
+        req.session.isSubscriber = true;
+        return next();
+    }
     res.status(403).send('Access Denied! Wrong Role');
 }
 //kiểm tra người dùng đã đăng kí
 module.exports.isSubscriber = (req, res, next) => {
-    if (req.session.user && req.user.role === 'subscriber') return next();
+    if (req.session.user && req.user.role === 'subscriber') {
+        req.session.isSubscriber = true;
+        return next();
+    }
     res.status(403).send('Access Denied! Wrong Role');
 }
