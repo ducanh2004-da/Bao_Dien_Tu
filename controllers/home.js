@@ -69,7 +69,7 @@ module.exports = {
                 return res.status(500).send("Không thể lấy chi tiết bài viết");
             }
 
-            if (post.statusName != "published") {
+            if (post.statusName != "Published") {
                 return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
             }
 
@@ -84,6 +84,9 @@ module.exports = {
                         console.error("Lỗi khi lấy danh mục:", err);
                         return res.status(500).send("Không thể lấy danh mục");
                     }
+
+                    // Splits the tags string into an array of tags
+                    post.tags = post.tags.split(",").map((tag) => tag.trim());
 
                     res.render("vwGuest/post-detail", {
                         layout: "main",
