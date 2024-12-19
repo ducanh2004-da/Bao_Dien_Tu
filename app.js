@@ -82,21 +82,21 @@ app.engine(
             ifCond(v1, operator, v2) {
                 switch (operator) {
                     case "==":
-                        return v1 == v2;
+                        return parseInt(v1) === parseInt(v2);
                     case "===":
                         return v1 === v2;
                     case "!=":
-                        return v1 != v2;
+                        return parseInt(v1) !== parseInt(v2);
                     case "!==":
                         return v1 !== v2;
                     case "<":
-                        return v1 < v2;
+                        return parseInt(v1) < parseInt(v2);
                     case "<=":
-                        return v1 <= v2;
+                        return parseInt(v1) <= parseInt(v2);
                     case ">":
-                        return v1 > v2;
+                        return parseInt(v1) > parseInt(v2);
                     case ">=":
-                        return v1 >= v2;
+                        return parseInt(v1) >= parseInt(v2);
                     case "&&":
                         return v1 && v2;
                     case "||":
@@ -145,7 +145,7 @@ app.get("/", (req, res) => {
 });
 
 // Define routes
-app.use("/main", authMiddleware.isUser, mainRoutes);
+app.use("/main", authMiddleware.isUser, authMiddleware.isSubscriber, mainRoutes);
 app.use("/writer", authMiddleware.isUser, authMiddleware.isWriter, writerRoutes);
 app.use("/editor", authMiddleware.isUser, authMiddleware.isEditor, editorRoutes);
 app.use("/home", homeRoutes);
