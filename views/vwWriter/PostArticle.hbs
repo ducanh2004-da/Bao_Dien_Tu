@@ -55,7 +55,7 @@
 
             previewButton.addEventListener("click", () => {
                 const title = document.getElementById("title").value;
-                const summary = document.getElementById("summary").value;
+                const abstract = document.getElementById("abstract").value;
                 const content = tinymce.get("content").getContent();
                 const category = document.getElementById("category").selectedOptions[0].text;
                 const tags = getAllTags();
@@ -102,7 +102,7 @@
 
                         <!-- Abstract Box -->
                         <div class="p-4 bg-light border rounded shadow-sm mb-4">
-                            <p class="mb-0">${summary}</p>
+                            <p class="mb-0">${abstract}</p>
                         </div>
 
                         <!-- Main Image -->
@@ -250,8 +250,8 @@
         </div>
 
         <div class="form-group">
-            <label for="summary">Tóm tắt</label>
-            <textarea class="form-control" id="summary" name="summary" required></textarea>
+            <label for="abstract">Tóm tắt</label>
+            <textarea class="form-control" id="abstract" name="abstract" required></textarea>
         </div>
 
         <div class="form-group">

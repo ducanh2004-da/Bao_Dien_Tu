@@ -85,16 +85,11 @@ const getTopCategoriesWithNewestPosts = (callback) => {
             GROUP BY c.id, c.name
             ORDER BY total_views DESC
             LIMIT 10
-            ), RankedPosts AS (
+            ),
+            RankedPosts AS (
         SELECT
-            p.id,
-            p.title,
+            p.*,
             pc.categoryId,
-            p.publish_date,
-            p.abstract,
-            p.thumbnail,
-            p.likes,
-            p.views,
             ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.publish_date DESC) AS row_num
         FROM posts p
             JOIN post_categories pc ON p.id = pc.postId
@@ -103,13 +98,7 @@ const getTopCategoriesWithNewestPosts = (callback) => {
             )
         SELECT
             c.name AS category_name,
-            rp.id AS post_id,
-            rp.title,
-            rp.publish_date,
-            rp.abstract,
-            rp.thumbnail,
-            rp.likes,
-            rp.views
+            rp.*
         FROM RankedPosts rp
                  JOIN categories c ON rp.categoryId = c.id
         WHERE rp.row_num <= 3
@@ -117,6 +106,7 @@ const getTopCategoriesWithNewestPosts = (callback) => {
     `;
     db.query(query, callback);
 };
+
 
 const getTop5MostLikedPostsByCategory = (categoryId, callback) => {
     const query = `

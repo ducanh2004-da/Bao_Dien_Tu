@@ -15,7 +15,7 @@ const getNextId = (tableName, callback) => {
 const insertArticle = (article, callback) => {
     const query = `
         INSERT INTO posts
-        (title, thumbnail, publish_date, abstract, content, statusName, created_at, updated_at, userId)
+        (title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId)
         VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
     `;
 
@@ -23,11 +23,11 @@ const insertArticle = (article, callback) => {
         query,
         [
             article.title,
-            article.thumbnail || null,
             article.publish_date || null,
-            article.summary,
+            article.abstract,
             article.content,
-            article.statusName || "Pending-Approval",
+            article.tags,
+            article.statusName,
             article.userId,
         ],
         (err, result) => {
@@ -104,17 +104,18 @@ const getArticlesById = (id, callback) => {
 const updateArticle = (article, callback) => {
     const query = `
         UPDATE posts
-        SET title = ?, abstract = ?, content = ?, statusName = ?, updated_at = NOW()
+        SET title = ?, abstract = ?, content = ?, statusName = ?, updated_at = NOW(), tags = ?
         WHERE id = ?
     `;
     db.query(
         query,
         [
             article.title,
-            article.summary,
+            article.abstract,
             article.content,
             "Pending-Approval",
             article.id,
+            article.tags,
         ],
         (err, result) => {
             if (err) return callback(err);

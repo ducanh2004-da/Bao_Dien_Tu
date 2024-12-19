@@ -160,7 +160,7 @@ module.exports = {
                     return res.status(500).send("Lỗi khi upload ảnh");
                 }
 
-                const { title, summary, content, category, tags } = req.body;
+                const { title, abstract, content, category, tags } = req.body;
 
                 const categoryId = parseInt(category, 10);
                 if (isNaN(categoryId)) {
@@ -174,7 +174,7 @@ module.exports = {
                     {
                         title: title,
                         category: categoryId,
-                        summary: summary,
+                        abstract: abstract,
                         content: content,
                         userId: req.session.user.id,
                     },
@@ -214,16 +214,16 @@ module.exports = {
                 return res.status(500).send("Lỗi khi upload ảnh");
             }
 
-            const { title, summary, content, category, tags } = req.body;
+            const { title, abstract, content, category, tags } = req.body;
 
             writerModel.updateArticle(
                 {
                     title: title,
                     category: parseInt(category, 10),
-                    summary: summary,
+                    abstract: abstract,
                     content: content,
                     id: id,
-
+                    tags: tags,
                 },
                 (insertErr, result) => {
                     if (insertErr) {
