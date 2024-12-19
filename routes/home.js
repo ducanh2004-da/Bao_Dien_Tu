@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const homeController = require("../controllers/home.js");
-const authMiddleware = require("../middlewares/auth");
 const { validateQuery } = require('../validators/validators');
 
 router.get("/", homeController.showHomePage);

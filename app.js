@@ -14,9 +14,7 @@ const path = require("path");
 const mainRoutes = require("./routes/main");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
-const postRoutes = require("./routes/post.js");
 const editorRoutes = require("./routes/editor.js");
-const profileRoutes = require("./routes/profile.js");
 const homeRoutes = require("./routes/home.js");
 const writerRoutes = require("./routes/writer.js");
 
@@ -27,6 +25,7 @@ require("./config/passport"); // Passport configuration
 const PORT = process.env.PORT || 5000;
 
 // Middleware setup
+const authMiddleware = require("./middlewares/auth");
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(express.json()); // Parse JSON bodies
 app.use(cookieParser());
@@ -146,12 +145,12 @@ app.get("/", (req, res) => {
 });
 
 // Define routes
-app.use("/main", mainRoutes);
-app.use("/writer", writerRoutes);
-app.use("/editor", editorRoutes);
+app.use("/main", authMiddleware.isUser, mainRoutes);
+app.use("/writer", authMiddleware.isUser, authMiddleware.isWriter, writerRoutes);
+app.use("/editor", authMiddleware.isUser, authMiddleware.isEditor, editorRoutes);
 app.use("/home", homeRoutes);
 app.use("/api", authRoutes);
-app.use("/admin", adminRoutes);
+app.use("/admin", authMiddleware.isUser, authMiddleware.isAdmin, adminRoutes);
 
 // Start the server
 app.listen(PORT, () => {

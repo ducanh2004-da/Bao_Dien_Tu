@@ -9,12 +9,12 @@ const { validateQuery } = require('../validators/validators');
 const router = express.Router();
 const MainController = require('../controllers/main');
 
-router.get('/',authMiddleware.isUser, MainController.showMainPage);
-router.get('/post/:id', authMiddleware.isUser, MainController.showDetail);
-router.post('/post/like/:id', authMiddleware.isUser, MainController.likePost);
-router.get('/search', validateQuery, authMiddleware.isUser, MainController.search);
-router.get('/profile',authMiddleware.isUser, profileController.show);
-router.get('/profile/edit', authMiddleware.isUser, profileController.viewEdit);
-router.post('/profile/update',authMiddleware.isUser,profileController.Edit);
+router.get('/',MainController.showMainPage);
+router.get('/post/:id', MainController.showDetail);
+router.post('/post/like/:id', MainController.likePost);
+router.get('/search', validateQuery, MainController.search);
+router.get('/profile', profileController.show);
+router.get('/profile/edit', profileController.viewEdit);
+router.post('/profile/update', profileController.Edit);
 
 module.exports = router;
