@@ -19,9 +19,6 @@ pids
 
 # Runtime data
 pids/
-*.pid
-*.seed
-*.pid.lock
 lib-cov/
 coverage/
 .cache/
@@ -48,7 +45,6 @@ Thumbs.db
 
 # Test Coverage
 .nyc_output/
-coverage/
 
 # Optional npm cache directory
 .npm/
@@ -59,9 +55,6 @@ coverage/
 # Optional stylelint cache
 .stylelintcache
 
-# Parcel-bundler cache (optional)
-.cache/
-
 # SvelteKit build artifacts
 .svelte-kit/
 
@@ -71,6 +64,3 @@ out/
 
 # Nuxt.js build output
 .nuxt/
-node_modules/
-
-.env
