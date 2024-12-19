@@ -11,7 +11,7 @@ module.exports.show = (req,res) =>{
             const formattedBirthday = new Date(user.birthday).toISOString().split('T')[0];
             user.birthday = formattedBirthday; 
         }
-        res.render('user/profile',{
+        res.render('vwUser/profile',{
             layout: "main",
             title: "Hồ sơ cá nhân",
             user: user
@@ -22,7 +22,7 @@ module.exports.show = (req,res) =>{
 module.exports.viewEdit = (req,res) =>{
     console.log(req.headers.referer);
     req.session.retUrl = req.headers.referer;
-    res.render('user/editProfile',{
+    res.render('vwUser/editProfile',{
         layout: "main",
         title: "Chỉnh sửa hồ sơ",
         user: req.session.user
