@@ -193,11 +193,11 @@ const searchContent = (content, limit, offset, callback) => {
     posts
   WHERE
     statusName = 'Published'
-      AND (abstract LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%'))
+      AND MATCH(abstract, content) AGAINST (? IN NATURAL LANGUAGE MODE)
   ORDER BY publish_date DESC
   LIMIT ? OFFSET ?;
   `;
-  db.query(query, [content, content, limit, offset], callback);
+  db.query(query, [content, limit, offset], callback);
 };
 
 const searchContentCount = (content, callback) => {
@@ -208,10 +208,11 @@ const searchContentCount = (content, callback) => {
     posts
   WHERE
     statusName = 'Published'
-      AND (abstract LIKE CONCAT('%', ?, '%') OR content LIKE CONCAT('%', ?, '%'));
+      AND MATCH(abstract, content) AGAINST (? IN NATURAL LANGUAGE MODE);
   `;
-  db.query(query, [content, content], callback);
+  db.query(query, [content], callback);
 };
+
 module.exports = {
   // getPostsByNewTime,
   getPostsByParrentId,
