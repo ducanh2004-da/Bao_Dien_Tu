@@ -31,7 +31,7 @@
                 <h4 class="mb-3 text-primary">Bài viết thuộc danh mục</h4>
                 {{#if posts.length}}
                     <div class="row">
-                        {{#each hotPosts}}
+                        {{#each posts}}
                             <div class="col-md-4 mb-3">
                                 <div class="card">
                                     <a href="{{#if ../user}}/main/post/{{this.id}}{{else}}/home/post/{{this.id}}{{/if}}">
