@@ -13,6 +13,7 @@ module.exports.show = (req,res) =>{
         }
         res.render('user/profile',{
             layout: "main",
+            title: "Hồ sơ cá nhân",
             user: user
         })
     })
@@ -23,6 +24,7 @@ module.exports.viewEdit = (req,res) =>{
     req.session.retUrl = req.headers.referer;
     res.render('user/editProfile',{
         layout: "main",
+        title: "Chỉnh sửa hồ sơ",
         user: req.session.user
     })
 }

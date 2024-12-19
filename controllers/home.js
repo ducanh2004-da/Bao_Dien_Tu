@@ -42,6 +42,7 @@ module.exports = {
                             // Render the homepage view
                             res.render("vwGuest/guest", {
                                 layout: "main",
+                                title: "Trang chủ",
                                 categories: filteredCategories,    // Hierarchical categories
                                 highlightedPosts,        // Highlighted posts
                                 topCategories,   // Posts grouped by parent categories
@@ -97,6 +98,7 @@ module.exports = {
                     // Render post detail view
                     res.render("vwGuest/post-detail", {
                         layout: "main",
+                        title: post.title,
                         post: post, // Single post data
                         category: categories[0], // Category information
                         author: author, // Author information
@@ -152,6 +154,7 @@ module.exports = {
             if (results.length === 0) {
                 return res.render("vwGuest/search", {
                     layout: "main",
+                    title: "Kết quả tìm kiếm cho " + query,
                     posts: results,
                     user: req.session.user,
                     message: "Không tìm thấy kết quả phù hợp",
@@ -202,6 +205,7 @@ module.exports = {
                 // Render search results
                 res.render("vwGuest/search", {
                     layout: "main",
+                    title: "Kết quả tìm kiếm cho " + query,
                     posts: results,
                     currentPage: page,
                     totalPages,

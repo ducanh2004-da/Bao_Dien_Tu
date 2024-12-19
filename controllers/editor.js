@@ -43,6 +43,8 @@ module.exports = {
               };
             });
             res.render("vwEditor/editor_review", {
+              layout: "main",
+              title: "Trang chủ của biên tập viên",
               articles: articlesWithNames,
               user: req.session.user
             });
@@ -50,6 +52,8 @@ module.exports = {
         });
       } else {
         res.render("vwEditor/editor_review", {
+          layout: "main",
+          title: "Trang chủ của biên tập viên",
           articles: null,
           user: req.session.user
         });
@@ -64,13 +68,13 @@ module.exports = {
         return;
       }
       res.render("vwEditor/editor_postreview", {
+        layout: "main",
+        title: "Xem bài viết",
         article: article[0],
         user: req.session.user
       });
     });
   },
-
-  updateStatusName: (req, res) => {},
 
   showArticlePage: (req, res) => {
     const statusFilter = req.query.statusName;
@@ -112,6 +116,8 @@ module.exports = {
               };
             });
             res.render("vwEditor/editor_review", {
+              layout: "main",
+              title: "Danh sách bài viết",
               articles: articlesWithNames,
               user: req.session.user
             });
@@ -119,6 +125,8 @@ module.exports = {
         });
       } else {
         res.render("vwEditor/editor_review", {
+          layout: "main",
+          title: "Danh sách bài viết",
           articles: null,
           user: req.session.user
         });

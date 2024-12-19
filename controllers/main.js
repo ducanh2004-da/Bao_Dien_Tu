@@ -45,6 +45,7 @@ module.exports = {
 
                             res.render("vwSubscriber/subscriber_main", {
                                 layout: "main",
+                                title: "Trang chủ",
                                 categories: filteredCategories,
                                 highlightedPosts,
                                 topCategories,
@@ -100,6 +101,7 @@ module.exports = {
                     // Render post detail view
                     res.render("vwSubscriber/post-detail", {
                         layout: "main",
+                        title: post.title,
                         post: post, // Single post data
                         category: categories[0], // Category information
                         author: author, // Author information
@@ -205,6 +207,7 @@ module.exports = {
                 // Render search results
                 res.render("vwSubscriber/search", {
                     layout: "main",
+                    title: "Kết quả tìm kiếm" + query,
                     posts: results,
                     user: req.session.user,
                     currentPage: page,

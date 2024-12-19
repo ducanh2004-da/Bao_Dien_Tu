@@ -8,6 +8,7 @@ module.exports = {
   showMainPage: (req, res) => {
     res.render("vwWriter/main", {
       layout: "main",
+      title: "Trang chủ của tác giả",
       user: req.session.user
     });
   },
@@ -30,6 +31,7 @@ module.exports = {
 
       res.render("vwWriter/PostArticle", {
         layout: "main",
+        title: "Đăng bài viết",
         user: req.session.user,
         categories: filteredCategories,
       });
@@ -62,6 +64,7 @@ module.exports = {
 
       res.render("vwWriter/MyArticle", {
         layout: "main",
+        title: "Bài viết của tôi",
         user: req.session.user,
         articles: groupedArticles,
       });
@@ -91,6 +94,7 @@ module.exports = {
 
         res.render("vwWriter/FixArticle", {
           layout: "main",
+          title: "Sửa bài viết",
           categories: filteredCategories,
           user: req.session.user,
           article: article[0],
