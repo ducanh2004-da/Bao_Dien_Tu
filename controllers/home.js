@@ -1,15 +1,14 @@
 const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
-const path = require("path");
 const homeModel = require("../models/home.js");
-const { post } = require("../routes/writer.js");
-const { showCategoryPage } = require("./writer.js");
 
 module.exports = {
     // Hiển thị trang chủ
     showHomePage: (req, res) => {
         categoryModel.getAllCategories((err, categories) => {
-            if (err) return res.status(500).send("Không thể lấy danh mục");
+            if (err) {
+              return res.status(500).send("Không thể lấy danh mục");
+            }
 
             const filteredCategories = categories
                 .filter((category) => category.parent_id === null)
@@ -19,25 +18,35 @@ module.exports = {
                 }));
 
             homeModel.getHighlightedPosts((err, highlightedPosts) => {
-                if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
+                if (err) {
+                  return res.status(500).send("Không thể lấy bài viết nổi bật");
+                }
 
                 homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
-                    if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                    if (err) {
+                      return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                    }
 
                     const topCategories = posts.reduce((grouped, post) => {
                         const { category_name, ...data } = post;
-                        if (!grouped[category_name]) grouped[category_name] = [];
+                        if (!grouped[category_name]) {
+                          grouped[category_name] = [];
+                        }
                         grouped[category_name].push(data);
                         return grouped;
                     }, {});
 
                     homeModel.getTop10NewestPosts((err, latestPosts) => {
-                        if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
+                        if (err) {
+                          return res.status(500).send("Không thể lấy bài viết mới nhất");
+                        }
 
                         homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
-                            if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                            if (err) {
+                              return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                            }
 
-                            res.render("vwGuest/guest", {
+                            res.render("vwUser/home", {
                                 layout: "main",
                                 title: "Trang chủ",
                                 categories: filteredCategories,
@@ -53,9 +62,13 @@ module.exports = {
         }); 
     },
     showCategory: (req, res) => {
-        const id = parseInt(req.query.id || 0);
+        const id = parseInt(req.params.id || 0);
+
+        // Get all categories to populate the navigation bar
         categoryModel.getAllCategories((err, categories) => {
-            if (err) return res.status(500).send("Cannot fetch categories");
+            if (err) {
+              return res.status(500).send("Không thể lấy danh mục");
+            }
 
             const filteredCategories = categories
                 .filter((category) => category.parent_id === null)
@@ -64,16 +77,30 @@ module.exports = {
                     children: categories.filter((child) => child.parent_id === parent.id),
                 }));
 
-            homeModel.getPostByCategory(id, (err, posts) => {
-                if (err) return res.status(500).send("Cannot get post of this category");
-                homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
-                    if (err) return res.status(500).send("Cannot get hot post of this categorys");
-                    // Render the homepage view
-                    res.render("vwPost/category", {
-                        layout: "main",
-                        categories: filteredCategories,    // Hierarchical categories
-                        posts,
-                        hotPosts
+            categoryModel.getCatById(id, (err, category) => {
+                if (err) {
+                  return res.status(500).send("Không thể lấy danh mục");
+                }
+
+                postModel.getPostByCategory(id, (err, posts) => {
+                    if (err) {
+                      return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                    }if (err) {
+                          return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                        }
+                    homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
+                        if (err) {
+                          return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                        }
+                        
+                        // Render the homepage view
+                        res.render("vwPost/byCat", {
+                            layout: "main",
+                            title: category[0].name,
+                            categories: filteredCategories,    // Hierarchical categories
+                            posts,
+                            hotPosts
+                        });
                     });
                 });
             });
@@ -116,7 +143,7 @@ module.exports = {
                     // Splits the tags string into an array of tags
                     // post.tags = post.tags.split(",").map((tag) => tag.trim());
 
-                    res.render("vwGuest/post-detail", {
+                    res.render("vwPost/post-detail", {
                         layout: "main",
                         title: post.title,
                         post,
@@ -163,7 +190,7 @@ module.exports = {
             }
 
             if (results.length === 0) {
-                return res.render("vwGuest/search", {
+                return res.render("vwPost/search", {
                     layout: "main",
                     title: "Kết quả tìm kiếm cho " + query,
                     posts: results,
@@ -209,7 +236,7 @@ module.exports = {
                     }
                 }
 
-                res.render("vwGuest/search", {
+                res.render("vwPost/search", {
                     layout: "main",
                     title: "Kết quả tìm kiếm cho " + query,
                     posts: results,

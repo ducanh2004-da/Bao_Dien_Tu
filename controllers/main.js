@@ -43,7 +43,7 @@ module.exports = {
                         homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
                             if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
 
-                            res.render("vwSubscriber/subscriber_main", {
+                            res.render("vwUser/home", {
                                 layout: "main",
                                 title: "Trang chủ",
                                 categories: filteredCategories,
@@ -102,13 +102,61 @@ module.exports = {
                     // post.tags = post.tags.split(",").map((tag) => tag.trim());
 
                     // Render post detail view
-                    res.render("vwSubscriber/post-detail", {
+                    res.render("vwPost/post-detail", {
                         layout: "main",
                         title: post.title,
                         post: post, // Single post data
                         category: categories[0], // Category information
                         author: author, // Author information
                         user: req.session.user, // User information
+                    });
+                });
+            });
+        });
+    },
+
+    // Show the category page
+    showCategory: (req, res) => {
+        const id = parseInt(req.params.id || 0);
+
+        // Get all categories to populate the navigation bar
+        categoryModel.getAllCategories((err, categories) => {
+            if (err) {
+                return res.status(500).send("Không thể lấy danh mục");
+            }
+
+            const filteredCategories = categories
+                .filter((category) => category.parent_id === null)
+                .map((parent) => ({
+                    ...parent,
+                    children: categories.filter((child) => child.parent_id === parent.id),
+                }));
+
+            categoryModel.getCatById(id, (err, category) => {
+                if (err) {
+                    return res.status(500).send("Không thể lấy danh mục");
+                }
+
+                postModel.getPostByCategory(id, (err, posts) => {
+                    if (err) {
+                        return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                    }if (err) {
+                        return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                    }
+                    homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
+                        if (err) {
+                            return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                        }
+
+                        // Render the homepage view
+                        res.render("vwPost/byCat", {
+                            layout: "main",
+                            user: req.session.user,
+                            title: category[0].name,
+                            categories: filteredCategories,    // Hierarchical categories
+                            posts,
+                            hotPosts
+                        });
                     });
                 });
             });
@@ -157,7 +205,7 @@ module.exports = {
             }
 
             if (results.length === 0) {
-                return res.render("vwSubscriber/search", {
+                return res.render("vwPost/search", {
                     layout: "main",
                     posts: results,
                     user: req.session.user,
@@ -207,7 +255,7 @@ module.exports = {
                 };
 
                 // Render search results
-                res.render("vwSubscriber/search", {
+                res.render("vwPost/search", {
                     layout: "main",
                     title: "Kết quả tìm kiếm" + query,
                     posts: results,
