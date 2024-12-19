@@ -5,10 +5,10 @@ const homeModel = require("../models/home.js");
 const { post } = require("../routes/writer.js");
 
 module.exports = {
-    // Show the homepage
+    // Hiển thị trang chủ
     showHomePage: (req, res) => {
         categoryModel.getAllCategories((err, categories) => {
-            if (err) return res.status(500).send("Cannot fetch categories");
+            if (err) return res.status(500).send("Không thể lấy danh mục");
 
             const filteredCategories = categories
                 .filter((category) => category.parent_id === null)
@@ -18,14 +18,12 @@ module.exports = {
                 }));
 
             homeModel.getHighlightedPosts((err, highlightedPosts) => {
-                if (err) return res.status(500).send("Cannot fetch highlighted posts");
+                if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
 
                 homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
-                    if (err) return res.status(500).send("Cannot fetch top categories");
+                    if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
 
-                    // Group posts by category_name
-                    const topCategories = posts.reduce((grouped, post) =>
-                    {
+                    const topCategories = posts.reduce((grouped, post) => {
                         const { category_name, ...data } = post;
                         if (!grouped[category_name]) grouped[category_name] = [];
                         grouped[category_name].push(data);
@@ -33,20 +31,19 @@ module.exports = {
                     }, {});
 
                     homeModel.getTop10NewestPosts((err, latestPosts) => {
-                        if (err) return res.status(500).send("Cannot fetch latest posts");
+                        if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
 
                         homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
-                            if (err) return res.status(500).send("Cannot fetch most viewed posts");
+                            if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
 
-                            // Render the homepage view
                             res.render("vwGuest/guest", {
                                 layout: "main",
                                 title: "Trang chủ",
-                                categories: filteredCategories,    // Hierarchical categories
-                                highlightedPosts,        // Highlighted posts
-                                topCategories,   // Posts grouped by parent categories
-                                latestPosts,            // Latest posts
-                                mostViewPosts,        // Most viewed posts
+                                categories: filteredCategories,
+                                highlightedPosts,
+                                topCategories,
+                                latestPosts,
+                                mostViewPosts,
                             });
                         });
                     });
@@ -55,31 +52,26 @@ module.exports = {
         });
     },
 
-    // Show post details
+    // Hiển thị chi tiết bài viết
     showDetail: (req, res) => {
         const id = req.params.id;
 
-        // Increment view count for the post
-        homeModel.updateView(id, (err) => {
+        postModel.updateView(id, (err) => {
             if (err) {
                 console.error("Lỗi khi tăng lượt xem:", err);
                 return res.status(500).send("Không thể tăng lượt xem");
             }
         });
 
-        // Fetch post details
         postModel.getPostById(id, (err, post) => {
             if (err) {
                 console.error("Lỗi khi lấy chi tiết bài viết:", err);
                 return res.status(500).send("Không thể lấy chi tiết bài viết");
             }
 
-            // Ensure that the post is published
-            if (post.statusName == "published") {
+            if (post.statusName != "published") {
                 return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
             }
-
-            // Fetch Author information
 
             postModel.getPostAuthorInfo(post.id, (err, author) => {
                 if (err) {
@@ -87,47 +79,42 @@ module.exports = {
                     return res.status(500).send("Không thể lấy thông tin tác giả");
                 }
 
-                // Fetch category details for the post
                 categoryModel.getCatById(post.categoryId, (err, categories) => {
                     if (err) {
                         console.error("Lỗi khi lấy danh mục:", err);
                         return res.status(500).send("Không thể lấy danh mục");
                     }
 
-                    // Render post detail view
                     res.render("vwGuest/post-detail", {
                         layout: "main",
                         title: post.title,
-                        post: post, // Single post data
-                        category: categories[0], // Category information
-                        author: author, // Author information
+                        post,
+                        category: categories[0],
+                        author,
                     });
                 });
             });
         });
     },
 
-
-    // Like a post
+    // Tăng lượt thích bài viết
     likePost: (req, res) => {
         const id = req.params.id;
 
-        homeModel.updateLike(id, (err) => {
+        postModel.updateLike(id, (err) => {
             if (err) {
                 console.error("Lỗi khi tăng lượt thích:", err);
                 return res.status(500).send("Không thể tăng lượt thích");
             }
 
-            // Return to referer page
             res.redirect(req.headers.referer);
         });
     },
 
-    // Search for posts
+    // Tìm kiếm bài viết
     search: (req, res) => {
         const query = req.query.q || "";
 
-        // Ensure page is within valid range
         if (!req.query.page) {
             return res.redirect("./search?q=" + query + "&page=1");
         }
@@ -135,14 +122,9 @@ module.exports = {
         let page = req.query.page;
         if (page < 1) page = 1;
 
-
-        // Limit the number of results per page
         const limit = 10;
-
-        // Calculate start index for pagination
         const startIndex = (page - 1) * limit;
 
-        // Fetch search results
         homeModel.searchContent(query, limit, startIndex, (err, results) => {
             if (err) {
                 console.error("Lỗi khi tìm kiếm bài viết:", err);
@@ -159,7 +141,6 @@ module.exports = {
                 });
             }
 
-            // Fetch total number of results
             homeModel.searchContentCount(query, (err, count) => {
                 if (err) {
                     console.error("Lỗi khi đếm số kết quả:", err);
@@ -167,11 +148,8 @@ module.exports = {
                 }
 
                 const nRows = count[0].total;
-
-                // Calculate total number of pages
                 const totalPages = Math.ceil(nRows / limit);
 
-                // Ensure that the page is within the valid range
                 if (page > totalPages) {
                     return res.status(404).send("Không tìm thấy trang");
                 }
@@ -184,13 +162,13 @@ module.exports = {
                             value: "...",
                         });
                         break;
-                    };
+                    }
                     if (i <= totalPages) {
                         pages.push({
                             value: i,
                         });
-                    };
-                };
+                    }
+                }
 
                 for (let i = totalPages - 3; i <= totalPages; i++) {
                     if (i > dotsIndex) {
@@ -198,9 +176,8 @@ module.exports = {
                             value: i,
                         });
                     }
-                };
+                }
 
-                // Render search results
                 res.render("vwGuest/search", {
                     layout: "main",
                     title: "Kết quả tìm kiếm cho " + query,

@@ -65,7 +65,7 @@ module.exports = {
         const id = req.params.id;
 
         // Increment view count for the post
-        homeModel.updateView(id, (err) => {
+        postModel.updateView(id, (err) => {
             if (err) {
                 console.error("Lỗi khi cập nhật lượt xem:", err);
                 return res.status(500).send("Không thể cập nhật lượt xem");
@@ -116,7 +116,7 @@ module.exports = {
     likePost: (req, res) => {
         const id = req.params.id;
 
-        homeModel.updateLike(id, (err) => {
+        postModel.updateLike(id, (err) => {
             if (err) {
                 console.error("Lỗi khi cập nhật lượt thích:", err);
                 return res.status(500).send("Không thể cập nhật lượt thích");
