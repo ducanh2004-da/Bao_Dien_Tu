@@ -1,5 +1,8 @@
 <!-- Articles List -->
 <div class="container-fluid py-3 bg-light rounded-lg">
+    <div class="alert alert-info" role="alert">
+        <p class="m-0">{{message}}</p>
+    </div>
     {{#each posts}}
         <div class="card mb-3">
             <div class="row no-gutters">
@@ -10,10 +13,10 @@
                 </div>
                 <div class="col p-2">
                     <div class="card-body">
-                        <a href="/main/post/{{this.id}}" class="text-decoration-none text-dark">
+                        <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                             <h2 class="card-title">{{title}}</h2>
                         </a>
-                        <a href="/main/post/{{this.id}}" class="text-decoration-none text-dark">
+                        <a href="/home/post/{{this.id}}" class="text-decoration-none text-dark">
                             <p class="card-text truncate-2-line">
                                 {{this.abstract}}
                             </p>
@@ -36,17 +39,17 @@
                 </li>
             {{else}}
                 <li class="page-item">
-                    <a class="page-link" href="/main/search?q={{query}}&page={{math currentPage "-" 1}}">Previous</a>
+                    <a class="page-link" href="/home/search?q={{query}}&page={{math currentPage "-" 1}}">Previous</a>
                 </li>
             {{/if}}
             {{#each pages}}
-                {{#if (ifCond this.value "===" ../currentPage)}}
+                {{#if (ifCond this.value "==" ../currentPage)}}
                     <li class="page-item active" aria-current="page">
                         <span class="page-link">{{this.value}}</span>
                     </li>
                 {{else}}
                     <li class="page-item">
-                        <a class="page-link" href="/main/search?q={{../query}}&page={{this.value}}">{{this.value}}</a>
+                        <a class="page-link" href="/home/search?q={{../query}}&page={{this.value}}">{{this.value}}</a>
                     </li>
                 {{/if}}
             {{/each}}
@@ -56,7 +59,7 @@
                 </li>
             {{else}}
                 <li class="page-item">
-                    <a class="page-link" href="/main/search?q={{query}}&page={{math currentPage "+" 1}}">Next</a>
+                    <a class="page-link" href="/home/search?q={{query}}&page={{math currentPage "+" 1}}">Next</a>
                 </li>
             {{/if}}
         </ul>
