@@ -1,105 +1,158 @@
 const db = require("../utils/db");
 
 const getNextId = (tableName, callback) => {
-  const query = "SHOW TABLE STATUS WHERE Name = ?";
-  db.query(query, [tableName], (err, results) => {
-    if (err) {
-      return callback(err, null);
-    }
+    const query = "SHOW TABLE STATUS WHERE Name = ?";
+    db.query(query, [tableName], (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
 
-    const nextId = results[0]?.Auto_increment;
-    callback(null, nextId);
-  });
+        const nextId = results[0]?.Auto_increment;
+        callback(null, nextId);
+    });
 };
 
 const insertArticle = (article, callback) => {
-  const query = `
-    INSERT INTO posts 
-      (title, categoryId, thumbnail, publish_date, abstract, content, statusName, created_at, updated_at, userId)
-    VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
-  `;
+    const query = `
+        INSERT INTO posts
+        (title, thumbnail, publish_date, abstract, content, statusName, created_at, updated_at, userId)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
+    `;
 
-  db.query(
-    query,
-    [
-      article.title,
-      article.category,
-      article.thumbnail || null,
-      article.publish_date || null,
-      article.summary,
-      article.content,
-      article.statusName || "Pending-Approval",
-      article.userId,
-    ],
-    callback
-  );
+    db.query(
+        query,
+        [
+            article.title,
+            article.thumbnail || null,
+            article.publish_date || null,
+            article.summary,
+            article.content,
+            article.statusName || "Pending-Approval",
+            article.userId,
+        ],
+        (err, result) => {
+            if (err) return callback(err);
+
+            // Insert into post_categories for categories
+            if (article.categories && article.categories.length > 0) {
+                const categoryQuery = `
+                    INSERT INTO post_categories (postId, categoryId)
+                    VALUES ?
+                `;
+                const categoryValues = article.categories.map((catId) => [
+                    result.insertId,
+                    catId,
+                ]);
+                db.query(categoryQuery, [categoryValues], callback);
+            } else {
+                callback(null, result);
+            }
+        }
+    );
 };
 
 const getArticlesByStatus = (statusName, userId, callback) => {
-  if (statusName === "all") {
-    const query = `
-    SELECT * FROM posts 
-    WHERE userId=?
-  `;
-    db.query(query, [userId], callback);
-  } else {
-    const query = `
-    SELECT * FROM posts 
-    WHERE statusName=? AND userId=?
-  `;
-    db.query(query, [statusName, userId], callback);
-  }
+    if (statusName === "all") {
+        const query = `
+            SELECT posts.*, GROUP_CONCAT(categories.name) AS categories
+            FROM posts
+                     LEFT JOIN post_categories ON posts.id = post_categories.postId
+                     LEFT JOIN categories ON post_categories.categoryId = categories.id
+            WHERE posts.userId=?
+            GROUP BY posts.id
+        `;
+        db.query(query, [userId], callback);
+    } else {
+        const query = `
+            SELECT posts.*, GROUP_CONCAT(categories.name) AS categories
+            FROM posts
+                     LEFT JOIN post_categories ON posts.id = post_categories.postId
+                     LEFT JOIN categories ON post_categories.categoryId = categories.id
+            WHERE posts.statusName=? AND posts.userId=?
+            GROUP BY posts.id
+        `;
+        db.query(query, [statusName, userId], callback);
+    }
 };
 
 const getArticlesByUserId = (userId, callback) => {
     const query = `
-        SELECT * FROM posts
-        WHERE userId = ?
+        SELECT posts.*, GROUP_CONCAT(categories.name) AS categories
+        FROM posts
+                 LEFT JOIN post_categories ON posts.id = post_categories.postId
+                 LEFT JOIN categories ON post_categories.categoryId = categories.id
+        WHERE posts.userId = ?
+        GROUP BY posts.id
     `;
 
     db.query(query, [userId], callback);
-}
+};
 
 const getArticlesById = (id, callback) => {
-  const query = `
-   SELECT * FROM posts
-   WHERE id=?
-  `;
+    const query = `
+        SELECT posts.*, GROUP_CONCAT(categories.name) AS categories
+        FROM posts
+                 LEFT JOIN post_categories ON posts.id = post_categories.postId
+                 LEFT JOIN categories ON post_categories.categoryId = categories.id
+        WHERE posts.id=?
+        GROUP BY posts.id
+    `;
 
-  db.query(query, [id], callback);
+    db.query(query, [id], callback);
 };
 
 const updateArticle = (article, callback) => {
-  const query = `
-    UPDATE posts
-    SET title = ?, categoryId = ?, abstract = ?, content = ?, statusName = ?, updated_at = NOW()
-    WHERE id = ?
-  `;
-  db.query(
-    query,
-    [
-      article.title,
-      article.category,
-      article.summary,
-      article.content,
-      "Pending-Approval",
-      article.id,
-    ],
-    callback
-  );
+    const query = `
+        UPDATE posts
+        SET title = ?, abstract = ?, content = ?, statusName = ?, updated_at = NOW()
+        WHERE id = ?
+    `;
+    db.query(
+        query,
+        [
+            article.title,
+            article.summary,
+            article.content,
+            "Pending-Approval",
+            article.id,
+        ],
+        (err, result) => {
+            if (err) return callback(err);
+
+            // Update post_categories
+            const deleteQuery = `DELETE FROM post_categories WHERE postId = ?`;
+            db.query(deleteQuery, [article.id], (deleteErr) => {
+                if (deleteErr) return callback(deleteErr);
+
+                if (article.categories && article.categories.length > 0) {
+                    const categoryQuery = `
+                        INSERT INTO post_categories (postId, categoryId)
+                        VALUES ?
+                    `;
+                    const categoryValues = article.categories.map((catId) => [
+                        article.id,
+                        catId,
+                    ]);
+                    db.query(categoryQuery, [categoryValues], callback);
+                } else {
+                    callback(null, result);
+                }
+            });
+        }
+    );
 };
 
-const getCategoryById = (ids, callback) => {
-  const query = "SELECT name FROM categories WHERE id = ?";
-  db.query(query, [ids], callback);
+const getCategoryById = (id, callback) => {
+    const query = "SELECT name FROM categories WHERE id = ?";
+    db.query(query, [id], callback);
 };
 
 module.exports = {
-  insertArticle,
-  getNextId,
-  getArticlesByStatus,
-  getArticlesByUserId,
-  getArticlesById,
-  updateArticle,
-  getCategoryById,
+    insertArticle,
+    getNextId,
+    getArticlesByStatus,
+    getArticlesByUserId,
+    getArticlesById,
+    updateArticle,
+    getCategoryById,
 };
