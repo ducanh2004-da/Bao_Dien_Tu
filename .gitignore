@@ -37,6 +37,7 @@ Thumbs.db
 # IDE specific
 .idea/
 .vscode/
+.codebuddy/
 *.sublime-project
 *.sublime-workspace
 
