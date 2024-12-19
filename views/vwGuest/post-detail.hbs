@@ -102,6 +102,21 @@
             </div>
         </div>
 
+        <!-- Tag Section -->
+        <div class="container-fluid mb-4">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <p>
+                        Tags:
+                        {{#each post.tags}}
+                            <span class="badge badge-info mr-2">{{this.name}}</span>
+                        {{/each}}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
     </article>
 
     <!-- Comment Section -->
