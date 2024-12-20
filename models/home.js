@@ -326,6 +326,22 @@ const searchContent = (content, limit, offset, callback) => {
     db.query(query, [content, limit, offset], callback);
 };
 
+const searchContentNoPremium = (content, limit, offset, callback) => {
+    const query = `
+        SELECT
+            id, title, abstract, publish_date, views, likes
+        FROM
+            posts
+        WHERE
+            statusName = 'Published'
+                AND premium = 0  -- Only consider non-premium posts for search
+                AND MATCH(abstract) AGAINST (?)
+        ORDER BY publish_date DESC
+            LIMIT ? OFFSET ?;
+    `;
+    db.query(query, [content, limit, offset], callback);
+};
+
 const searchContentCount = (content, callback) => {
     const query = `
         SELECT
@@ -339,6 +355,20 @@ const searchContentCount = (content, callback) => {
     db.query(query, [content], callback);
 };
 
+const searchContentCountNoPremium = (content, callback) => {
+    const query = `
+        SELECT
+            COUNT(*) AS total
+        FROM
+            posts
+        WHERE
+            statusName = 'Published'
+                AND premium = 0  -- Only consider non-premium posts for search
+                AND MATCH(abstract) AGAINST (?);
+    `;
+    db.query(query, [content], callback);
+}
+
 module.exports = {
     getHighlightedPosts,
     getTop10MostViewedPosts,
@@ -350,6 +380,8 @@ module.exports = {
     getTop5MostLikedPostsByCategory,
     getTop5MostLikedPostsByCategoryNoPremium,
     searchContentCount,
+    searchContentNoPremium,
     searchContent,
+    searchContentCountNoPremium,
     getTopCategoriesWithNewestPostsNoPremium
 };
