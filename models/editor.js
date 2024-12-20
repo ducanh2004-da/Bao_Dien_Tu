@@ -16,22 +16,52 @@ const updatePublished = (id, callback) => {
     );
 };
 
-const getArticlesByStatus = (statusName, callback) => {
+const getArticlesByStatusOfEditor = (statusName, editorId, callback) => {
     let query = `
         SELECT posts.*, GROUP_CONCAT(categories.name) AS categories
         FROM posts
         LEFT JOIN post_categories ON posts.id = post_categories.postId
         LEFT JOIN categories ON post_categories.categoryId = categories.id
+        WHERE posts.statusName = ? AND categories.editorId = ?
+        GROUP BY posts.id
     `;
-    if (statusName !== "all") {
-        query += " WHERE posts.statusName = ?";
-        db.query(query + " GROUP BY posts.id", [statusName], callback);
-    } else {
-        db.query(query + " GROUP BY posts.id", [], callback);
-    }
+    db.query(query, [statusName, editorId], callback);
+}
+
+const isPostInEditorCategories = (postId, editorId, callback) => {
+    // Query to get the categories the editor is in charge of
+    const getEditorCategoriesQuery = `
+        SELECT id
+        FROM categories
+        WHERE editorId = ?
+    `;
+
+    db.query(getEditorCategoriesQuery, [editorId], (err, editorCategories) => {
+        if (err) return callback(err);
+
+        const editorCategoryIds = editorCategories.map(cat => cat.id);
+
+        // Query to get the category of the post
+        const getPostCategoryQuery = `
+            SELECT categoryId
+            FROM post_categories
+            WHERE postId = ?
+        `;
+
+        db.query(getPostCategoryQuery, [postId], (err, postCategories) => {
+            if (err) return callback(err);
+
+            const postCategoryIds = postCategories.map(cat => cat.categoryId);
+
+            // Check if any of the post's categories are in the editor's categories
+            const isInEditorCategories = postCategoryIds.some(catId => editorCategoryIds.includes(catId));
+
+            callback(null, isInEditorCategories);
+        });
+    });
 };
 
-const getArticlesById = (id, callback) => {
+const getArticleById = (id, callback) => {
     const query = `
         SELECT posts.*, GROUP_CONCAT(categories.name) AS categories
         FROM posts
@@ -83,8 +113,9 @@ module.exports = {
     getAllPosts,
     getPostById,
     updatePublished,
-    getArticlesByStatus,
-    getArticlesById,
+    getArticlesByStatusOfEditor,
+    isPostInEditorCategories,
+    getArticleById,
     getCategoriesByIds,
     getUsersByIds,
     getCategoryById,
