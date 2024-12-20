@@ -17,6 +17,8 @@ router.get('/profile/edit', profileController.viewEdit);
 router.post('/profile/update',upload.single('image'), profileController.Edit);
 router.get('/subscription', MainController.showSubscription);
 // Route to handle upgrading to premium
-router.post('/premium', MainController.subscription);
+router.post('/subscribe', MainController.subscribe);
+router.post('/extendSubscription', MainController.extendSubscription);
+// router.post('/unsubscribe', MainController.unsubscribe);
 
 module.exports = router;

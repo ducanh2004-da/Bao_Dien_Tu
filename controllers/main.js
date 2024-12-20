@@ -2,8 +2,7 @@ const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
 const homeModel = require("../models/home.js");
 const subscriptionModel = require("../models/subscription.js");
-const User = require("../models/user.js");
-const Subscription = require("../models/subscription.js")
+const db = require("../utils/db");
 
 
 module.exports = {
@@ -274,8 +273,7 @@ module.exports = {
 
     // Subscription page
     showSubscription: (req, res) => {
-        const { user } = req.session;
-        const isSubscriber = user.id;
+        const { user, isSubscriber } = req.session;
 
         if (isSubscriber) {
             
@@ -312,43 +310,56 @@ module.exports = {
             });
         }
     },
-};
-module.exports.subscription = async (req, res) => {
-    try {
-        // Find the user based on user ID
-        User.findById(req.user.id, (err, users) => {
+
+    // Subscribe to a plan
+
+    subscribe: (req, res) => {
+        if (req.user.role !== 'subscriber') {
+            return res.status(403).send('Access Denied! Wrong Role');
+        }
+
+        // Create a new subscription
+        subscriptionModel.subscribe(
+            req.user.id,
+            30,
+            (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send('Lỗi khi tạo đăng ký');
+                }
+            }
+        );
+        res.redirect('/main/subscription');
+
+    },
+
+    // Extend subscription by 30 days
+    extendSubscription: (req, res) => {
+        // Check if the user is a subscriber
+        subscriptionModel.getSubscriptionByUserId = (req.user.id, (err, subscription) => {
             if (err) {
-                console.log(err);
-                return res.status(500).send('Lỗi khi tìm kiếm người dùng');
+                console.error("Lỗi khi lấy thông tin đăng ký:", err);
+                return res.status(500).send("Không thể lấy thông tin đăng ký");
             }
 
-            // Kiểm tra nếu người dùng có vai trò 'subscriber'
-            if (req.user.role === 'subscriber') {
-                // Tạo bản ghi subscription mới với 7 ngày premium
-                Subscription.subscribe(
-                    req.user.id, 
-                    new Date(), 
-                    new Date(new Date().setDate(new Date().getDate() + 7)), 
-                    'Active',
-                    (err) => {
-                        if (err) {
-                            console.log(err);
-                            return res.status(500).send('Lỗi khi tạo đăng ký');
-                        }
+            // Check if the user has an active subscription
+            if (subscription.length === 0) {
+                return res.status(403).send("Không thể tạo đăng ký");
+            }
 
-                        // Cập nhật vai trò của người dùng thành 'premium subscriber'
-                            // Chuyển hướng người dùng đến trang subscription
-                            
+            // Extend the subscription
+            subscriptionModel.extendSubscription(
+                req.user.id,
+                30,
+                (err) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send('Lỗi khi gia hạn đăng ký');
                     }
-                );
-                res.redirect('/main/subscription');
-            } else {
-                res.status(400).send('Bạn không phải là subscriber');
-            }
+                }
+            );
+            res.redirect('/main/subscription');
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Đã có lỗi xảy ra');
-    }
+    },
 };
 
