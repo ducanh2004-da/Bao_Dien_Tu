@@ -113,11 +113,64 @@ const getPostByCategory = (categoryId, callback) => {
     });
 };
 
+const getPostByCategoryNoPremium = (categoryId, callback) => {
+    // First, check if the category is a parent category
+    const checkParentQuery = `
+        SELECT COUNT(*) AS isParent
+        FROM categories
+        WHERE id = ? AND parent_id IS NULL
+    `;
+
+    db.query(checkParentQuery, [categoryId], (err, results) => {
+        if (err) return callback(err);
+
+        const isParent = results[0].isParent > 0;
+
+        let query;
+        let params;
+
+        if (isParent) {
+            // If it's a parent category, get posts from all its subcategories
+            query = `
+                SELECT 
+                    p.*, 
+                    c.name AS category_name
+                FROM posts p
+                JOIN post_categories pc ON p.id = pc.postId
+                JOIN categories c ON pc.categoryId = c.id
+                WHERE c.parent_id = ?
+                  AND p.statusName = 'Published'
+                  AND p.premium = 0  -- Exclude premium posts
+                ORDER BY p.created_at DESC;
+            `;
+            params = [categoryId];
+        } else {
+            // If it's not a parent category, get posts from the given category
+            query = `
+                SELECT 
+                    p.*, 
+                    c.name AS category_name
+                FROM posts p
+                JOIN post_categories pc ON p.id = pc.postId
+                JOIN categories c ON pc.categoryId = c.id
+                WHERE c.id = ?
+                  AND p.statusName = 'Published'
+                  AND p.premium = 0  -- Exclude premium posts
+                ORDER BY p.created_at DESC;
+            `;
+            params = [categoryId];
+        }
+
+        db.query(query, params, callback);
+    });
+};
+
 module.exports = {
     getAllPosts,
     getPostById,
     getPostAuthorInfo,
     getPostByCategory,
+    getPostByCategoryNoPremium,
     updatePublished,
     updatePost,
     updateView,
