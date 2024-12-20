@@ -13,7 +13,7 @@
             {{#if (ifCond daysLeft "<=" 3)}}
                 <div class="alert alert-warning" role="alert">
                     Đăng ký của bạn sẽ hết hạn trong {{daysLeft}} ngày. Gia hạn ngay để tránh gián đoạn!
-                    <a href="#" class="btn btn-warning">Gia hạn</a>
+                    <a href="/main/extendSubscription/" class="btn btn-warning">Gia hạn</a>
                 </div>
 
 
@@ -21,7 +21,7 @@
         {{else}}
             <p class="text-danger">Bạn không phải là premium subscriber.</p>
             <p class="text-muted">Đăng ký ngay để mở khóa các tính năng và nội dung cao cấp.</p>
-            <form action="/main/premium" method="POST">
+            <form action="/main/subscribe/" method="POST">
                 <button class="btn btn-primary">Đăng ký ngay</button>
             </form>
         {{/if}}
