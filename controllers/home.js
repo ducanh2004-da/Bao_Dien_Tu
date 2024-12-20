@@ -1,10 +1,13 @@
 const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
 const homeModel = require("../models/home.js");
+const commentModel = require("../models/comment.js");
 
 module.exports = {
     // Hiển thị trang chủ
     showHomePage: (req, res) => {
+
+        let notification = req.session.notification || null;
         categoryModel.getAllCategories((err, categories) => {
             if (err) {
               return res.status(500).send("Không thể lấy danh mục");
@@ -46,9 +49,12 @@ module.exports = {
                               return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
                             }
 
+                            notification = req.session.notification || null;
+
                             res.render("vwUser/home", {
                                 layout: "main",
                                 title: "Trang chủ",
+                                notification,
                                 categories: filteredCategories,
                                 highlightedPosts,
                                 topCategories,
@@ -118,55 +124,61 @@ module.exports = {
             }
         });
 
-        postModel.getPostById(id, (err, post) => {
+        postModel.isPremium(id, (err, result) => {
             if (err) {
-                console.error("Lỗi khi lấy chi tiết bài viết:", err);
-                return res.status(500).send("Không thể lấy chi tiết bài viết");
+                console.error("Lỗi khi kiểm tra bài viết có phải premium:", err);
+                return res.status(500).send("Không thể kiểm tra bài viết");
             }
 
-            if (post.statusName != "Published") {
-                return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
-            }
-
-            postModel.getPostAuthorInfo(post.id, (err, author) => {
-                if (err) {
-                    console.error("Lỗi khi lấy thông tin tác giả:", err);
-                    return res.status(500).send("Không thể lấy thông tin tác giả");
-                }
-
-                categoryModel.getCatById(post.categoryId, (err, categories) => {
+            if (result[0].premium) {
+                req.session.notification = {
+                    type: "danger",
+                    message: "Bạn không có đủ quyền truy cập bài viết này",
+                };
+                return res.redirect("/home");
+            } else {
+                postModel.getPostById(id, (err, post) => {
                     if (err) {
-                        console.error("Lỗi khi lấy danh mục:", err);
-                        return res.status(500).send("Không thể lấy danh mục");
+                        console.error("Lỗi khi lấy chi tiết bài viết:", err);
+                        return res.status(500).send("Không thể lấy chi tiết bài viết");
                     }
 
-                    // Splits the tags string into an array of tags
-                    // post.tags = post.tags.split(",").map((tag) => tag.trim());
+                    if (post.statusName != "Published") {
+                        return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
+                    }
 
-                    res.render("vwPost/post-detail", {
-                        layout: "main",
-                        title: post.title,
-                        tags: post.tags.split(",").map((tag) => tag.trim()),
-                        post,
-                        category: categories[0],
-                        author,
+                    postModel.getPostAuthorInfo(post.id, (err, author) => {
+                        if (err) {
+                            console.error("Lỗi khi lấy thông tin tác giả:", err);
+                            return res.status(500).send("Không thể lấy thông tin tác giả");
+                        }
+
+                        categoryModel.getCatById(post.categoryId, (err, categories) => {
+                            if (err) {
+                                console.error("Lỗi khi lấy danh mục:", err);
+                                return res.status(500).send("Không thể lấy danh mục");
+                            }
+
+                            commentModel.getCommentsByPostId(id, (err, comments) => {
+                                if (err) {
+                                    console.error("Lỗi khi lấy bình luận:", err);
+                                    return res.status(500).send("Không thể lấy bình luận");
+                                }
+
+                                res.render("vwPost/post-detail", {
+                                    layout: "main",
+                                    title: post.title,
+                                    tags: post.tags.split(",").map((tag) => tag.trim()),
+                                    post,
+                                    category: categories[0],
+                                    author,
+                                    comments,
+                                });
+                            });
+                        });
                     });
                 });
-            });
-        });
-    },
-
-    // Tăng lượt thích bài viết
-    likePost: (req, res) => {
-        const id = req.params.id;
-
-        postModel.updateLike(id, (err) => {
-            if (err) {
-                console.error("Lỗi khi tăng lượt thích:", err);
-                return res.status(500).send("Không thể tăng lượt thích");
             }
-
-            res.redirect(req.headers.referer);
         });
     },
 

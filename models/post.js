@@ -113,6 +113,10 @@ const getPostsByCategory = (categoryId, callback) => {
     });
 };
 
+const isPremium = (id, callback) => {
+    db.query("SELECT premium FROM posts WHERE id = ?", [id], callback);
+};
+
 const getPostsByCategoryNoPremium = (categoryId, callback) => {
     // First, check if the category is a parent category
     const checkParentQuery = `
@@ -171,6 +175,7 @@ module.exports = {
     getPostAuthorInfo,
     getPostsByCategory,
     getPostsByCategoryNoPremium,
+    isPremium,
     updatePublished,
     updatePost,
     updateView,

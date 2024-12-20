@@ -2,12 +2,15 @@ const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
 const homeModel = require("../models/home.js");
 const subscriptionModel = require("../models/subscription.js");
-const db = require("../utils/db");
+const commentModel = require("../models/comment.js");
 
 
 module.exports = {
     // Show the subscriber main page
     showMainPage: (req, res) => {
+
+        let notification = req.session.notification || null;
+
         // Fetch all categories
         categoryModel.getAllCategories((err, categories) => {
             if (err) return res.status(500).send("Không thể lấy danh mục");
@@ -48,6 +51,7 @@ module.exports = {
                                 res.render("vwUser/home", {
                                     layout: "main",
                                     title: "Trang chủ",
+                                    notification: notification,
                                     categories: filteredCategories,
                                     highlightedPosts,
                                     topCategories,
@@ -83,9 +87,15 @@ module.exports = {
                             homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
                                 if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
 
+                                notification = {
+                                    type: "info",
+                                    content: "Hãy trở thành subscriber để được đọc những bài viết premium",
+                                };
+
                                 res.render("vwUser/home", {
                                     layout: "main",
                                     title: "Trang chủ",
+                                    notification: notification,
                                     categories: filteredCategories,
                                     highlightedPosts,
                                     topCategories,
@@ -105,54 +115,76 @@ module.exports = {
     showDetail: (req, res) => {
         const id = req.params.id;
 
-        // Increment view count for the post
-        postModel.updateView(id, (err) => {
+        postModel.isPremium(id, (err, isPremium) => {
             if (err) {
-                console.error("Lỗi khi cập nhật lượt xem:", err);
-                return res.status(500).send("Không thể cập nhật lượt xem");
+                return res.status(500).send("Không thể lấy bài viết");
             }
-        });
-
-        // Fetch post details
-        postModel.getPostById(id, (err, post) => {
-            if (err) {
-                console.error("Lỗi khi lấy bài viết:", err);
-                return res.status(500).send("Không thể lấy chi tiết bài viết");
-            }
-
-            // Ensure that the post is published
-            if (post.statusName !== "Published") {
-                return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
-            }
-
-            // Fetch author information
-            postModel.getPostAuthorInfo(post.id, (err, author) => {
-                if (err) {
-                    console.error("Lỗi khi lấy thông tin tác giả:", err);
-                    return res.status(500).send("Không thể lấy thông tin tác giả");
-                }
-
-                // Fetch category details for the post
-                categoryModel.getCatById(post.categoryId, (err, categories) => {
+            if (isPremium && req.session.isSubscriber) {
+                // Increment view count for the post
+                postModel.updateView(id, (err) => {
                     if (err) {
-                        console.error("Lỗi khi lấy danh mục:", err);
-                        return res.status(500).send("Không thể lấy danh mục");
+                        console.error("Lỗi khi cập nhật lượt xem:", err);
+                        return res.status(500).send("Không thể cập nhật lượt xem");
+                    }
+                });
+
+                // Fetch post details
+                postModel.getPostById(id, (err, post) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy bài viết:", err);
+                        return res.status(500).send("Không thể lấy chi tiết bài viết");
                     }
 
-                    // Splits the tags string into an array of tags
-                    // post.tags = post.tags.split(",").map((tag) => tag.trim());
+                    // Ensure that the post is published
+                    if (post.statusName !== "Published") {
+                        return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
+                    }
 
-                    // Render post detail view
-                    res.render("vwPost/post-detail", {
-                        layout: "main",
-                        title: post.title,
-                        post: post, // Single post data
-                        category: categories[0], // Category information
-                        author: author, // Author information
-                        user: req.session.user, // User information
+                    // Fetch author information
+                    postModel.getPostAuthorInfo(post.id, (err, author) => {
+                        if (err) {
+                            console.error("Lỗi khi lấy thông tin tác giả:", err);
+                            return res.status(500).send("Không thể lấy thông tin tác giả");
+                        }
+
+                        // Fetch category details for the post
+                        categoryModel.getCatById(post.categoryId, (err, categories) => {
+                            if (err) {
+                                console.error("Lỗi khi lấy danh mục:", err);
+                                return res.status(500).send("Không thể lấy danh mục");
+                            }
+
+                            // Fetch comments for the post
+                            commentModel.getCommentsByPostId(id, (err, comments) => {
+                                if (err) {
+                                    console.error("Lỗi khi lấy bình luận:", err);
+                                    return res.status(500).send("Không thể lấy bình luận");
+                                }
+
+                                console.log(comments);
+
+                                // Render post detail view
+                                res.render("vwPost/post-detail", {
+                                    layout: "main",
+                                    title: post.title,
+                                    post: post, // Single post data
+                                    category: categories[0], // Category information
+                                    author: author, // Author information
+                                    user: req.session.user, // User information
+                                    comments: comments, // Comments for the post
+                                });
+                            });
+                        });
                     });
                 });
-            });
+            } else {
+                // Show a message to prompt the user to subscribe
+                req.session.notification = {
+                    type: "warning",
+                        content: "Bài viết này chỉ dành cho người đăng ký",
+                };
+                res.redirect("/main");
+            }
         });
     },
 
@@ -229,15 +261,19 @@ module.exports = {
     likePost: (req, res) => {
         const id = req.params.id;
 
-        postModel.updateLike(id, (err) => {
-            if (err) {
-                console.error("Lỗi khi cập nhật lượt thích:", err);
-                return res.status(500).send("Không thể cập nhật lượt thích");
-            }
+        if (req.session.isUser) {
+            postModel.updateLike(id, (err) => {
+                if (err) {
+                    console.error("Lỗi khi cập nhật lượt thích:", err);
+                    return res.status(500).send("Không thể cập nhật lượt thích");
+                }
 
-            // Redirect back to referer
-            res.redirect(req.headers.referer);
-        });
+                // Redirect back to referer
+                res.redirect(req.headers.referer);
+            });
+        } else {
+            res.redirect("/login");
+        }
     },
 
     // Search for posts
@@ -448,8 +484,14 @@ module.exports = {
     // Subscribe to a plan
 
     subscribe: (req, res) => {
-        if (req.user.role !== 'subscriber') {
-            return res.status(403).send('Access Denied! Wrong Role');
+        if (req.user.role === 'subscriber') {
+            req.session.notification = {
+                type: 'warning',
+                content: 'Bạn đã đăng ký gói dịch vụ này'
+            };
+            // Pass the notification to the next request
+            return res.redirect('/main');
+
         }
 
         // Create a new subscription
@@ -461,10 +503,16 @@ module.exports = {
                     console.log(err);
                     return res.status(500).send('Lỗi khi tạo đăng ký');
                 }
+                // Set success notification
+                req.session.notification = {
+                    type: 'success',
+                    content: 'Bạn đã đăng ký thành công gói dịch vụ!'
+                };
+
+                // Redirect to the main page
+                res.redirect('/main');
             }
         );
-        res.redirect('/main/subscription');
-
     },
 
     // Extend subscription by 30 days
@@ -478,7 +526,11 @@ module.exports = {
 
             // Check if the user has an active subscription
             if (subscription.length === 0) {
-                return res.status(403).send("Không thể tạo đăng ký");
+                req.session.notification = {
+                    type: 'warning',
+                    content: 'Bạn chưa đăng ký gói dịch vụ nên không thể gia hạn'
+                };
+                return res.redirect('/main');
             }
 
             // Extend the subscription
@@ -490,9 +542,32 @@ module.exports = {
                         console.log(err);
                         return res.status(500).send('Lỗi khi gia hạn đăng ký');
                     }
+
+                    // Set success notification
+                    req.session.notification = {
+                        type: 'success',
+                        content: 'Đăng ký cơ bản 30 ngày'
+                    };
+
+                    // Redirect to the main page
+                    res.redirect('/main');
                 }
             );
-            res.redirect('/main/subscription');
+        });
+    },
+
+    comment: (req, res) => {
+        const id = req.params.id;
+        const content = req.body.content;
+        const userId = req.session.user.id;
+
+        commentModel.addComment(id, userId, content, (err) => {
+            if (err) {
+                console.error("Lỗi khi thêm bình luận:", err);
+                return res.status(500).send("Không thể thêm bình luận");
+            }
+
+            res.redirect(req.headers.referer);
         });
     },
 };
