@@ -96,6 +96,7 @@ module.exports = {
                     categories: filteredCategories,
                     user: req.session.user,
                     article: article[0],
+                    tags: article[0].tags.split(","),
                 });
             });
         });
@@ -172,7 +173,8 @@ module.exports = {
                         abstract: abstract,
                         content: content,
                         userId: req.session.user.id,
-                        is_premium: is_premium
+                        is_premium: is_premium,
+                        tags: tags,
                     },
                     (insertErr, result) => {
                         if (insertErr) {

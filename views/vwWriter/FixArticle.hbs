@@ -38,7 +38,7 @@
                 const tagsInput = document.createElement("input");
                 tagsInput.type = "hidden";
                 tagsInput.name = "tags";
-                tagsInput.value = JSON.stringify(tags);
+                tagsInput.value = tags.join(",");
 
                 // Append the hidden input to the form
                 form.appendChild(tagsInput);
@@ -192,6 +192,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="container-fluid mb-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>
+                                        Tags:&nbsp;
+                                        ${tags.map((tag) => `${tag}`).join(",&nbsp")}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </article>
                 </div>
             </body>
@@ -226,6 +236,38 @@
                     height: "auto", key: 1}
             ]
         });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const fileInput = document.getElementById("thumbnail");
+            const form = document.getElementById("edit-article-form");
+
+            // Check if there's an initial preview
+            const initialPreviewExists = document.querySelector(".file-preview-image");
+
+            if (initialPreviewExists) {
+                // Remove `required` if there's an initial preview
+                fileInput.removeAttribute("required");
+            }
+
+            // Listen for changes in the file input
+            fileInput.addEventListener("change", () => {
+                if (fileInput.files.length > 0) {
+                    // Remove `required` when a file is selected
+                    fileInput.removeAttribute("required");
+                } else if (!initialPreviewExists) {
+                    // Reapply `required` if no initial preview and no file selected
+                    fileInput.setAttribute("required", "required");
+                }
+            });
+
+            // Before form submission, ensure validation matches the input state
+            form.addEventListener("submit", (event) => {
+                if (!initialPreviewExists && fileInput.files.length === 0) {
+                    alert("Please upload a file."); // Optional: Display user-friendly message
+                    event.preventDefault();
+                }
+            });
+        });
     </script>
 {{/section}}
 <!-- Sidebar -->
@@ -253,12 +295,12 @@
     <form action="/writer/fix-article/submit?id={{article.id}}" method="POST" enctype="multipart/form-data" id="edit-article-form">
     <div class="form-group">
         <label for="title">Tiêu đề bài viết</label>
-        <input type="text" class="form-control" id="title" name="title" value="{{article.title}}" required />
+        <input type="text" class="form-control" id="title" name="title" value="{{article.title}}" required/>
     </div>
 
     <div class="form-group">
         <label for="thumbnail">Ảnh nền</label>
-        <input type="file" class="file form-control-file" id="thumbnail" name="thumbnail" required value=""/>
+        <input type="file" class="file form-control-file" id="thumbnail" name="thumbnail" required/>
     </div>
 
     <div class="form-group">
@@ -292,15 +334,24 @@
     </div>
 
     <div class="form-group">
-        <label for="tags">Tags</label>
+        <label for="tag-input">Tags</label>
         <div class="input-group">
-            <input type="text" class="form-control" id="tag-input" name="tags" value="{{article.tags}}" />
+            <input type="text" id="tag-input" class="form-control" placeholder="Nhập với một tag" aria-label="Nhập với một tag" aria-describedby="add-tag-btn"/>
             <div class="input-group-append">
-                <button class="btn btn-info" type="button" id="add-tag-btn">Thêm</button>
+                <button id="add-tag-btn" class="btn btn-primary" type="button">Thêm tag</button>
             </div>
         </div>
-        <div class="tag-container" id="tag-container">
-            <!-- Tags will appear here -->
+    </div>
+    <div class="form-group">
+        <div id="tag-container" class="tag-container border rounded p-3">
+            {{#each tags}}
+                <div class="tag">
+                    <span>{{this}}</span><span class="remove-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"></path>
+                    </svg></span>
+                </div>
+            {{/each}}
         </div>
     </div>
 
