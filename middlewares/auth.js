@@ -1,40 +1,49 @@
-// Kiểm tra xem người dùng đã đăng nhập hay chưa (sử dụng session)
-module.exports.isUser = function(req, res, next) {
-    if (!req.session.user) {
-        return res.redirect('/api');
-    }
-    next();
-};
+// Middleware for role-based authentication
 
-//Kiểm tra admin
-module.exports.isAdmin = (req, res, next) => {
-    if (req.session.user && req.user.role === 'admin') {
-        req.session.isSubscriber = true;
-        return next();
+module.exports = {
+    // Check if the user is logged in
+    isUser: function (req, res, next) {
+        if (!req.session.user) {
+            return res.redirect('/api');
+        }
+        req.session.isUser = true;
+        next();
+    },
+
+    // Generalized role checker
+    checkRole: function (role) {
+        return (req, res, next) => {
+            module.exports.isUser(req, res, () => {
+                if (req.user.role === role) {
+                    req.session.isSubscriber = true;
+                    return next();
+                }
+                res.status(403).send('Access Denied! Wrong Role');
+            });
+        };
+    },
+
+    // Role-specific middleware
+    isAdmin: function (req, res, next) {
+        return module.exports.checkRole('admin')(req, res, next);
+    },
+
+    isEditor: function (req, res, next) {
+        return module.exports.checkRole('editor')(req, res, next);
+    },
+
+    isWriter: function (req, res, next) {
+        return module.exports.checkRole('writer')(req, res, next);
+    },
+
+    isSubscriber: function (req, res, next) {
+        module.exports.isUser(req, res, () => {
+            const allowedRoles = ['subscriber', 'admin', 'editor', 'writer'];
+            if (allowedRoles.includes(req.user.role)) {
+                req.session.isSubscriber = true;
+                return next();
+            }
+            res.status(403).send('Access Denied! Wrong Role');
+        });
     }
-    res.status(403).send('Access Denied! Wrong Role');
-}
-//kiểm tra editor
-module.exports.isEditor = (req, res, next) => {
-    if (req.session.user && req.user.role === 'editor') {
-        req.session.isSubscriber = true;
-        return next();
-    }
-    res.status(403).send('Access Denied! Wrong Role');
-}
-//kiểm tra phóng viên
-module.exports.isWriter = (req, res, next) => {
-    if (req.session.user && req.user.role === 'writer') {
-        req.session.isSubscriber = true;
-        return next();
-    }
-    res.status(403).send('Access Denied! Wrong Role');
-}
-//kiểm tra người dùng đã đăng kí
-module.exports.isSubscriber = (req, res, next) => {
-    if (req.session.user && req.user.role === 'subscriber' || req.user.role === 'admin' || req.user.role === 'editor' || req.user.role === 'writer') {
-        req.session.isSubscriber = true;
-        return next();
-    }
-    res.status(403).send('Access Denied! Wrong Role');
-}
+};

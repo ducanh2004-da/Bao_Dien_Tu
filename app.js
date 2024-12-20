@@ -147,12 +147,12 @@ app.get("/", (req, res) => {
 });
 
 // Define routes
-app.use("/main", authMiddleware.isUser, authMiddleware.isSubscriber, mainRoutes);
-app.use("/writer", authMiddleware.isUser, authMiddleware.isWriter, writerRoutes);
-app.use("/editor", authMiddleware.isUser, authMiddleware.isEditor, editorRoutes);
+app.use("/main", authMiddleware.isSubscriber, mainRoutes);
+app.use("/writer", authMiddleware.isWriter, writerRoutes);
+app.use("/editor", authMiddleware.isEditor, editorRoutes);
 app.use("/home", homeRoutes);
 app.use("/api", authRoutes);
-app.use("/admin", authMiddleware.isUser, authMiddleware.isAdmin, adminRoutes);
+app.use("/admin", authMiddleware.isAdmin, adminRoutes);
 
 app.use((err, req, res, next) => {
     console.error('Lỗi xảy ra:', err); // Ghi nhật ký lỗi đầy đủ để dễ gỡ lỗi
