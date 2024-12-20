@@ -63,7 +63,7 @@ const updateLike = (id, callback) => {
 };
 
 
-const getPostByCategory = (categoryId, callback) => {
+const getPostsByCategory = (categoryId, callback) => {
     // First, check if the category is a parent category
     const checkParentQuery = `
         SELECT COUNT(*) AS isParent
@@ -113,7 +113,7 @@ const getPostByCategory = (categoryId, callback) => {
     });
 };
 
-const getPostByCategoryNoPremium = (categoryId, callback) => {
+const getPostsByCategoryNoPremium = (categoryId, callback) => {
     // First, check if the category is a parent category
     const checkParentQuery = `
         SELECT COUNT(*) AS isParent
@@ -169,8 +169,8 @@ module.exports = {
     getAllPosts,
     getPostById,
     getPostAuthorInfo,
-    getPostByCategory,
-    getPostByCategoryNoPremium,
+    getPostsByCategory,
+    getPostsByCategoryNoPremium,
     updatePublished,
     updatePost,
     updateView,
