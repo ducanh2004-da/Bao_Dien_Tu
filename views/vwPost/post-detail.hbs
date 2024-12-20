@@ -119,10 +119,29 @@
     </article>
 
     <!-- Comment Section -->
+
+    <h3 class="mb-3 font-weight-bold">Bình luận</h3>
+    {{#each comments}}
+    <div class="card shadow-sm mb-2">
+        <div class="card-body">
+            <p class="font-weight-bold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                </svg>
+                &nbsp;
+                {{#if this.penName}}{{this.penName}}{{else}}{{this.username}}{{/if}}
+            </p>
+            <p>{{this.content}}</p>
+            <p class="text-muted">{{this.commentDate}}</p>
+        </div>
+    </div>
+    {{/each}}
+
     <h3 class="mb-3 font-weight-bold">Viết bình luận</h3>
     <div class="card shadow-sm mb-5">
         <div class="card-body">
-            <form action="/post/{{post.id}}/comment" method="POST" id="comment-form">
+            <form action="/main/post/{{post.id}}/comment" method="POST" id="comment-form">
                 <div class="form-group mb-3">
                     <label for="content" class="form-label font-weight-bold">Nội dung</label>
                     <textarea id="content" name="content" class="form-control" rows="3" placeholder="Viết bình luận của bạn..."></textarea>
@@ -138,6 +157,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
             </svg>&nbsp;
-            Back to Post List</a>
+            Back to main page
     </div>
 </div>
