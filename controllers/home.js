@@ -82,13 +82,13 @@ module.exports = {
                   return res.status(500).send("Không thể lấy danh mục");
                 }
 
-                postModel.getPostByCategory(id, (err, posts) => {
+                postModel.getPostByCategoryNoPremium(id, (err, posts) => {
                     if (err) {
                       return res.status(500).send("Không thể lấy bài viết của danh mục này");
                     }if (err) {
                           return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
                         }
-                    homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
+                    homeModel.getTop5MostLikedPostsByCategoryNoPremium(id, (err, hotPosts) => {
                         if (err) {
                           return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
                         }
@@ -146,6 +146,7 @@ module.exports = {
                     res.render("vwPost/post-detail", {
                         layout: "main",
                         title: post.title,
+                        tags: post.tags.split(",").map((tag) => tag.trim()),
                         post,
                         category: categories[0],
                         author,
