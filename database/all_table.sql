@@ -102,15 +102,10 @@ CREATE TRIGGER after_user_insert
 AFTER INSERT ON users
 FOR EACH ROW
 BEGIN
-    -- Insert default subscription for the new user
-    INSERT INTO subscriptions (userId)
-    VALUES (NEW.id);
-
-    -- Ensure the default role is subscriber
-    IF NEW.role IS NULL THEN
-        UPDATE users
-        SET role = 'subscriber'
-        WHERE id = NEW.id;
+    -- Insert default subscription for the new user only if the role is subscriber or non-subscriber
+    IF NEW.role IN ('subscriber') THEN
+        INSERT INTO subscriptions (userId)
+        VALUES (NEW.id);
     END IF;
 END$$
 
