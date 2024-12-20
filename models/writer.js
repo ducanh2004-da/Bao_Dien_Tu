@@ -84,6 +84,7 @@ const getArticlesByUserId = (userId, callback) => {
                  LEFT JOIN categories ON post_categories.categoryId = categories.id
         WHERE posts.userId = ?
         GROUP BY posts.id
+        ORDER BY posts.updated_at DESC
     `;
 
     db.query(query, [userId], callback);
@@ -97,6 +98,7 @@ const getArticlesById = (id, callback) => {
                  LEFT JOIN categories ON post_categories.categoryId = categories.id
         WHERE posts.id=?
         GROUP BY posts.id
+        ORDER BY posts.updated_at DESC
     `;
 
     db.query(query, [id], callback);
@@ -105,7 +107,7 @@ const getArticlesById = (id, callback) => {
 const updateArticle = (article, callback) => {
     const query = `
         UPDATE posts
-        SET title = ?, abstract = ?, content = ?, statusName = ?, updated_at = NOW(), tags = ?
+        SET title = ?, abstract = ?, content = ?, statusName = ?, updated_at = NOW(), tags = ?, premium = ?
         WHERE id = ?
     `;
     db.query(
@@ -115,8 +117,9 @@ const updateArticle = (article, callback) => {
             article.abstract,
             article.content,
             "Pending-Approval",
-            article.id,
             article.tags,
+            article.is_premium,
+            article.id,
         ],
         (err, result) => {
             if (err) return callback(err);
