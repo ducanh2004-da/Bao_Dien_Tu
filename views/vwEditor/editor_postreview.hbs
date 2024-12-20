@@ -86,17 +86,17 @@
     <div class="container-fluid bg-light p-4 rounded-lg shadow-lg my-4">
         <form action="/editor/article-update" method="POST" id="review-form">
             <!-- Post ID -->
-            <input type="hidden" name="post-id" value="{{article.id}}" />
+            <input type="hidden" name="post-id" value="{{article.id}}" readonly/>
             <!-- Title Input -->
             <div class="form-group">
                 <label for="post-title">Tiêu đề bài viết</label>
-                <input type="text" class="form-control" id="post-title" name="post-title" value="{{article.title}}" />
+                <input type="text" class="form-control" id="post-title" name="post-title" value="{{article.title}}" readonly/>
             </div>
 
             <!-- Short Description -->
             <div class="form-group">
                 <label for="short-description">Mô tả ngắn</label>
-                <textarea class="form-control" id="short-description" rows="4" name="short-description">{{article.abstract}}</textarea>
+                <textarea class="form-control" id="short-description" rows="4" name="short-description" readonly>{{article.abstract}}</textarea>
             </div>
 
             <!-- Full Description -->
@@ -110,20 +110,18 @@
             <!-- Thumbnail Image -->
             <div class="form-group">
                 <label for="post-thumbnail">Ảnh đại diện</label>
-                <img src="/public/posts/imgs/{{article.id}}/thumbnail.jpg" alt="Post Thumbnail" class="img-thumbnail" id="post-thumbnail" style="display: block; height: 100%; max-width: 400px" />
-            </div>
-
-            <!-- Tags Section -->
-            <div class="form-group">
-                <label for="tag-input">Tags</label>
-                <div class="input-group">
-                    <input type="text" id="tag-input" class="form-control" placeholder="Nhập với một tag" aria-label="Nhập với một tag" aria-describedby="add-tag-btn" />
-                </div>
+                <img src="/public/posts/imgs/{{article.id}}/thumbnail.jpg" alt="Post Thumbnail" class="img-thumbnail" id="post-thumbnail" style="display: block; height: 100%; max-width: 400px"/>
             </div>
 
             <!-- Tags Container -->
             <div class="form-group">
-                <div id="tag-container" class="tag-container border rounded p-3"></div>
+                <div id="tag-container" class="tag-container border rounded p-3">
+                    {{#each tags}}
+                        <div class="tag">
+                            <span>{{this}}</span>
+                        </div>
+                    {{/each}}
+                </div>
             </div>
 
             <!-- Action Buttons -->
