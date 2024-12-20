@@ -43,6 +43,14 @@ const getParentCat = (callback) => {
     );
 };
 
+const getEditorCats = (editorId, callback) => {
+    db.query(
+        'SELECT * FROM categories WHERE editorId = ?',
+        [editorId],
+        callback
+    );
+}
+
 module.exports = {
     getAllCategories,
     add,
