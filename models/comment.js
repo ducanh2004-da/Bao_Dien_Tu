@@ -9,16 +9,27 @@ const getCommentById = (id, callback) => {
 }
 
 const getCommentsByPostId = (postId, callback) => {
-    db.query("SELECT * FROM comments WHERE postId = ?", [postId], callback);
+    // Also get the user info of the comment
+    const query = `
+        SELECT comments.*, users.*
+        FROM comments
+        JOIN users ON comments.userId = users.id
+        WHERE postId = ?
+    `;
+    db.query(query, [postId], callback);
 }
 
-const addComment = (comment, callback) => {
+const addComment = (postId, userId, content, callback) => {
     db.query(
-        "INSERT INTO comments SET ?",
-        comment,
-        (err, result) => {
-            if (err) return callback(err);
-            getCommentById(result.insertId, callback);
-        }
+        "INSERT INTO comments (postId, userId, content) VALUES (?,?,?)",
+        [postId, userId, content],
+        callback
     );
+}
+
+module.exports = {
+    getAllComments,
+    getCommentById,
+    getCommentsByPostId,
+    addComment,
 }
