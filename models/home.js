@@ -52,7 +52,7 @@ const getHighlightedPostsNoPremium = (callback) => {
                      JOIN categories c ON pc.categoryId = c.id
             WHERE p.statusName = 'Published'
               AND p.publish_date >= NOW() - INTERVAL ${currentInterval} DAY
-              AND p.premium = 0 
+              AND p.premium Is Null 
             ORDER BY p.views DESC, p.likes DESC
                 LIMIT 4;
         `;
@@ -101,7 +101,7 @@ const getTop10MostViewedPostsNoPremium = (callback) => {
                  JOIN post_categories pc ON p.id = pc.postId
                  JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
-           AND p.premium = 0 
+           AND p.premium Is Null 
         ORDER BY p.views DESC
             LIMIT 10;
     `;
@@ -131,7 +131,7 @@ const getTop10NewestPostsNoPremium = (callback) => {
                  JOIN post_categories pc ON p.id = pc.postId
                  JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
-           AND p.premium = 0 
+           AND p.premium Is Null 
         ORDER BY p.publish_date DESC
             LIMIT 10;
     `;
@@ -200,7 +200,7 @@ RankedPosts AS (
     JOIN post_categories pc ON p.id = pc.postId
     JOIN TopCategories tc ON pc.categoryId = tc.category_id
     WHERE p.statusName = 'Published' 
-      AND p.premium = 0 
+      AND p.premium Is Null 
 )
 
 SELECT
@@ -287,7 +287,7 @@ const getTop5MostLikedPostsByCategoryNoPremium = (categoryId, callback) => {
                          JOIN categories c ON pc.categoryId = c.id
                 WHERE c.parent_id = ?
                   AND p.statusName = 'Published'
-                  AND p.premium = 0 
+                  AND p.premium Is Null 
                 ORDER BY p.likes DESC
                     LIMIT 5;
             `;

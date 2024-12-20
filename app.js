@@ -61,6 +61,8 @@ app.engine(
                     case "<":
                         return parseInt(v1) < parseInt(v2);
                     case "<=":
+                        console.log(parseInt(v1), parseInt(v2));
+                        console.log(parseInt(v1) <= parseInt(v2));
                         return parseInt(v1) <= parseInt(v2);
                     case ">":
                         return parseInt(v1) > parseInt(v2);

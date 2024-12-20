@@ -6,30 +6,32 @@ module.exports = {
     showArticleReview: (req, res) => {
         const id = req.query.id;
         const userId = req.session.user.id;
-
-        editorModel.isPostInEditorCategories(id, userId, (err, result) => {
+    
+        editorModel.isPostInEditorCategories(id, userId, (err, isInEditorCategories) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send("Lỗi khi kiểm tra bài viết.");
             }
-
-            if (result.length === 0) {
+    
+            if (!isInEditorCategories) {
                 return res.status(403).send("Không thể xem bài viết này.");
             }
-
-            editorModel.getArticleById(id, (err, article) => {
+    
+            editorModel.getArticleById(id, (err, results) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).send("Lỗi khi lấy bài viết.");
                 }
-
+    
+                const article = results[0]; // Lấy bài viết đầu tiên từ kết quả
                 if (!article) {
                     return res.status(404).send("Không tìm thấy bài viết.");
                 }
-
-                const tags = article.tags.split(",").map(tag => tag.trim());
-
-                res.render("vwEditor/editor_review_article", {
+    
+                // Sửa lỗi bằng cách kiểm tra article.tags và gán giá trị mặc định
+                const tags = (article?.tags ?? '').split(",").map(tag => tag.trim());
+    
+                res.render("vwEditor/editor_postreview", {
                     layout: "main",
                     title: "Xem bài viết",
                     article: article,
@@ -39,7 +41,7 @@ module.exports = {
             });
         });
     },
-
+    
     showMainPage: (req, res) => {
         const statusFilter = req.query.statusName;
         const userId = req.session.user.id;
@@ -106,7 +108,7 @@ module.exports = {
             return res.status(400).json({ message: "Thiếu ID bài viết." });
         }
 
-        editorModel.isPostInEditorCategories(id, userId, (err, result) => {
+        editorModel.isPostInEditorCategories(id, req.session.user.id, (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send("Lỗi khi kiểm tra bài viết.");
@@ -139,7 +141,7 @@ module.exports = {
                 .json({ message: "Thiếu lý do từ chối hoặc ID bài viết." });
         }
 
-        editorModel.isPostInEditorCategories(id, userId, (err, result) => {
+        editorModel.isPostInEditorCategories(id, req.session.user.id, (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send("Lỗi khi kiểm tra bài viết.");

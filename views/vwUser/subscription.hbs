@@ -5,19 +5,29 @@
     <div class="card-body">
         <!-- Kiểm tra nếu người dùng là người đăng ký -->
         {{#if isSubscriber}}
-            <p class="text-success">Bạn là <strong>subscriber</strong>.</p>
-            <p>Đăng ký của bạn có hiệu lực đến: <strong>{{subscription.end_date}}</strong></p>
-            <p class="text-muted">Tận hưởng nội dung và lợi ích cao cấp!</p>
-
-            <!-- Cảnh báo người dùng nếu đăng ký của họ sắp hết hạn -->
-            {{#if (ifCond daysLeft "<=" 3)}}
+            <!-- Cảnh báo người dùng nếu đăng ký của họ đã hết hạn -->
+            {{#if (ifCond subscription.status "===" "Expired")}}
                 <div class="alert alert-warning" role="alert">
-                    Đăng ký của bạn sẽ hết hạn trong {{daysLeft}} ngày. Gia hạn ngay để tránh gián đoạn!
+                    Đăng ký của bạn đã hết hạn. Gia hạn ngay để tránh gián đoạn!
                     <a href="/main/extendSubscription/" class="btn btn-warning">Gia hạn</a>
                 </div>
-
-
+            <!-- Cảnh báo người dùng nếu đăng ký của họ sắp hết hạn -->
+            {{else}}
+                {{#if almostExpired}}
+                    <div class="alert alert-warning" role="alert">
+                        Đăng ký của bạn sẽ hết hạn trong {{daysLeft}} ngày. Gia hạn ngay để tránh gián đoạn!
+                        <a href="/main/extendSubscription/" class="btn btn-warning">Gia hạn</a>
+                    </div>
+                {{else}}
+                    <!-- Hiển thị thông tin đăng ký -->
+                    <p class="text-success">Bạn là <strong>subscriber</strong>.</p>
+                    <p>Đăng ký của bạn có hiệu lực đến: <strong>{{subscription.end_date}}</strong></p>
+                    <p class="text-muted">Tận hưởng nội dung và lợi ích cao cấp!</p>
+                {{/if}}
             {{/if}}
+
+
+
         {{else}}
             <p class="text-danger">Bạn không phải là premium subscriber.</p>
             <p class="text-muted">Đăng ký ngay để mở khóa các tính năng và nội dung cao cấp.</p>

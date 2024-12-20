@@ -15,7 +15,7 @@ CREATE TABLE users (
     role ENUM('subscriber', 'writer', 'editor', 'admin', 'non-subscriber') DEFAULT 'subscriber',  -- Phân quyền người dùng
     penName VARCHAR(50),  -- Bút danh (không bắt buộc)
     birthday DATE,  -- Ngày sinh
-    imgURL VARCHAR(255) DEFAULT NULL, --lưu ảnh đại diện
+    imgURL VARCHAR(255) DEFAULT NULL, 
 	otp_code VARCHAR(6),                   -- Mã OTP 6 chữ số
     otp_expires_at DATETIME,               -- Thời gian hết hạn của mã OTP
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -102,15 +102,10 @@ CREATE TRIGGER after_user_insert
 AFTER INSERT ON users
 FOR EACH ROW
 BEGIN
-    -- Insert default subscription for the new user
-    INSERT INTO subscriptions (userId)
-    VALUES (NEW.id);
-
-    -- Ensure the default role is subscriber
-    IF NEW.role IS NULL THEN
-        UPDATE users
-        SET role = 'subscriber'
-        WHERE id = NEW.id;
+    -- Insert default subscription for the new user only if the role is subscriber or non-subscriber
+    IF NEW.role IN ('subscriber') THEN
+        INSERT INTO subscriptions (userId)
+        VALUES (NEW.id);
     END IF;
 END$$
 

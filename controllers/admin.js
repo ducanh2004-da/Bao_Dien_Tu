@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Category = require('../models/category');
 const Post =require('../models/post');
+const Subscribe = require('../models/subscription');
 
 module.exports.showAll = (req,res) =>{
     User.getAllUser((err,users)=>{
@@ -170,5 +171,32 @@ module.exports.EditPost = (req,res) =>{
             return res.status(500).json({ error: err.message });
         }
         res.redirect('/admin');
+    })
+}
+module.exports.Delay = (req,res) =>{
+    const userId = req.params.id;
+    User.findById(userId,(err,user)=>{
+        if(err){
+            console.log(err);
+        }
+        if (!user) {
+            return res.status(404).send('Người dùng không tồn tại.');
+        }
+        Subscribe.getSubscriptionByUserId(userId,(err,subscription)=>{
+            if(err){
+                console.log(err);
+            }
+            if (!subscription) {
+                return res.status(404).send('Người dùng chưa có tài khoản subscriber.');
+            }
+            const newEndDate = new Date(subscription[0].end_date);
+            newEndDate.setDate(newEndDate.getDate() + 7); // Cộng thêm 7 ngày
+            Subscribe.extendSubscriptions(newEndDate,userId,(err)=>{
+                if(err){
+                    console.log(err);
+                }
+                res.redirect('/admin');
+            })
+        })
     })
 }

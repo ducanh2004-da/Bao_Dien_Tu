@@ -17,4 +17,5 @@ router.get('user/:id/delete',AdminController.deleteUser);
 router.post('/user/:id/edit',AdminController.EditUser);
 router.get('/post/:id/edit',AdminController.viewEditPost);
 router.post('/post/:id/edit',AdminController.EditPost);
+router.get('/user/:id/delay',AdminController.Delay);
 module.exports = router;
