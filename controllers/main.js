@@ -443,7 +443,7 @@ module.exports = {
 
     // Subscription page
     showSubscription: (req, res) => {
-        const { user, isSubscriber } = req.session;
+        const { user, isUser, isSubscriber } = req.session;
 
         if (isSubscriber) {
             
@@ -464,19 +464,22 @@ module.exports = {
                     // Render subscription page
                     res.render("vwUser/subscription", {
                         layout: "main",
-                        title: "Đăng ký",
+                        title: "Gói dịch vụ",
                         user,
                         subscription: subscription[0],
                         isSubscriber,
                         daysLeft,
+                        almostExpired: daysLeft <= 3,
                     });
                 });
             });
-        } else {
+        } else if (isUser) {
+            // Render subscription page
             res.render("vwUser/subscription", {
                 layout: "main",
-                title: "Quản lý gói đăng ký",
+                title: "Gói dịch vụ",
                 user,
+                isUser,
             });
         }
     },

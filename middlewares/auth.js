@@ -38,7 +38,7 @@ module.exports = {
 
     isSubscriber: function (req, res, next) {
         module.exports.isUser(req, res, () => {
-            const allowedRoles = ['subscriber', 'admin', 'editor', 'writer'];
+            const allowedRoles = ['subscriber', 'admin', 'editor', 'writer', 'non-subscriber'];
             if (allowedRoles.includes(req.user.role)) {
                 req.session.isSubscriber = true;
                 return next();
