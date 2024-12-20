@@ -3,7 +3,7 @@
         <div class="card-body">
             <!-- Profile Header -->
             <div class="text-center mb-4">
-                <img src="/public/users/avatars/{{user.id}}/avatar.jpg"
+                <img src="{{user.imgURL}}"
                      alt="User Avatar"
                      class="rounded-circle border img-thumbnail
                          {{#if (ifCond user.role '===' 'admin')}}border-danger{{/if}}

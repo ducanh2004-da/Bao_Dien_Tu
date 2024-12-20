@@ -4,7 +4,7 @@ const customJoi = require("./joiExtensions");
 const userSchema = Joi.object({
     username: Joi.string().min(3).max(50).optional().trim().escapeHTML(),
     email: Joi.string().email().required().trim().escapeHTML(),
-    password: Joi.string().min(8).max(255).required().trim().escapeHTML(),
+    password: Joi.string().min(5).max(255).required().trim().escapeHTML(),
     penName: Joi.string().max(100).optional().trim().escapeHTML(),
     birthday: Joi.date().optional(),
     otp_code: Joi.string().length(6).optional().escapeHTML(),

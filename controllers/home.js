@@ -17,12 +17,12 @@ module.exports = {
                     children: categories.filter((child) => child.parent_id === parent.id),
                 }));
 
-            homeModel.getHighlightedPosts((err, highlightedPosts) => {
+            homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
                 if (err) {
                   return res.status(500).send("Không thể lấy bài viết nổi bật");
                 }
 
-                homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
+                homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
                     if (err) {
                       return res.status(500).send("Không thể lấy danh mục hàng đầu");
                     }
@@ -36,12 +36,12 @@ module.exports = {
                         return grouped;
                     }, {});
 
-                    homeModel.getTop10NewestPosts((err, latestPosts) => {
+                    homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
                         if (err) {
                           return res.status(500).send("Không thể lấy bài viết mới nhất");
                         }
 
-                        homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
+                        homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
                             if (err) {
                               return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
                             }

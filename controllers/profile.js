@@ -32,7 +32,20 @@ module.exports.viewEdit = (req,res) =>{
 module.exports.Edit = (req,res) =>{
     const id = req.session.user.id;
     const user = req.body;
-    User.editUser(id,user,(err)=>{
+
+    console.log(req.file)
+    if (!req.file) {
+        return res.status(400).send('Vui lòng tải lên một ảnh.');
+    }
+
+    const allowedFormats = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedFormats.includes(req.file.mimetype)) {
+        return res.status(400).json({ error: 'File định dạng không hợp lệ!' });
+    }
+
+    const imageUrl = req.file.path;
+
+    User.editUser(id,user,imageUrl,(err)=>{
         if (err) {
             return res.status(500).json({ error: err.message });
         }

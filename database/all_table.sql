@@ -7,14 +7,17 @@ USE baodientu;
 -- Create the `users` table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100),
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255),
-    role ENUM('subscriber', 'writer', 'editor', 'admin', 'non-subscriber') DEFAULT 'subscriber',
-    penName VARCHAR(50),
-    birthday DATE,
-    otp_code VARCHAR(6),
-    otp_expires_at DATETIME,
+    username VARCHAR(100), 
+    email VARCHAR(100) NOT NULL UNIQUE, 
+    password VARCHAR(255),   -- Có thể để null nếu dùng OAuth
+    githubId VARCHAR(255) UNIQUE,  -- Lưu ID Facebook nếu sử dụng OAuth
+    googleId VARCHAR(255) UNIQUE,  -- Lưu ID Google nếu sử dụng OAuth
+    role ENUM('subscriber','writer','editor','admin') DEFAULT 'subscriber',  -- Phân quyền người dùng
+    penName VARCHAR(50),  -- Bút danh (không bắt buộc)
+    birthday DATE,  -- Ngày sinh
+    imgURL VARCHAR(255) DEFAULT NULL, --lưu ảnh đại diện
+	otp_code VARCHAR(6),                   -- Mã OTP 6 chữ số
+    otp_expires_at DATETIME,               -- Thời gian hết hạn của mã OTP
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

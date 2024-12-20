@@ -23,132 +23,10 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Báo Điện Tử - Đăng Nhập</title>
+  <link rel="stylesheet" href="/stylesheet/form.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #4a6cf7;
-      --secondary-color: #6c757d;
-      --background-light: #f4f6f9;
-      --text-dark: #333;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--background-light);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 15px;
-    }
-
-    .login-container {
-      background-color: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 450px;
-      padding: 30px;
-      transition: all 0.3s ease;
-    }
-
-    .login-container:hover {
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-    }
-
-    .site-title {
-      text-align: center;
-      color: var(--primary-color);
-      margin-bottom: 30px;
-      font-weight: 700;
-    }
-
-    .form-control {
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 15px;
-    }
-
-    .btn-primary {
-      background-color: var(--primary-color);
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      width: 100%;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background-color: #3a5aef;
-      transform: translateY(-3px);
-    }
-
-    .role-switcher {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .role-switcher a {
-      color: var(--secondary-color);
-      margin: 0 10px;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .role-switcher a:hover {
-      color: var(--primary-color);
-    }
-
-    .social-login {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .social-login a {
-      color: var(--secondary-color);
-      font-size: 24px;
-      transition: color 0.3s ease;
-    }
-
-    .social-login a:hover {
-      color: var(--primary-color);
-    }
-
-    .form-switch-link {
-      color: var(--primary-color);
-      text-align: center;
-      margin-top: 15px;
-      cursor: pointer;
-    }
-
-    .message-container {
-      margin-bottom: 20px;
-    }
-
-   .snowflake {
-  position: fixed;
-  top: -10px;
-  color: white;
-  font-size: 1em;
-  font-family: Arial, sans-serif;
-  text-shadow: 0 0 5px #000;
-  pointer-events: none;
-  user-select: none;
-  z-index: 1000;
-  animation: fall linear forwards;
-}
-
-@keyframes fall {
-  to {
-    transform: translateY(100vh);
-  }
-}
-  </style>
 </head>
 <body>
   <div class="login-container">
@@ -172,6 +50,14 @@
       {{/if}}
     </div>
 
+    <h5 class="text-center">Đăng nhập với vai trò?</h5>
+    <div class="role-switcher mt-3">
+      <a href="#" id="switch-to-sub"><i class="fas fa-user"></i> Subscriber</a>
+      <a href="#" id="switch-to-writer"><i class="fas fa-pen"></i> Writer</a>
+      <a href="#" id="switch-to-editor"><i class="fas fa-edit"></i> Editor</a>
+      <a href="#" id="switch-to-admin"><i class="fas fa-user-shield"></i> Admin</a>
+    </div>
+    <br>
     <!-- Form đăng nhập Subscriber -->
     <form action="/api/login" method="POST" class="form role-form" id="sub-login-form">
       <h3 class="text-center mb-4">Đăng Nhập Subscriber</h3>
@@ -225,17 +111,11 @@
       <input type="text" name="birthday" class="form-control" id="register-birthday" placeholder="Ngày sinh" required>
       <button type="submit" class="btn btn-primary">Đăng Ký</button>
     </form>
-
-    <div class="role-switcher mt-3">
-      <a href="#" id="switch-to-sub"><i class="fas fa-user"></i> Subscriber</a>
-      <a href="#" id="switch-to-writer"><i class="fas fa-pen"></i> Writer</a>
-      <a href="#" id="switch-to-editor"><i class="fas fa-edit"></i> Editor</a>
-      <a href="#" id="switch-to-admin"><i class="fas fa-user-shield"></i> Admin</a>
-    </div>
+  
 
     <div class="form-switch-link">
-      <span id="switch-regis">Chưa có tài khoản? Đăng ký ngay</span>
-      <span id="switch-log" style="display:none;">Đã có tài khoản? Đăng nhập</span>
+      <span id="switch-regis"><div style="color:black;">Chưa có tài khoản?</div> Đăng ký ngay</span>
+      <span id="switch-log" style="display:none;"><div style="color:black;">Đã có tài khoản?</div> Đăng nhập</span>
     </div>
 
     <div class="social-login">

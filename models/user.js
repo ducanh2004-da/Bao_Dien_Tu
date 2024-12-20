@@ -102,10 +102,10 @@ const updateRole = (id,user, callback) =>{
     )
 }
 
-const editUser = (id,user,callback) =>{
+const editUser = (id,user,imageUrl,callback) =>{
     db.query(
-        'UPDATE users SET username = ?, email = ?, penName = ?, birthday = ? WHERE id = ?',
-        [user.username, user.email, user.penName, user.birthday, id],
+        'UPDATE users SET username = ?, email = ?, penName = ?, birthday = ?, imgURL = ? WHERE id = ?',
+        [user.username, user.email, user.penName, user.birthday,imageUrl, id],
         callback
     );
 }

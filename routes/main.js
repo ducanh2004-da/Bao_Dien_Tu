@@ -1,6 +1,7 @@
 const express = require('express');
 const profileController = require('../controllers/profile');
 const { validateQuery } = require('../validators/validators');
+const { upload } = require('../cloudinary/Cloud');
 
 
 const router = express.Router();
@@ -13,7 +14,9 @@ router.get('/category/:id', MainController.showCategory);
 router.get('/search', validateQuery, MainController.search);
 router.get('/profile', profileController.show);
 router.get('/profile/edit', profileController.viewEdit);
-router.post('/profile/update', profileController.Edit);
+router.post('/profile/update',upload.single('image'), profileController.Edit);
 router.get('/subscription', MainController.showSubscription);
+// Route to handle upgrading to premium
+router.post('/premium', MainController.subscription);
 
 module.exports = router;

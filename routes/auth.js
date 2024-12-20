@@ -53,13 +53,13 @@ router.route('/forgot-password')
 
 router.route('/reset-password')
     .get(AuthController.showResetForm)
-    .post(validatePost,AuthController.resetPass)
+    .post(AuthController.resetPass)
 
 router.route('/verify-otp')
     .get((req,res) => {
         res.render('checkOtp');
         })
-    .post(validatePost,AuthController.checkOtp)
+    .post(AuthController.checkOtp)
 
 router.get('/logout', AuthController.Logout);
 

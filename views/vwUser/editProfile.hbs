@@ -4,7 +4,7 @@
             <h2 class="text-center mb-4">Edit Profile</h2>
 
             <!-- Form Section -->
-            <form action="../profile/update" method="POST">
+            <form action="../profile/update" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" class="form-control" value="{{user.username}}">
@@ -23,6 +23,10 @@
                 <div class="form-group">
                     <label for="birthday">Birthday</label>
                     <input type="date" id="birthday" name="birthday" class="form-control" value="{{user.birthday}}">
+                </div>
+                <div class="mb-3">
+                    <h4>Upload Avatar</h4>
+                    <input type="file" name="image">
                 </div>
 
                 <button type="submit" class="btn btn-success btn-block btn-lg mt-3">Update Profile</button>

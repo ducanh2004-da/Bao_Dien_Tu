@@ -19,9 +19,11 @@
 
             {{/if}}
         {{else}}
-            <p class="text-danger">Bạn không phải là subscriber.</p>
+            <p class="text-danger">Bạn không phải là premium subscriber.</p>
             <p class="text-muted">Đăng ký ngay để mở khóa các tính năng và nội dung cao cấp.</p>
-            <a href="#" class="btn btn-primary">Đăng ký ngay</a>
+            <form action="/main/premium" method="POST">
+                <button class="btn btn-primary">Đăng ký ngay</button>
+            </form>
         {{/if}}
     </div>
 </div>

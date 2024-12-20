@@ -26,6 +26,7 @@
         <div id="main-news" class="col-md-9">
             <div class="container mt-4">
                 <h4 class="mb-3 text-primary">Tin nổi bật</h4>
+                {{#if highlightedPosts}}
                 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
                         <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -95,8 +96,12 @@
                         <span class="sr-only">Next</span>
                     </button>
                 </div>
+                {{else}}
+                <div>Chưa có tin nổi bật nào! </div>
+                {{/if}}
             </div>
 
+            {{#if topCategories}}
             {{#each topCategories}}
                 <div class="container mt-4">
                     <h4 class="mb-3 text-primary">
@@ -163,6 +168,9 @@
                     {{/if}}
                 </div>
             {{/each}}
+            {{else}}
+            <div>Chưa có tin theo chủ đề nào, hãy dùng file database/sample.sql để tạo</div>
+            {{/if}}
 
 
         </div>
@@ -179,6 +187,7 @@
                     </div>
                 </div>
                 <div id="latest-news" style="display: block">
+                    {{#if latestPosts}}
                     {{#each latestPosts}}
                         <div class="card mb-3">
                             <a href="{{#if ../user}}/main/post/{{this.id}}{{else}}/home/post/{{this.id}}{{/if}}">
@@ -203,6 +212,9 @@
                             </div>
                         </div>
                     {{/each}}
+                    {{else}}
+                    <div>Chưa có tin mới nào! hãy dùng file database/sample.sql để tạo</div>
+                    {{/if}}
                 </div>
                 <div id="most-views-news" style="display: none">
                     {{#each mostViewPosts}}

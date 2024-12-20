@@ -11,12 +11,11 @@ const getNextId = (tableName, callback) => {
         callback(null, nextId);
     });
 };
-
 const insertArticle = (article, callback) => {
     const query = `
         INSERT INTO posts
-        (title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId)
-        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
+        (title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId, premium)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)
     `;
 
     db.query(
@@ -29,11 +28,12 @@ const insertArticle = (article, callback) => {
             article.tags,
             "Pending-Approval",
             article.userId,
+            article.is_premium
         ],
         (err, result) => {
             if (err) return callback(err);
 
-            // Insert into post_categories for categories
+            // Insert into post_categories for multiple categories
             if (article.categories && article.categories.length > 0) {
                 const categoryQuery = `
                     INSERT INTO post_categories (postId, categoryId)
@@ -50,6 +50,7 @@ const insertArticle = (article, callback) => {
         }
     );
 };
+
 
 const getArticlesByStatus = (statusName, userId, callback) => {
     if (statusName === "all") {

@@ -138,7 +138,7 @@ module.exports = {
                 console.error("Lỗi khi lấy ID tiếp theo:", err);
                 return res.status(500).send("Lỗi khi lấy ID tiếp theo");
             }
-
+    
             const storage = multer.diskStorage({
                 destination: function (req, file, cb) {
                     const folderPath = `./public/posts/imgs/${nextId}`;
@@ -151,45 +151,43 @@ module.exports = {
                     cb(null, "thumbnail" + path.extname(file.originalname));
                 },
             });
-
+    
             const upload = multer({ storage }).single("thumbnail");
-
+    
             upload(req, res, (err) => {
                 if (err) {
                     console.error("Lỗi khi upload ảnh:", err);
                     return res.status(500).send("Lỗi khi upload ảnh");
                 }
-
-                const { title, abstract, content, category, tags } = req.body;
-
-                const categoryId = parseInt(category, 10);
-                if (isNaN(categoryId)) {
-                    console.error("categoryId không hợp lệ:", category);
-                    return res
-                        .status(400)
-                        .send("Danh mục không hợp lệ. Vui lòng kiểm tra lại.");
-                }
-
+    
+                const { title, abstract, content, category, tags, is_premium } = req.body;
+    
+                // Check if the categories are passed as an array
+                const categories = Array.isArray(category) ? category : [category];
+    
                 writerModel.insertArticle(
                     {
                         title: title,
-                        category: categoryId,
+                        categories: categories, // Pass multiple categories here
                         abstract: abstract,
                         content: content,
                         userId: req.session.user.id,
+                        is_premium: is_premium
                     },
                     (insertErr, result) => {
                         if (insertErr) {
                             console.error("Lỗi khi thêm bài viết:", insertErr);
                             return res.status(500).send("Lỗi khi thêm bài viết");
                         }
-
+    
                         res.redirect(`/writer/my-articles`);
                     }
                 );
             });
         });
     },
+    
+
 
     submitFixArticle: (req, res) => {
         const id = req.query.id;

@@ -2,6 +2,8 @@ const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
 const homeModel = require("../models/home.js");
 const subscriptionModel = require("../models/subscription.js");
+const User = require("../models/user.js");
+const Subscription = require("../models/subscription.js")
 
 
 module.exports = {
@@ -272,7 +274,8 @@ module.exports = {
 
     // Subscription page
     showSubscription: (req, res) => {
-        const { isSubscriber, user } = req.session;
+        const { user } = req.session;
+        const isSubscriber = user.id;
 
         if (isSubscriber) {
             
@@ -295,7 +298,8 @@ module.exports = {
                         layout: "main",
                         title: "Đăng ký",
                         user,
-                        subscription,
+                        subscription: subscription[0],
+                        isSubscriber,
                         daysLeft,
                     });
                 });
@@ -309,3 +313,42 @@ module.exports = {
         }
     },
 };
+module.exports.subscription = async (req, res) => {
+    try {
+        // Find the user based on user ID
+        User.findById(req.user.id, (err, users) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send('Lỗi khi tìm kiếm người dùng');
+            }
+
+            // Kiểm tra nếu người dùng có vai trò 'subscriber'
+            if (req.user.role === 'subscriber') {
+                // Tạo bản ghi subscription mới với 7 ngày premium
+                Subscription.subscribe(
+                    req.user.id, 
+                    new Date(), 
+                    new Date(new Date().setDate(new Date().getDate() + 7)), 
+                    'Active',
+                    (err) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).send('Lỗi khi tạo đăng ký');
+                        }
+
+                        // Cập nhật vai trò của người dùng thành 'premium subscriber'
+                            // Chuyển hướng người dùng đến trang subscription
+                            
+                    }
+                );
+                res.redirect('/main/subscription');
+            } else {
+                res.status(400).send('Bạn không phải là subscriber');
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Đã có lỗi xảy ra');
+    }
+};
+

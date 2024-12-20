@@ -1,9 +1,5 @@
 ﻿-- Insert Sample Users
-INSERT INTO users (username, email, password, role, penName, birthday)
-VALUES
-    ('john_doe', 'john@example.com', 'hashed_password_1', 'subscriber', 'John', '1990-01-01'),
-    ('jane_doe', 'jane@example.com', 'hashed_password_2', 'Non-subscriber', 'Jane', '1992-02-02'),
-    ('admin_user', 'admin@example.com', 'hashed_password_3', 'admin', NULL, '1985-05-15');
+-- Nên tạo user trước thay vì dùng query tạo user
 
 -- Insert Sample Subscriptions
 INSERT INTO subscriptions (userId, start_date, end_date, status)
@@ -37,6 +33,6 @@ VALUES
 -- Insert Sample Comments
 INSERT INTO comments (postId, commenter, commentDate, content, email)
 VALUES
-    (1, 'Alice', CURRENT_TIMESTAMP, 'This article is amazing!', 'alice@example.com'),
-    (2, 'Bob', CURRENT_TIMESTAMP, 'Great insights on physics.', 'bob@example.com'),
-    (3, 'Charlie', CURRENT_TIMESTAMP, 'Looking forward to more Python content.', 'charlie@example.com');
+    (1, 'Alice', CURRENT_TIMESTAMP, 'This article is amazing!', 'anhdott1@gmail.com'),
+    (2, 'Bob', CURRENT_TIMESTAMP, 'Great insights on physics.', 'anhdott1@gmail.com'),
+    (3, 'Charlie', CURRENT_TIMESTAMP, 'Looking forward to more Python content.', 'anhdott1@gmail.com');

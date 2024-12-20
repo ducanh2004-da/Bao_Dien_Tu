@@ -44,19 +44,19 @@ const extendSubscription = (id, days, callback) => {
     );
 }
 
-const subscribe = (userId, days, callback) => {
+const subscribe = (userId, startDate, endDate, status, callback) => {
     db.query(
-        `INSERT INTO subscriptions (userId, start_date, end_date, status, created_at, updated_at)
-        VALUES (?, CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL ? DAY), 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        ON DUPLICATE KEY UPDATE
-        start_date = CURRENT_DATE,
-        end_date = DATE_ADD(CURRENT_DATE, INTERVAL ? DAY),
-        status = 'Active',
-        updated_at = CURRENT_TIMESTAMP;`,
-        [userId, days, days],
-        callback
+        'INSERT INTO subscriptions (userId, start_date, end_date, status) VALUES (?, ?, ?, ?)',
+        [userId, startDate, endDate, status],
+        (err, result) => {
+            if (err) {
+                return callback(err); // Trả về lỗi nếu có
+            }
+            callback(null, result); // Trả về kết quả thành công
+        }
     );
-}
+};
+
 
 const cancelSubscription = (id, callback) => {
     db.query(
