@@ -20,44 +20,84 @@ module.exports = {
                     children: categories.filter((child) => child.parent_id === parent.id),
                 }));
 
-            // Fetch highlighted posts
-            homeModel.getHighlightedPosts((err, highlightedPosts) => {
-                if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
+            // Check if the user is a subscriber
+            if (req.session.isSubscriber) {
+                homeModel.getHighlightedPosts((err, highlightedPosts) => {
+                    if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
 
-                // Fetch top categories with newest posts
-                homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
-                    if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                    // Fetch top categories with newest posts
+                    homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
+                        if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
 
-                    // Group posts by category_name
-                    const topCategories = posts.reduce((grouped, post) => {
-                        const { category_name, ...data } = post;
-                        if (!grouped[category_name]) grouped[category_name] = [];
-                        grouped[category_name].push(data);
-                        return grouped;
-                    }, {});
+                        // Group posts by category_name
+                        const topCategories = posts.reduce((grouped, post) => {
+                            const { category_name, ...data } = post;
+                            if (!grouped[category_name]) grouped[category_name] = [];
+                            grouped[category_name].push(data);
+                            return grouped;
+                        }, {});
 
-                    // Fetch top 10 newest posts
-                    homeModel.getTop10NewestPosts((err, latestPosts) => {
-                        if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
+                        // Fetch top 10 newest posts
+                        homeModel.getTop10NewestPosts((err, latestPosts) => {
+                            if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
 
-                        // Fetch top 10 most viewed posts
-                        homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
-                            if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                            // Fetch top 10 most viewed posts
+                            homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
+                                if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
 
-                            res.render("vwUser/home", {
-                                layout: "main",
-                                title: "Trang chủ",
-                                categories: filteredCategories,
-                                highlightedPosts,
-                                topCategories,
-                                latestPosts,
-                                mostViewPosts,
-                                user: req.session.user,
+                                res.render("vwUser/home", {
+                                    layout: "main",
+                                    title: "Trang chủ",
+                                    categories: filteredCategories,
+                                    highlightedPosts,
+                                    topCategories,
+                                    latestPosts,
+                                    mostViewPosts,
+                                    user: req.session.user,
+                                });
                             });
                         });
                     });
                 });
-            });
+            } else if (req.session.isUser) {
+                homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
+                    if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
+
+                    // Fetch top categories with newest posts
+                    homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
+                        if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
+
+                        // Group posts by category_name
+                        const topCategories = posts.reduce((grouped, post) => {
+                            const { category_name, ...data } = post;
+                            if (!grouped[category_name]) grouped[category_name] = [];
+                            grouped[category_name].push(data);
+                            return grouped;
+                        }, {});
+
+                        // Fetch top 10 newest posts
+                        homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
+                            if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
+
+                            // Fetch top 10 most viewed posts
+                            homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
+                                if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+
+                                res.render("vwUser/home", {
+                                    layout: "main",
+                                    title: "Trang chủ",
+                                    categories: filteredCategories,
+                                    highlightedPosts,
+                                    topCategories,
+                                    latestPosts,
+                                    mostViewPosts,
+                                    user: req.session.user,
+                                });
+                            });
+                        });
+                    });
+                });
+            }
         });
     },
 
@@ -138,28 +178,49 @@ module.exports = {
                     return res.status(500).send("Không thể lấy danh mục");
                 }
 
-                postModel.getPostByCategory(id, (err, posts) => {
-                    if (err) {
-                        return res.status(500).send("Không thể lấy bài viết của danh mục này");
-                    }if (err) {
-                        return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
-                    }
-                    homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
+                if (req.session.isSubscriber) {
+                    postModel.getPostsByCategory(id, (err, posts) => {
                         if (err) {
-                            return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                            return res.status(500).send("Không thể lấy bài viết của danh mục này");
                         }
+                        homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
+                            if (err) {
+                                return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                            }
 
-                        // Render the homepage view
-                        res.render("vwPost/byCat", {
-                            layout: "main",
-                            user: req.session.user,
-                            title: category[0].name,
-                            categories: filteredCategories,    // Hierarchical categories
-                            posts,
-                            hotPosts
+                            // Render the homepage view
+                            res.render("vwPost/byCat", {
+                                layout: "main",
+                                user: req.session.user,
+                                title: category[0].name,
+                                categories: filteredCategories,    // Hierarchical categories
+                                posts,
+                                hotPosts
+                            });
                         });
-                    });
-                });
+                    })
+                } else if (req.session.isUser) {
+                    postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
+                        if (err) {
+                            return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                        }
+                        homeModel.getTop5MostLikedPostsByCategoryNoPremium(id, (err, hotPosts) => {
+                            if (err) {
+                                return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                            }
+
+                            // Render the homepage view
+                            res.render("vwPost/byCat", {
+                                layout: "main",
+                                user: req.session.user,
+                                title: category[0].name,
+                                categories: filteredCategories,    // Hierarchical categories
+                                posts,
+                                hotPosts
+                            });
+                        });
+                    })
+                }
             });
         });
     },
@@ -199,76 +260,149 @@ module.exports = {
         const startIndex = (page - 1) * limit;
 
         // Fetch search results
-        homeModel.searchContent(query, limit, startIndex, (err, results) => {
-            if (err) {
-                console.error("Lỗi khi tìm kiếm bài viết:", err);
-                return res.status(500).send("Không thể tìm kiếm bài viết");
-            }
-
-            if (results.length === 0) {
-                return res.render("vwPost/search", {
-                    layout: "main",
-                    posts: results,
-                    user: req.session.user,
-                    message: "Không tìm thấy kết quả phù hợp",
-                });
-            }
-
-            // Fetch total number of results
-            homeModel.searchContentCount(query, (err, count) => {
+        if (req.session.isSubscriber) {
+            homeModel.searchContent(query, limit, startIndex, (err, results) => {
                 if (err) {
-                    console.error("Lỗi khi đếm số kết quả:", err);
-                    return res.status(500).send("Không thể đếm số kết quả");
+                    console.error("Lỗi khi tìm kiếm bài viết:", err);
+                    return res.status(500).send("Không thể tìm kiếm bài viết");
                 }
 
-                const nRows = count[0].total;
-
-                // Calculate total number of pages
-                const totalPages = Math.ceil(nRows / limit);
-
-                // Ensure that the page is within the valid range
-                if (page > totalPages) {
-                    return res.status(404).send("Không tìm thấy trang");
+                if (results.length === 0) {
+                    return res.render("vwPost/search", {
+                        layout: "main",
+                        posts: results,
+                        user: req.session.user,
+                        message: "Không tìm thấy kết quả phù hợp",
+                    });
                 }
 
-                pages = [];
-                const dotsIndex = page + 3;
-                for (let i = 1; i <= totalPages; i++) {
-                    if (i === dotsIndex) {
-                        pages.push({
-                            value: "...",
-                        });
-                        break;
-                    };
-                    if (i <= totalPages) {
-                        pages.push({
-                            value: i,
-                        });
-                    };
-                };
-
-                for (let i = totalPages - 3; i <= totalPages; i++) {
-                    if (i > dotsIndex) {
-                        pages.push({
-                            value: i,
-                        });
+                // Fetch total number of results
+                homeModel.searchContentCount(query, (err, count) => {
+                    if (err) {
+                        console.error("Lỗi khi đếm số kết quả:", err);
+                        return res.status(500).send("Không thể đếm số kết quả");
                     }
-                };
 
-                // Render search results
-                res.render("vwPost/search", {
-                    layout: "main",
-                    title: "Kết quả tìm kiếm" + query,
-                    posts: results,
-                    user: req.session.user,
-                    currentPage: page,
-                    totalPages,
-                    pages,
-                    query,
-                    message: "Tìm thấy " + nRows + " kết quả phù hợp",
+                    const nRows = count[0].total;
+
+                    // Calculate total number of pages
+                    const totalPages = Math.ceil(nRows / limit);
+
+                    // Ensure that the page is within the valid range
+                    if (page > totalPages) {
+                        return res.status(404).send("Không tìm thấy trang");
+                    }
+
+                    pages = [];
+                    const dotsIndex = page + 3;
+                    for (let i = 1; i <= totalPages; i++) {
+                        if (i === dotsIndex) {
+                            pages.push({
+                                value: "...",
+                            });
+                            break;
+                        };
+                        if (i <= totalPages) {
+                            pages.push({
+                                value: i,
+                            });
+                        };
+                    };
+
+                    for (let i = totalPages - 3; i <= totalPages; i++) {
+                        if (i > dotsIndex) {
+                            pages.push({
+                                value: i,
+                            });
+                        }
+                    };
+
+                    // Render search results
+                    res.render("vwPost/search", {
+                        layout: "main",
+                        title: "Kết quả tìm kiếm" + query,
+                        posts: results,
+                        user: req.session.user,
+                        currentPage: page,
+                        totalPages,
+                        pages,
+                        query,
+                        message: "Tìm thấy " + nRows + " kết quả phù hợp",
+                    });
                 });
             });
-        });
+        } else if (req.session.isUser) {
+            homeModel.searchContentNoPremium(query, limit, startIndex, (err, results) => {
+                if (err) {
+                    console.error("Lỗi khi tìm kiếm bài viết:", err);
+                    return res.status(500).send("Không thể tìm kiếm bài viết");
+                }
+
+                if (results.length === 0) {
+                    return res.render("vwPost/search", {
+                        layout: "main",
+                        posts: results,
+                        user: req.session.user,
+                        message: "Không tìm thấy kết quả phù hợp",
+                    });
+                }
+
+                // Fetch total number of results
+                homeModel.searchContentCountNoPremium(query, (err, count) => {
+                    if (err) {
+                        console.error("Lỗi khi đếm số kết quả:", err);
+                        return res.status(500).send("Không thể đếm số kết quả");
+                    }
+
+                    const nRows = count[0].total;
+
+                    // Calculate total number of pages
+                    const totalPages = Math.ceil(nRows / limit);
+
+                    // Ensure that the page is within the valid range
+                    if (page > totalPages) {
+                        return res.status(404).send("Không tìm thấy trang");
+                    }
+
+                    pages = [];
+                    const dotsIndex = page + 3;
+                    for (let i = 1; i <= totalPages; i++) {
+                        if (i === dotsIndex) {
+                            pages.push({
+                                value: "...",
+                            });
+                            break;
+                        };
+                        if (i <= totalPages) {
+                            pages.push({
+                                value: i,
+                            });
+                        };
+                    };
+
+                    for (let i = totalPages - 3; i <= totalPages; i++) {
+                        if (i > dotsIndex) {
+                            pages.push({
+                                value: i,
+                            });
+                        }
+                    };
+
+                    // Render search results
+                    res.render("vwPost/search", {
+                        layout: "main",
+                        title: "Kết quả tìm kiếm" + query,
+                        posts: results,
+                        user: req.session.user,
+                        currentPage: page,
+                        totalPages,
+                        pages,
+                        query,
+                        message: "Tìm thấy " + nRows + " kết quả phù hợp",
+                    });
+                });
+            });
+        }
     },
 
     // Subscription page

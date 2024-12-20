@@ -82,7 +82,7 @@ module.exports = {
                   return res.status(500).send("Không thể lấy danh mục");
                 }
 
-                postModel.getPostByCategoryNoPremium(id, (err, posts) => {
+                postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
                     if (err) {
                       return res.status(500).send("Không thể lấy bài viết của danh mục này");
                     }if (err) {
@@ -184,7 +184,7 @@ module.exports = {
         const limit = 10;
         const startIndex = (page - 1) * limit;
 
-        homeModel.searchContent(query, limit, startIndex, (err, results) => {
+        homeModel.searchContentNoPremium(query, limit, startIndex, (err, results) => {
             if (err) {
                 console.error("Lỗi khi tìm kiếm bài viết:", err);
                 return res.status(500).send("Không thể tìm kiếm bài viết");
@@ -200,7 +200,7 @@ module.exports = {
                 });
             }
 
-            homeModel.searchContentCount(query, (err, count) => {
+            homeModel.searchContentCountNoPremium(query, (err, count) => {
                 if (err) {
                     console.error("Lỗi khi đếm số kết quả:", err);
                     return res.status(500).send("Không thể đếm số kết quả");
