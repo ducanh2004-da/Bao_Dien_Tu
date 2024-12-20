@@ -72,12 +72,14 @@ CREATE TABLE post_categories (
 CREATE TABLE comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     postId INT,
-    commenter VARCHAR(100) NOT NULL,
     commentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     content TEXT NOT NULL,
-    email VARCHAR(100),
+    userId INT NOT NULL,
     CONSTRAINT fk_comments_post
         FOREIGN KEY (postId) REFERENCES posts(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_comments_user
+        FOREIGN KEY (userId) REFERENCES users(id)
         ON DELETE CASCADE
 );
 
