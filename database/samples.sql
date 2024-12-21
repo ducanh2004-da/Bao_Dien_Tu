@@ -1,38 +1,46 @@
-﻿-- Insert Sample Users
--- Nên tạo user trước thay vì dùng query tạo user
-
--- Insert Sample Subscriptions
-INSERT INTO subscriptions (userId, start_date, end_date, status)
+﻿-- Insert sample users
+INSERT INTO users (username, email, password, role, penName, birthday, imgURL)
 VALUES
-    (1, CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY), 'Active'), -- John
-    (2, DATE_SUB(CURRENT_DATE, INTERVAL 10 DAY), DATE_SUB(CURRENT_DATE, INTERVAL 3 DAY), 'Expired'), -- Jane
-    (3, CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY), 'Active'); -- Admin
+('john_doe', 'john@example.com', '$2a$10$Ufb9xTeA.1.e08gvS8KZt.uoREaCkyhJrrNMXwN1ExfB2SXyQ8bv.', 'subscriber', 'JohnD', '1990-01-01', 'https://example.com/img/john.jpg'),
+('jane_writer', 'jane@example.com', '$2a$10$Ufb9xTeA.1.e08gvS8KZt.uoREaCkyhJrrNMXwN1ExfB2SXyQ8bv.', 'writer', 'JaneW', '1985-05-20', 'https://example.com/img/jane.jpg'),
+('editor_bob', 'bob@example.com', '$2a$10$Ufb9xTeA.1.e08gvS8KZt.uoREaCkyhJrrNMXwN1ExfB2SXyQ8bv.', 'editor', 'EditorBob', '1980-12-12', 'https://example.com/img/bob.jpg'),
+('admin_alan', 'alan@example.com', '$2a$10$Ufb9xTeA.1.e08gvS8KZt.uoREaCkyhJrrNMXwN1ExfB2SXyQ8bv.', 'admin', 'AdminAlan', '1975-07-15', 'https://example.com/img/alan.jpg');
 
--- Insert Sample Categories
+-- 0909090909 password
+
+-- Insert sample categories
 INSERT INTO categories (name, parent_id, editorId)
 VALUES
-    ('Technology', NULL, 3), -- Parent category
-    ('Programming', 1, 3), -- Sub-category of Technology
-    ('Science', NULL, 3), -- Parent category
-    ('Physics', 3, 3); -- Sub-category of Science
+('Technology', NULL, 3),
+('Health', NULL, 3),
+('Programming', 1, 3),
+('Fitness', 2, 3);
 
--- Insert Sample Posts
-INSERT INTO posts (title, publish_date, premium, abstract, content, statusName, media, userId, refuse, views, likes, tags)
+-- Insert sample posts
+INSERT INTO posts (title, publish_date, premium, abstract, content, statusName, media, userId, tags)
 VALUES
-    ('The Future of Tech', CURRENT_DATE, TRUE, 'Exploring future technologies.', 'Detailed content goes here.', 'Published', 'media1.mp4', 1, NULL, 100, 25, 'tech,future'),
-    ('Advances in Physics', CURRENT_DATE, FALSE, 'Breakthroughs in physics.', 'Detailed content goes here.', 'Published', 'media2.mp4', 2, NULL, 50, 15, 'science,physics'),
-    ('Learn Python', CURRENT_DATE, TRUE, 'A beginners guide to Python.', 'Detailed content goes here.', 'Pending-Approval', NULL, 1, NULL, 20, 5, 'programming,python');
+('The Rise of AI', '2024-12-01', TRUE, 'A brief look at the rise of AI technologies.', 'Detailed content about AI...', 'Published', 'https://example.com/media/ai.jpg', 2, 'AI,Technology'),
+('Staying Fit in 2024', '2024-12-15', FALSE, 'Tips for staying healthy and fit.', 'In-depth health and fitness tips...', 'Published', 'https://example.com/media/fitness.jpg', 2, 'Fitness,Health'),
+('Introduction to Python', '2024-11-20', FALSE, 'A beginner guide to Python programming.', 'Complete guide to Python basics...', 'Approved', 'https://example.com/media/python.jpg', 2, 'Programming,Python');
 
--- Insert Sample Post Categories
+-- Insert sample post categories
 INSERT INTO post_categories (postId, categoryId)
 VALUES
-    (1, 2), -- 'The Future of Tech' belongs to 'Programming' (sub-category of Technology)
-    (2, 4), -- 'Advances in Physics' belongs to 'Physics' (sub-category of Science)
-    (3, 2); -- 'Learn Python' belongs to 'Programming' (sub-category of Technology)
+(1, 1),
+(2, 2),
+(3, 3);
 
--- Insert Sample Comments
-INSERT INTO comments (postId, commenter, commentDate, content, email)
+-- Insert sample comments
+INSERT INTO comments (postId, content, userId)
 VALUES
-    (1, 'Alice', CURRENT_TIMESTAMP, 'This article is amazing!', 'anhdott1@gmail.com'),
-    (2, 'Bob', CURRENT_TIMESTAMP, 'Great insights on physics.', 'anhdott1@gmail.com'),
-    (3, 'Charlie', CURRENT_TIMESTAMP, 'Looking forward to more Python content.', 'anhdott1@gmail.com');
+(1, 'Great insights on AI!', 1),
+(2, 'This is very helpful, thanks!', 1),
+(3, 'Python is my favorite language!', 1);
+
+-- Insert sample likes
+INSERT INTO likes (postId, userId)
+VALUES
+(1, 1),
+(1, 3),
+(2, 1),
+(3, 2);
