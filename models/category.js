@@ -57,6 +57,17 @@ const getPostCategoryId = (postId, callback) =>{
     )
 }
 
+const getPostCategories = (postId, callback) => {
+    db.query(
+        `SELECT c.id, c.name
+        FROM categories c
+        JOIN post_categories pc ON c.id = pc.categoryId
+        WHERE pc.postId = ?`,
+        [postId],
+        callback
+    );
+}
+
 module.exports = {
     getAllCategories,
     add,
@@ -65,4 +76,5 @@ module.exports = {
     deletes,
     getParentCat,
     getPostCategoryId,
+    getPostCategories,
 };

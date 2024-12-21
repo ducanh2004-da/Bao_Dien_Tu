@@ -87,16 +87,31 @@ module.exports = {
                     .filter((category) => category.parent_id === null)
                     .map((parent) => ({
                         ...parent,
-                        children: categories.filter((child) => child.parent_id === parent.id),
+                        children: categories
+                            .filter((child) => child.parent_id === parent.id)
+                            .map((child) => ({
+                                id: child.id,
+                                name: child.name,
+                            })),
                     }));
 
-                res.render("vwWriter/FixArticle", {
-                    layout: "main",
-                    title: "Sửa bài viết",
-                    categories: filteredCategories,
-                    user: req.session.user,
-                    article: article[0],
-                    tags: article[0].tags.split(","),
+                console.log(filteredCategories);
+
+                categoryModel.getPostCategories(id, (err, postCategories) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy danh mục bài viết:", err);
+                        return res.status(500).send("Lỗi khi lấy danh mục bài viết");
+                    }
+
+                    res.render("vwWriter/FixArticle", {
+                        layout: "main",
+                        title: "Sửa bài viết",
+                        categories: filteredCategories,
+                        postCategories: postCategories,
+                        user: req.session.user,
+                        article: article[0],
+                        tags: article[0].tags.split(","),
+                    });
                 });
             });
         });

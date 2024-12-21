@@ -24,7 +24,13 @@
                 <div class="col-12">
                     <p>
                         Thể loại:
-                        <a href="{{#if ../user}}/main/category/{{category.id}}{{else}}/home/category/{{category.id}}{{/if}}" class="text-primary text-decoration-none">{{category.name}}</a>
+                        {{#each categories}}
+                            {{#if @last}}
+                                <a href="{{#if ../user}}/main{{else}}/home{{/if}}/category/{{this.id}}" class="text-primary text-decoration-none">{{this.name}}</a>
+                            {{else}}
+                                <a href="{{#if ../user}}/main{{else}}/home{{/if}}/category/{{this.id}}" class="text-primary text-decoration-none">{{this.name}}, </a>
+                            {{/if}}
+                        {{/each}}
                     </p>
                 </div>
             </div>
@@ -111,7 +117,11 @@
                     <p>
                         Tags:&nbsp;
                         {{#each tags}}
-                        <a href="{{#if ../user}}/main/tag/{{this}}{{else}}/home/tag/{{this}}{{/if}}" class="text-primary text-decoration-none">{{this}}, </a>
+                            {{#if @last}}
+                                <a href="{{#if ../user}}/main/tag/{{this}}{{else}}/home/tag/{{this}}{{/if}}" class="text-primary text-decoration-none">{{this}}</a>
+                            {{else}}
+                                <a href="{{#if ../user}}/main/tag/{{this}}{{else}}/home/tag/{{this}}{{/if}}" class="text-primary text-decoration-none">{{this}}, </a>
+                            {{/if}}
                         {{/each}}
                     </p>
                 </div>

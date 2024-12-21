@@ -154,38 +154,34 @@ module.exports = {
                             console.error("Lỗi khi lấy thông tin tác giả:", err);
                             return res.status(500).send("Không thể lấy thông tin tác giả");
                         }
-                        categoryModel.getPostCategoryId(post.id,(err, categoryId)=>{
+                        categoryModel.getPostCategories(post.id,(err, cats)=>{
                             if (err) {
                                 console.error("Lỗi khi lấy thông tin :", err);
                                 return res.status(500).send("Không thể lấy thông tin");
                             }
-                            var catId = categoryId[0].categoryId;
-                        categoryModel.getCatById(catId, (err, categories) => {
-                            if (err) {
-                                console.error("Lỗi khi lấy danh mục:", err);
-                                return res.status(500).send("Không thể lấy danh mục");
-                            }
 
+                            console.log(cats);
+
+                            // Fetch comments for the post
                             commentModel.getCommentsByPostId(id, (err, comments) => {
                                 if (err) {
                                     console.error("Lỗi khi lấy bình luận:", err);
                                     return res.status(500).send("Không thể lấy bình luận");
                                 }
 
+                                // Render post detail view
                                 res.render("vwPost/post-detail", {
                                     layout: "main",
                                     title: post.title,
-                                    tags: post.tags.split(",").map((tag) => tag.trim()),
-                                    post,
-                                    category: categories[0],
-                                    author,
-                                    comments,
-                                    tags,
+                                    post: post, // Single post data
+                                    categories: cats, // Category information
+                                    author: author, // Author information
+                                    comments: comments, // Comments for the post
+                                    tags: tags,
                                 });
                             });
                         });
                     });
-                })
                 });
             }
         });

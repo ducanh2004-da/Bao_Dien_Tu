@@ -99,6 +99,23 @@ app.engine(
                         return NaN;
                 }
             },
+            includes(list, value, ...keys) {
+
+                // Filter out Handlebars metadata
+                keys = keys.filter(key => typeof key === "string");
+
+                if (!Array.isArray(list) || typeof value !== "object") {
+                    return false;
+                }
+
+                return keys.length === 0
+                                    ? list.some(item =>
+                                        Object.keys(value).every(key => item[key] === value[key])
+                                    )
+                                    : list.some(item =>
+                                        keys.every(key => item[key] === value[key])
+                                    );
+            },
             section: hbs_sections(),
         },
     })

@@ -174,17 +174,10 @@ module.exports = {
                             return res.status(500).send("Không thể lấy thông tin tác giả");
                         }
 
-                        categoryModel.getPostCategoryId(post.id,(err, cat)=>{
-                                if (err) {
-                                    console.error("Lỗi khi lấy thông tin :", err);
-                                        return res.status(500).send("Không thể lấy thông tin");
-                                }
-
-                        // Fetch category details for the post
-                        categoryModel.getCatById(cat.categoryId, (err, categories) => {
+                        categoryModel.getPostCategories(post.id,(err, cats)=>{
                             if (err) {
-                                console.error("Lỗi khi lấy danh mục:", err);
-                                return res.status(500).send("Không thể lấy danh mục");
+                                console.error("Lỗi khi lấy thông tin :", err);
+                                return res.status(500).send("Không thể lấy thông tin");
                             }
 
                             // Fetch comments for the post
@@ -199,7 +192,7 @@ module.exports = {
                                     layout: "main",
                                     title: post.title,
                                     post: post, // Single post data
-                                    category: categories[0], // Category information
+                                    categories: cats, // Category information
                                     author: author, // Author information
                                     user: req.session.user, // User information
                                     comments: comments, // Comments for the post
@@ -207,7 +200,6 @@ module.exports = {
                                 });
                             });
                         });
-                    });
                     });
                 });
             } else {
