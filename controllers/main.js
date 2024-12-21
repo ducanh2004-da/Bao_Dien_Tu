@@ -5,6 +5,27 @@ const subscriptionModel = require("../models/subscription.js");
 const commentModel = require("../models/comment.js");
 
 
+let categories = [];
+
+const initializeCategories = () => {
+    categoryModel.getAllCategories((err, data) => {
+        if (err) {
+            console.error("Error initializing categories:", err);
+        } else {
+            categories = Array.isArray(data) ? data : [];
+        }
+    });
+};
+
+initializeCategories();
+
+const filteredCategories = categories
+    .filter((category) => category.parent_id === null)
+    .map((parent) => ({
+        ...parent,
+        children: categories.filter((child) => child.parent_id === parent.id),
+    }));
+
 module.exports = {
     // Show the subscriber main page
     showMainPage: (req, res) => {
@@ -14,126 +35,110 @@ module.exports = {
         // Clear the notification after displaying it
         req.session.notification = null;
 
-        // Fetch all categories
-        categoryModel.getAllCategories((err, categories) => {
-            if (err) {
-              return res.status(500).send("Không thể lấy danh mục");
-            }
+        if (isSubscriber) {
+            homeModel.getHighlightedPosts((err, highlightedPosts) => {
+                if (err) {
+                    return res.status(500).send("Không thể lấy bài viết nổi bật");
+                }
 
-            // Build hierarchical categories
-            const filteredCategories = categories
-                .filter((category) => category.parent_id === null)
-                .map((parent) => ({
-                    ...parent,
-                    children: categories.filter((child) => child.parent_id === parent.id),
-                }));
-
-            // Check if the user is a subscriber
-            if (isSubscriber) {
-                homeModel.getHighlightedPosts((err, highlightedPosts) => {
+                // Fetch top categories with newest posts
+                homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
                     if (err) {
-                      return res.status(500).send("Không thể lấy bài viết nổi bật");
+                        return res.status(500).send("Không thể lấy danh mục hàng đầu");
                     }
 
-                    // Fetch top categories with newest posts
-                    homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
+                    // Group posts by category_name
+                    const topCategories = posts.reduce((grouped, post) => {
+                        const { category_name, ...data } = post;
+                        if (!grouped[category_name]) {
+                            grouped[category_name] = [];
+                        }
+                        grouped[category_name].push(data);
+                        return grouped;
+                    }, {});
+
+                    // Fetch top 10 newest posts
+                    homeModel.getTop10NewestPosts((err, latestPosts) => {
                         if (err) {
-                          return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                            return res.status(500).send("Không thể lấy bài viết mới nhất");
                         }
 
-                        // Group posts by category_name
-                        const topCategories = posts.reduce((grouped, post) => {
-                            const { category_name, ...data } = post;
-                            if (!grouped[category_name]) {
-                                grouped[category_name] = [];
-                            }
-                            grouped[category_name].push(data);
-                            return grouped;
-                        }, {});
-
-                        // Fetch top 10 newest posts
-                        homeModel.getTop10NewestPosts((err, latestPosts) => {
+                        // Fetch top 10 most viewed posts
+                        homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
                             if (err) {
-                                return res.status(500).send("Không thể lấy bài viết mới nhất");
+                                return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
                             }
 
-                            // Fetch top 10 most viewed posts
-                            homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
-                                if (err) {
-                                    return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
-                                }
-
-                                res.render("vwUser/home", {
-                                    layout: "main",
-                                    title: "Trang chủ",
-                                    notification: notification,
-                                    categories: filteredCategories,
-                                    highlightedPosts,
-                                    topCategories,
-                                    latestPosts,
-                                    mostViewPosts,
-                                    user: req.session.user,
-                                });
+                            res.render("vwUser/home", {
+                                layout: "main",
+                                title: "Trang chủ",
+                                notification: notification,
+                                categories: filteredCategories,
+                                highlightedPosts,
+                                topCategories,
+                                latestPosts,
+                                mostViewPosts,
+                                user: req.session.user,
                             });
                         });
                     });
                 });
-            } else if (isUser) {
-                homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
+            });
+        } else if (isUser) {
+            homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
+                if (err) {
+                    return res.status(500).send("Không thể lấy bài viết nổi bật");
+                }
+
+                // Fetch top categories with newest posts
+                homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
                     if (err) {
-                        return res.status(500).send("Không thể lấy bài viết nổi bật");
+                        return res.status(500).send("Không thể lấy danh mục hàng đầu");
                     }
 
-                    // Fetch top categories with newest posts
-                    homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
+                    // Group posts by category_name
+                    const topCategories = posts.reduce((grouped, post) => {
+                        const { category_name, ...data } = post;
+                        if (!grouped[category_name]) {
+                            grouped[category_name] = [];
+                        }
+                        grouped[category_name].push(data);
+                        return grouped;
+                    }, {});
+
+                    // Fetch top 10 newest posts
+                    homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
                         if (err) {
-                            return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                            return res.status(500).send("Không thể lấy bài viết mới nhất");
                         }
 
-                        // Group posts by category_name
-                        const topCategories = posts.reduce((grouped, post) => {
-                            const { category_name, ...data } = post;
-                            if (!grouped[category_name]) {
-                                grouped[category_name] = [];
-                            }
-                            grouped[category_name].push(data);
-                            return grouped;
-                        }, {});
-
-                        // Fetch top 10 newest posts
-                        homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
+                        // Fetch top 10 most viewed posts
+                        homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
                             if (err) {
-                                return res.status(500).send("Không thể lấy bài viết mới nhất");
+                                return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
                             }
 
-                            // Fetch top 10 most viewed posts
-                            homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
-                                if (err) {
-                                    return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
-                                }
+                            notification = {
+                                type: "info",
+                                content: "Hãy trở thành subscriber để được đọc những bài viết premium",
+                            };
 
-                                notification = {
-                                    type: "info",
-                                    content: "Hãy trở thành subscriber để được đọc những bài viết premium",
-                                };
-
-                                res.render("vwUser/home", {
-                                    layout: "main",
-                                    title: "Trang chủ",
-                                    notification: notification,
-                                    categories: filteredCategories,
-                                    highlightedPosts,
-                                    topCategories,
-                                    latestPosts,
-                                    mostViewPosts,
-                                    user: req.session.user,
-                                });
+                            res.render("vwUser/home", {
+                                layout: "main",
+                                title: "Trang chủ",
+                                notification: notification,
+                                categories: filteredCategories,
+                                highlightedPosts,
+                                topCategories,
+                                latestPosts,
+                                mostViewPosts,
+                                user: req.session.user,
                             });
                         });
                     });
                 });
-            }
-        });
+            });
+        }
     },
 
     // Show post details
@@ -187,16 +192,25 @@ module.exports = {
                                     return res.status(500).send("Không thể lấy bình luận");
                                 }
 
-                                // Render post detail view
-                                res.render("vwPost/post-detail", {
-                                    layout: "main",
-                                    title: post.title,
-                                    post: post, // Single post data
-                                    categories: cats, // Category information
-                                    author: author, // Author information
-                                    user: req.session.user, // User information
-                                    comments: comments, // Comments for the post
-                                    tags: tags,
+                                // Check if the user has liked the post
+                                postModel.isLiked(id, req.session.user.id, (err, isLiked) => {
+                                    if (err) {
+                                        console.error("Lỗi khi kiểm tra lượt thích:", err);
+                                        return res.status(500).send("Không thể kiểm tra lượt thích");
+                                    }
+
+                                    // Render post detail view
+                                    res.render("vwPost/post-detail", {
+                                        layout: "main",
+                                        title: post.title,
+                                        post: post, // Single post data
+                                        categories: cats, // Category information
+                                        author: author, // Author information
+                                        user: req.session.user, // User information
+                                        comments: comments, // Comments for the post
+                                        tags: tags,
+                                        isLiked: isLiked,
+                                    });
                                 });
                             });
                         });
@@ -217,82 +231,68 @@ module.exports = {
     showCategory: (req, res) => {
         const id = parseInt(req.params.id || 0);
 
-        // Get all categories to populate the navigation bar
-        categoryModel.getAllCategories((err, categories) => {
+        categoryModel.getCatById(id, (err, category) => {
             if (err) {
                 return res.status(500).send("Không thể lấy danh mục");
             }
 
-            const filteredCategories = categories
-                .filter((category) => category.parent_id === null)
-                .map((parent) => ({
-                    ...parent,
-                    children: categories.filter((child) => child.parent_id === parent.id),
-                }));
-
-            categoryModel.getCatById(id, (err, category) => {
-                if (err) {
-                    return res.status(500).send("Không thể lấy danh mục");
-                }
-
-                if (req.session.isSubscriber) {
-                    postModel.getPostsByCategory(id, (err, posts) => {
+            if (req.session.isSubscriber) {
+                postModel.getPostsByCategory(id, (err, posts) => {
+                    if (err) {
+                        return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                    }
+                    homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
                         if (err) {
-                            return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                            return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
                         }
-                        homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
-                            if (err) {
-                                return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
-                            }
 
-                            // Render the homepage view
-                            res.render("vwPost/byCat", {
-                                layout: "main",
-                                user: req.session.user,
-                                title: category[0].name,
-                                categories: filteredCategories,    // Hierarchical categories
-                                posts,
-                                hotPosts
-                            });
+                        // Render the homepage view
+                        res.render("vwPost/byCat", {
+                            layout: "main",
+                            user: req.session.user,
+                            title: category[0].name,
+                            categories: filteredCategories,    // Hierarchical categories
+                            posts,
+                            hotPosts
                         });
-                    })
-                } else if (req.session.isUser) {
-                    postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
+                    });
+                })
+            } else if (req.session.isUser) {
+                postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
+                    if (err) {
+                        return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                    }
+                    homeModel.getTop5MostLikedPostsByCategoryNoPremium(id, (err, hotPosts) => {
                         if (err) {
-                            return res.status(500).send("Không thể lấy bài viết của danh mục này");
+                            return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
                         }
-                        homeModel.getTop5MostLikedPostsByCategoryNoPremium(id, (err, hotPosts) => {
-                            if (err) {
-                                return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
-                            }
 
-                            // Render the homepage view
-                            res.render("vwPost/byCat", {
-                                layout: "main",
-                                user: req.session.user,
-                                title: category[0].name,
-                                categories: filteredCategories,    // Hierarchical categories
-                                posts,
-                                hotPosts
-                            });
+                        // Render the homepage view
+                        res.render("vwPost/byCat", {
+                            layout: "main",
+                            user: req.session.user,
+                            title: category[0].name,
+                            categories: filteredCategories,    // Hierarchical categories
+                            posts,
+                            hotPosts
                         });
-                    })
-                }
-            });
+                    });
+                })
+            }
         });
     },
 
     // Like a post
     likePost: (req, res) => {
         const {id} = req.params;
+        const userId = req.session.user.id;
 
         if (req.session.isUser) {
-            postModel.updateLike(id, (err) => {
+            postModel.updateLike(id, userId, (err) => {
                 if (err) {
                     console.error("Lỗi khi cập nhật lượt thích:", err);
                     return res.status(500).send("Không thể cập nhật lượt thích");
                 }
-
                 // Redirect back to referer
                 res.redirect(req.headers.referer);
             });
@@ -385,6 +385,7 @@ module.exports = {
                         posts: results,
                         user: req.session.user,
                         currentPage: page,
+                        categories: filteredCategories,
                         totalPages,
                         pages,
                         query,
@@ -608,7 +609,8 @@ module.exports.showTag = (req,res) =>{
         }
         res.render("vwPost/byTag", {
             layout: "main",
-            title: posts[0].tags,
+            categories: filteredCategories,
+            title: tag,
             posts,
         });
     })
