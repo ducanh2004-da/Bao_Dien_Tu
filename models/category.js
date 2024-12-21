@@ -51,11 +51,18 @@ const getEditorCats = (editorId, callback) => {
     );
 }
 
+const getCategoryId = (postId,callback) =>{
+    db.query('SELECT * FROM post_categories WHERE postId = ?',
+        [postId],callback
+    )
+}
+
 module.exports = {
     getAllCategories,
     add,
     update,
     getCatById,
     deletes,
-    getParentCat
+    getParentCat,
+    getCategoryId
 };

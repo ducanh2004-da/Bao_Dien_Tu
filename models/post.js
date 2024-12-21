@@ -9,6 +9,13 @@ const getPostById = (id, callback) => {
         callback(null, results[0]);
     });
 };
+const getPostByTag = (tag,callback) =>{
+    // Thêm ký tự '%' để sử dụng LIKE
+    const formattedTag = `%${tag}%`;
+    db.query("SELECT * FROM posts WHERE tags LIKE ?",
+        [formattedTag],callback
+    )
+}
 
 const updatePublished = (id, callback) => {
     db.query(
@@ -172,6 +179,7 @@ const getPostsByCategoryNoPremium = (categoryId, callback) => {
 module.exports = {
     getAllPosts,
     getPostById,
+    getPostByTag,
     getPostAuthorInfo,
     getPostsByCategory,
     getPostsByCategoryNoPremium,

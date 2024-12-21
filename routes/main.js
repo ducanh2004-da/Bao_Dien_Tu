@@ -19,6 +19,7 @@ router.post('/post/:id/comment', MainController.comment);
 router.get('/subscription', MainController.showSubscription);
 router.post('/subscribe', MainController.subscribe);
 router.post('/extendSubscription', MainController.extendSubscription);
+router.get('/tag/:name', MainController.showTag);
 // router.post('/unsubscribe', MainController.unsubscribe);
 
 module.exports = router;

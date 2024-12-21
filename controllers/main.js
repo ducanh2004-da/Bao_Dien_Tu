@@ -147,8 +147,14 @@ module.exports = {
                             return res.status(500).send("Không thể lấy thông tin tác giả");
                         }
 
+                        categoryModel.getCategoryId(post.id,(err,cat)=>{
+                                if (err) {
+                                    console.error("Lỗi khi lấy thông tin :", err);
+                                        return res.status(500).send("Không thể lấy thông tin");
+                                }
+
                         // Fetch category details for the post
-                        categoryModel.getCatById(post.categoryId, (err, categories) => {
+                        categoryModel.getCatById(cat.categoryId, (err, categories) => {
                             if (err) {
                                 console.error("Lỗi khi lấy danh mục:", err);
                                 return res.status(500).send("Không thể lấy danh mục");
@@ -175,6 +181,7 @@ module.exports = {
                                 });
                             });
                         });
+                    });
                     });
                 });
             } else {
@@ -572,3 +579,17 @@ module.exports = {
     },
 };
 
+module.exports.showTag = (req,res) =>{
+    const tag = req.params.name;
+    postModel.getPostByTag(tag,(err,posts)=>{
+        if (err) {
+            console.error("Lỗi:", err);
+            return res.status(500).send("Không thể ra kết quả");
+        }
+        res.render("vwPost/byTag", {
+            layout: "main",
+            title: posts[0].tags,
+            posts,
+        });
+    })
+}
