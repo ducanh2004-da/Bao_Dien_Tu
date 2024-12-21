@@ -59,17 +59,54 @@ const updateView = (id, callback) => {
         callback
     );
 };
-const updateLike = (id, callback) => {
 
-
+const updateLike = (postId, userId, callback) => {
+    // Check if the user has already liked the post
     db.query(
-        "UPDATE posts SET likes = likes + 1 WHERE id = ?",
-        [id],
+        "SELECT COUNT(*) AS liked FROM likes WHERE postId = ? AND userId = ?",
+        [postId, userId],
+        (err, results) => {
+            if (err) return callback(err);
+
+            const liked = results[0].liked > 0;
+
+            if (liked) {
+                // If the user has already liked the post, delete the like
+                deleteLike(postId, userId, callback);
+            } else {
+                // If the user has not liked the post, insert a new like
+                insertLike(postId, userId, callback);
+            }
+        }
+    );
+};
+
+const insertLike = (postId, userId, callback) => {
+    db.query(
+        "INSERT INTO likes (postId, userId) VALUES (?, ?)",
+        [postId, userId],
         callback
     );
 };
 
+const isLiked = (postId, userId, callback) => {
+    db.query(
+        "SELECT COUNT(*) AS liked FROM likes WHERE postId = ? AND userId = ?",
+        [postId, userId],
+        (err, results) => {
+            if (err) return callback(err);
+            callback(null, results[0].liked > 0);
+        }
+    );
+};
 
+const deleteLike = (postId, userId, callback) => {
+    db.query(
+        "DELETE FROM likes WHERE postId = ? AND userId = ?",
+        [postId, userId],
+        callback
+    );
+};
 const getPostsByCategory = (categoryId, callback) => {
     // First, check if the category is a parent category
     const checkParentQuery = `
@@ -188,5 +225,8 @@ module.exports = {
     updatePost,
     updateView,
     updateLike,
+    isLiked,
+    insertLike,
+    deleteLike,
     deletePost,
 };
