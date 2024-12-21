@@ -147,7 +147,7 @@ module.exports = {
                             return res.status(500).send("Không thể lấy thông tin tác giả");
                         }
 
-                        categoryModel.getCategoryId(post.id,(err,cat)=>{
+                        categoryModel.getPostCategoryId(post.id,(err, cat)=>{
                                 if (err) {
                                     console.error("Lỗi khi lấy thông tin :", err);
                                         return res.status(500).send("Không thể lấy thông tin");
