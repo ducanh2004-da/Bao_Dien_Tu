@@ -9,11 +9,16 @@ module.exports = {
     // Show the subscriber main page
     showMainPage: (req, res) => {
 
-        let notification = req.session.notification || null;
+        let { notification } = req.session;
+        const { isSubscriber, isUser } = req.session;
+        // Clear the notification after displaying it
+        req.session.notification = null;
 
         // Fetch all categories
         categoryModel.getAllCategories((err, categories) => {
-            if (err) return res.status(500).send("Không thể lấy danh mục");
+            if (err) {
+              return res.status(500).send("Không thể lấy danh mục");
+            }
 
             // Build hierarchical categories
             const filteredCategories = categories
@@ -24,29 +29,39 @@ module.exports = {
                 }));
 
             // Check if the user is a subscriber
-            if (req.session.isSubscriber) {
+            if (isSubscriber) {
                 homeModel.getHighlightedPosts((err, highlightedPosts) => {
-                    if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
+                    if (err) {
+                      return res.status(500).send("Không thể lấy bài viết nổi bật");
+                    }
 
                     // Fetch top categories with newest posts
                     homeModel.getTopCategoriesWithNewestPosts((err, posts) => {
-                        if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                        if (err) {
+                          return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                        }
 
                         // Group posts by category_name
                         const topCategories = posts.reduce((grouped, post) => {
                             const { category_name, ...data } = post;
-                            if (!grouped[category_name]) grouped[category_name] = [];
+                            if (!grouped[category_name]) {
+                                grouped[category_name] = [];
+                            }
                             grouped[category_name].push(data);
                             return grouped;
                         }, {});
 
                         // Fetch top 10 newest posts
                         homeModel.getTop10NewestPosts((err, latestPosts) => {
-                            if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
+                            if (err) {
+                                return res.status(500).send("Không thể lấy bài viết mới nhất");
+                            }
 
                             // Fetch top 10 most viewed posts
                             homeModel.getTop10MostViewedPosts((err, mostViewPosts) => {
-                                if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                                if (err) {
+                                    return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                                }
 
                                 res.render("vwUser/home", {
                                     layout: "main",
@@ -63,29 +78,39 @@ module.exports = {
                         });
                     });
                 });
-            } else if (req.session.isUser) {
+            } else if (isUser) {
                 homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
-                    if (err) return res.status(500).send("Không thể lấy bài viết nổi bật");
+                    if (err) {
+                        return res.status(500).send("Không thể lấy bài viết nổi bật");
+                    }
 
                     // Fetch top categories with newest posts
                     homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
-                        if (err) return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                        if (err) {
+                            return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                        }
 
                         // Group posts by category_name
                         const topCategories = posts.reduce((grouped, post) => {
                             const { category_name, ...data } = post;
-                            if (!grouped[category_name]) grouped[category_name] = [];
+                            if (!grouped[category_name]) {
+                                grouped[category_name] = [];
+                            }
                             grouped[category_name].push(data);
                             return grouped;
                         }, {});
 
                         // Fetch top 10 newest posts
                         homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
-                            if (err) return res.status(500).send("Không thể lấy bài viết mới nhất");
+                            if (err) {
+                                return res.status(500).send("Không thể lấy bài viết mới nhất");
+                            }
 
                             // Fetch top 10 most viewed posts
                             homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
-                                if (err) return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                                if (err) {
+                                    return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
+                                }
 
                                 notification = {
                                     type: "info",
@@ -113,7 +138,7 @@ module.exports = {
 
     // Show post details
     showDetail: (req, res) => {
-        const id = req.params.id;
+        const {id} = req.params;
 
         postModel.isPremium(id, (err, isPremium) => {
             if (err) {
@@ -266,7 +291,7 @@ module.exports = {
 
     // Like a post
     likePost: (req, res) => {
-        const id = req.params.id;
+        const {id} = req.params;
 
         if (req.session.isUser) {
             postModel.updateLike(id, (err) => {
@@ -292,8 +317,8 @@ module.exports = {
             return res.redirect("./search?q=" + query + "&page=1");
         }
 
-        let page = req.query.page;
-        if (page < 1) page = 1;
+        let {page} = req.query;
+        page = Math.max(page, 1)
 
 
         // Limit the number of results per page
@@ -336,7 +361,7 @@ module.exports = {
                         return res.status(404).send("Không tìm thấy trang");
                     }
 
-                    pages = [];
+                    let pages = [];
                     const dotsIndex = page + 3;
                     for (let i = 1; i <= totalPages; i++) {
                         if (i === dotsIndex) {
@@ -344,13 +369,13 @@ module.exports = {
                                 value: "...",
                             });
                             break;
-                        };
+                        }
                         if (i <= totalPages) {
                             pages.push({
                                 value: i,
                             });
-                        };
-                    };
+                        }
+                    }
 
                     for (let i = totalPages - 3; i <= totalPages; i++) {
                         if (i > dotsIndex) {
@@ -358,7 +383,7 @@ module.exports = {
                                 value: i,
                             });
                         }
-                    };
+                    }
 
                     // Render search results
                     res.render("vwPost/search", {
@@ -407,7 +432,7 @@ module.exports = {
                         return res.status(404).send("Không tìm thấy trang");
                     }
 
-                    pages = [];
+                    let pages = [];
                     const dotsIndex = page + 3;
                     for (let i = 1; i <= totalPages; i++) {
                         if (i === dotsIndex) {
@@ -415,13 +440,13 @@ module.exports = {
                                 value: "...",
                             });
                             break;
-                        };
+                        }
                         if (i <= totalPages) {
                             pages.push({
                                 value: i,
                             });
-                        };
-                    };
+                        }
+                    }
 
                     for (let i = totalPages - 3; i <= totalPages; i++) {
                         if (i > dotsIndex) {
@@ -429,7 +454,7 @@ module.exports = {
                                 value: i,
                             });
                         }
-                    };
+                    }
 
                     // Render search results
                     res.render("vwPost/search", {
@@ -451,20 +476,28 @@ module.exports = {
     // Subscription page
     showSubscription: (req, res) => {
         const { user, isUser, isSubscriber } = req.session;
-        
-        if (isSubscriber) {
-            // Fetch subscription details
-            subscriptionModel.getSubscriptionByUserId(user.id, (err, subscription) => {
-                if (err) {
-                    console.error("Lỗi khi lấy thông tin đăng ký:", err);
-                    return res.status(500).send("Không thể lấy thông tin đăng ký");
-                }
+        subscriptionModel.getSubscriptionByUserId(user.id, (err, subscription) => {
+            if (err) {
+                console.error("Lỗi khi lấy thông tin đăng ký:", err);
+                return res.status(500).send("Không thể lấy thông tin đăng ký");
+            }
+
+            if (subscription.length === 0) {
+                return res.render("vwUser/subscription", {
+                    layout: "main",
+                    title: "Đăng ký gói dịch vụ",
+                    user,
+                    isUser,
+                    isSubscriber,
+                });
+            } else {
                 // Get subscription days left
                 subscriptionModel.getUserSubscriptionDaysLeft(user.id, (err, daysLeft) => {
                     if (err) {
                         console.error("Lỗi khi lấy số ngày còn lại của đăng ký:", err);
                         return res.status(500).send("Không thể lấy số ngày còn lại của người dùng");
                     }
+
                     // Render subscription page
                     res.render("vwUser/subscription", {
                         layout: "main",
@@ -476,16 +509,8 @@ module.exports = {
                         almostExpired: daysLeft <= 3,
                     });
                 });
-            });
-        } else if (isUser) {
-            // Render subscription page
-            res.render("vwUser/subscription", {
-                layout: "main",
-                title: "Gói dịch vụ",
-                user,
-                isUser,
-            });
-        }
+            }
+        });
     },
 
     // Subscribe to a plan
@@ -524,8 +549,10 @@ module.exports = {
 
     // Extend subscription by 30 days
     extendSubscription: (req, res) => {
+        const { user } = req.session;
+
         // Check if the user is a subscriber
-        subscriptionModel.getSubscriptionByUserId = (req.user.id, (err, subscription) => {
+        subscriptionModel.getSubscriptionByUserId = (user.id, (err, subscription) => {
             if (err) {
                 console.error("Lỗi khi lấy thông tin đăng ký:", err);
                 return res.status(500).send("Không thể lấy thông tin đăng ký");
@@ -542,7 +569,7 @@ module.exports = {
 
             // Extend the subscription
             subscriptionModel.extendSubscription(
-                req.user.id,
+                user.id,
                 30,
                 (err) => {
                     if (err) {
@@ -564,8 +591,8 @@ module.exports = {
     },
 
     comment: (req, res) => {
-        const id = req.params.id;
-        const content = req.body.content;
+        const {id} = req.params;
+        const {content} = req.body;
         const userId = req.session.user.id;
 
         commentModel.addComment(id, userId, content, (err) => {
