@@ -38,12 +38,11 @@ module.exports = {
 
     isSubscriber: function (req, res, next) {
         module.exports.isUser(req, res, () => {
-            const allowedRoles = ['subscriber', 'admin', 'editor', 'writer', 'non-subscriber'];
+            const allowedRoles = ['subscriber', 'admin', 'editor', 'writer'];
             if (allowedRoles.includes(req.user.role)) {
                 req.session.isSubscriber = true;
-                return next();
             }
-            res.status(403).send('Access Denied! Wrong Role');
+            return next();
         });
     }
 };
