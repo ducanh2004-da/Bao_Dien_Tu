@@ -26,9 +26,9 @@ VALUES
 -- Insert sample post categories
 INSERT INTO post_categories (postId, categoryId)
 VALUES
-(1, 1),
-(2, 2),
-(3, 3);
+(1, 3), -- "The Rise of AI" linked to "Programming" (child of "Technology")
+(2, 4), -- "Staying Fit in 2024" linked to "Fitness" (child of "Health")
+(3, 3); -- "Introduction to Python" linked to "Programming"
 
 -- Insert sample comments
 INSERT INTO comments (postId, content, userId)
