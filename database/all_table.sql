@@ -95,6 +95,21 @@ CREATE TABLE subscriptions (
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Create the `likes` table
+CREATE TABLE likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    postId INT NOT NULL,
+    userId INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_likes_post
+        FOREIGN KEY (postId) REFERENCES posts(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_likes_user
+        FOREIGN KEY (userId) REFERENCES users(id)
+        ON DELETE CASCADE,
+    UNIQUE (postId, userId) -- Ensures a user can like a post only once
+);
+
 -- Create a trigger to handle new users and assign default subscription
 DELIMITER $$
 
@@ -131,6 +146,34 @@ BEGIN
         FROM subscriptions
         WHERE status = 'Expired'
     );
+END$$
+
+DELIMITER ;
+
+-- Create a trigger to update the `likes` count in the `posts` table
+DELIMITER $$
+
+CREATE TRIGGER after_like_insert
+AFTER INSERT ON likes
+FOR EACH ROW
+BEGIN
+    UPDATE posts
+    SET likes = likes + 1
+    WHERE id = NEW.postId;
+END$$
+
+DELIMITER ;
+
+-- Create a trigger to handle likes removal and decrement the `likes` count
+DELIMITER $$
+
+CREATE TRIGGER after_like_delete
+AFTER DELETE ON likes
+FOR EACH ROW
+BEGIN
+    UPDATE posts
+    SET likes = likes - 1
+    WHERE id = OLD.postId;
 END$$
 
 DELIMITER ;
