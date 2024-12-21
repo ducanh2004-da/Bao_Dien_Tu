@@ -83,7 +83,7 @@
                 <div class="col-12">
                     <p>
                         Thể loại:
-                        {{#each categories}}
+                        {{#each postCategories}}
                             {{#if @last}}
                                 <a href="{{#if ../user}}/main{{else}}/home{{/if}}/category/{{this.id}}" class="text-primary text-decoration-none">{{this.name}}</a>
                             {{else}}
