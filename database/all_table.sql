@@ -52,8 +52,12 @@ CREATE TABLE posts (
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Add a full-text index to the `abstract` column
-ALTER TABLE posts ADD FULLTEXT(abstract);
+-- Add a full-text index to the `title` and `abstract` columns
+ALTER TABLE posts ADD FULLTEXT(title, abstract);
+
+-- Add a full-text index to the `tags` column
+ALTER TABLE posts ADD FULLTEXT(tags);
+
 
 -- Create the `post_categories` table (many-to-many relationship)
 CREATE TABLE post_categories (
