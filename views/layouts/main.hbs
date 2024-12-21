@@ -63,7 +63,11 @@
                             {{/if}}
                             {{#if (ifCond user.role "===" 'editor')}}
                                 <li><a class="dropdown-item" href="/editor/">Trang biên tập</a></li>
-                            {{else}}
+                            {{/if}}
+                            {{#if (ifCond user.role "===" 'subscriber')}}
+                                <li><a class="dropdown-item" href="/main/subscription/">Quản lý gói</a></li>
+                            {{/if}}
+                            {{#if (ifCond user.role "===" 'subscriber')}}
                                 <li><a class="dropdown-item" href="/main/subscription/">Quản lý gói</a></li>
                             {{/if}}
 
