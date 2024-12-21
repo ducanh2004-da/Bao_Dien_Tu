@@ -151,7 +151,7 @@ const getPostsByCategoryNoPremium = (categoryId, callback) => {
                 JOIN categories c ON pc.categoryId = c.id
                 WHERE c.parent_id = ?
                   AND p.statusName = 'Published'
-                  AND p.premium Is Null  -- Exclude premium posts
+                  AND p.premium = 0  -- Exclude premium posts
                 ORDER BY p.created_at DESC;
             `;
             params = [categoryId];
@@ -166,7 +166,7 @@ const getPostsByCategoryNoPremium = (categoryId, callback) => {
                 JOIN categories c ON pc.categoryId = c.id
                 WHERE c.id = ?
                   AND p.statusName = 'Published'
-                  AND p.premium Is Null  -- Exclude premium posts
+                  AND p.premium = 0  -- Exclude premium posts
                 ORDER BY p.created_at DESC;
             `;
             params = [categoryId];
