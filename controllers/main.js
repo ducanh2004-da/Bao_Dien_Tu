@@ -4,27 +4,37 @@ const homeModel = require("../models/home.js");
 const subscriptionModel = require("../models/subscription.js");
 const commentModel = require("../models/comment.js");
 
-
 let categories = [];
+let filteredCategories = [];
 
-const initializeCategories = () => {
-    categoryModel.getAllCategories((err, data) => {
-        if (err) {
-            console.error("Error initializing categories:", err);
-        } else {
-            categories = Array.isArray(data) ? data : [];
-        }
+const initializeCategories = async () => {
+    return new Promise((resolve, reject) => {
+        categoryModel.getAllCategories((err, data) => {
+            if (err) {
+                console.error("Error initializing categories:", err);
+                reject(err);
+            } else {
+                categories = Array.isArray(data) ? data : [];
+                resolve(categories);
+            }
+        });
     });
 };
 
-initializeCategories();
+const updateFilteredCategories = async () => {
+    await initializeCategories(); // Ensure categories is populated
+    filteredCategories = categories
+        .filter((category) => category.parent_id === null)
+        .map((parent) => ({
+            ...parent,
+            children: categories.filter((child) => child.parent_id === parent.id),
+        }));
+};
 
-const filteredCategories = categories
-    .filter((category) => category.parent_id === null)
-    .map((parent) => ({
-        ...parent,
-        children: categories.filter((child) => child.parent_id === parent.id),
-    }));
+// Call the function to initialize and update
+updateFilteredCategories().then(() => {}).catch((error) => {
+    console.error("Error updating filtered categories:", error);
+});
 
 module.exports = {
     // Show the subscriber main page
@@ -204,7 +214,8 @@ module.exports = {
                                         layout: "main",
                                         title: post.title,
                                         post: post, // Single post data
-                                        categories: cats, // Category information
+                                        categories: filteredCategories, // Hierarchical categories
+                                        postCategories: cats, // Category information
                                         author: author, // Author information
                                         user: req.session.user, // User information
                                         comments: comments, // Comments for the post
@@ -230,17 +241,19 @@ module.exports = {
     // Show the category page
     showCategory: (req, res) => {
         const id = parseInt(req.params.id || 0);
+        const { isSubscriber, isUser } = req.session;
 
         categoryModel.getCatById(id, (err, category) => {
             if (err) {
                 return res.status(500).send("Không thể lấy danh mục");
             }
 
-            if (req.session.isSubscriber) {
+            if (isSubscriber) {
                 postModel.getPostsByCategory(id, (err, posts) => {
                     if (err) {
                         return res.status(500).send("Không thể lấy bài viết của danh mục này");
                     }
+
                     homeModel.getTop5MostLikedPostsByCategory(id, (err, hotPosts) => {
                         if (err) {
                             return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
@@ -257,7 +270,7 @@ module.exports = {
                         });
                     });
                 })
-            } else if (req.session.isUser) {
+            } else if (isUser) {
                 postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
                     if (err) {
                         return res.status(500).send("Không thể lấy bài viết của danh mục này");
@@ -602,7 +615,7 @@ module.exports = {
 
 module.exports.showTag = (req,res) =>{
     const tag = req.params.name;
-    postModel.getPostByTag(tag,(err,posts)=>{
+    homeModel.getPostsByTag(tag,(err, posts)=>{
         if (err) {
             console.error("Lỗi:", err);
             return res.status(500).send("Không thể ra kết quả");

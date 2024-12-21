@@ -186,31 +186,28 @@ const getTopCategoriesWithNewestPostsNoPremium = (callback) => {
     JOIN post_categories pc ON c.id = pc.categoryId
     JOIN posts p ON pc.postId = p.id
     WHERE p.statusName = 'Published'
+      AND p.premium = 0  -- Only consider non-premium posts for total views count
     GROUP BY c.id, c.name
     ORDER BY total_views DESC
-    LIMIT 10
-),
-
-RankedPosts AS (
-    SELECT
-        p.*,
-        pc.categoryId,
-        ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.publish_date DESC) AS row_num
-    FROM posts p
-    JOIN post_categories pc ON p.id = pc.postId
-    JOIN TopCategories tc ON pc.categoryId = tc.category_id
-    WHERE p.statusName = 'Published' 
-      AND p.premium = 0 
-)
-
-SELECT
-    c.name AS category_name,
-    rp.*
-FROM RankedPosts rp
-JOIN categories c ON rp.categoryId = c.id
-WHERE rp.row_num <= 3
-ORDER BY c.name, rp.publish_date DESC;
-    `;
+    LIMIT 10),
+            RankedPosts AS (
+            SELECT
+                p.*,
+                pc.categoryId,
+                ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.publish_date DESC) AS row_num
+            FROM posts p
+            JOIN post_categories pc ON p.id = pc.postId
+                JOIN TopCategories tc ON pc.categoryId = tc.category_id
+                                    WHERE p.statusName = 'Published' 
+                                        AND p.premium = 0)
+        SELECT
+            c.name AS category_name,
+            rp.*
+        FROM RankedPosts rp
+            JOIN categories c ON rp.categoryId = c.id
+        WHERE rp.row_num <= 3
+        ORDER BY c.name, rp.publish_date DESC;
+`;
     db.query(query, callback);
 };
 
@@ -268,6 +265,7 @@ const getTop5MostLikedPostsByCategoryNoPremium = (categoryId, callback) => {
         SELECT COUNT(*) AS isParent
         FROM categories
         WHERE id = ? AND parent_id IS NULL
+        
     `;
 
     db.query(checkParentQuery, [categoryId], (err, results) => {
@@ -301,6 +299,7 @@ const getTop5MostLikedPostsByCategoryNoPremium = (categoryId, callback) => {
                          JOIN categories c ON pc.categoryId = c.id
                 WHERE c.id = ?
                   AND p.statusName = 'Published'
+                  AND p.premium = 0  -- Only consider non-premium posts for likes count and sorting
                 ORDER BY p.likes DESC
                     LIMIT 5;
             `;
@@ -319,7 +318,7 @@ const searchContent = (content, limit, offset, callback) => {
             posts
         WHERE
             statusName = 'Published'
-                AND MATCH(abstract) AGAINST (?)
+                AND MATCH(title, abstract) AGAINST (?)
         ORDER BY publish_date DESC
             LIMIT ? OFFSET ?;
     `;
@@ -335,7 +334,7 @@ const searchContentNoPremium = (content, limit, offset, callback) => {
         WHERE
             statusName = 'Published'
                 AND premium = 0  -- Only consider non-premium posts for search
-                AND MATCH(abstract) AGAINST (?)
+                AND MATCH(title, abstract) AGAINST (?)
         ORDER BY publish_date DESC
             LIMIT ? OFFSET ?;
     `;
@@ -350,7 +349,7 @@ const searchContentCount = (content, callback) => {
             posts
         WHERE
             statusName = 'Published'
-                AND MATCH(abstract) AGAINST (?);
+                AND MATCH(title, abstract) AGAINST (?);
     `;
     db.query(query, [content], callback);
 };
@@ -364,9 +363,42 @@ const searchContentCountNoPremium = (content, callback) => {
         WHERE
             statusName = 'Published'
                 AND premium = 0  -- Only consider non-premium posts for search
-                AND MATCH(abstract) AGAINST (?);
+                AND MATCH(title, abstract) AGAINST (?);
     `;
     db.query(query, [content], callback);
+}
+
+const getPostsByTag = (tag, callback) =>{
+    // Thêm ký tự '%' để sử dụng LIKE
+    const formattedTag = `%${tag}%`;
+    db.query(
+        `SELECT p.*, c.name AS category_name
+        FROM posts p
+        JOIN post_categories pc ON p.id = pc.postId
+        JOIN categories c ON pc.categoryId = c.id
+        WHERE p.statusName = 'Published'
+        AND MATCH(p.tags) AGAINST (?)
+        ORDER BY p.updated_at DESC`,
+        [formattedTag],
+        callback
+    )
+}
+
+const getPostsByTagNoPremium = (tag, callback) => {
+    // Thêm ký tự '%' để sử dụng LIKE
+    const formattedTag = `%${tag}%`;
+    db.query(
+        `SELECT p.*, c.name AS category_name
+        FROM posts p
+        JOIN post_categories pc ON p.id = pc.postId
+        JOIN categories c ON pc.categoryId = c.id
+        WHERE p.statusName = 'Published'
+        AND p.premium = 0
+        AND MATCH(p.tags) AGAINST (?)
+        ORDER BY p.updated_at DESC`,
+        [formattedTag],
+        callback
+    );
 }
 
 module.exports = {
@@ -383,5 +415,7 @@ module.exports = {
     searchContentNoPremium,
     searchContent,
     searchContentCountNoPremium,
-    getTopCategoriesWithNewestPostsNoPremium
+    getTopCategoriesWithNewestPostsNoPremium,
+    getPostsByTag,
+    getPostsByTagNoPremium
 };
