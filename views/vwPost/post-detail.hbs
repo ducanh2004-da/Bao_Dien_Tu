@@ -110,7 +110,9 @@
                 <div class="col-12">
                     <p>
                         Tags:&nbsp;
-                        {{post.tags}}
+                        {{#each tags}}
+                        <a href="{{#if ../user}}/main/tag/{{this}}{{else}}/home/tag/{{this}}{{/if}}" class="text-primary text-decoration-none">{{this}}, </a>
+                        {{/each}}
                     </p>
                 </div>
             </div>

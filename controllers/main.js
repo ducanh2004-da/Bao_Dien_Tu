@@ -165,6 +165,8 @@ module.exports = {
                         return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
                     }
 
+                    const tags = post.tags?.split(',').map(tag => tag.trim());
+
                     // Fetch author information
                     postModel.getPostAuthorInfo(post.id, (err, author) => {
                         if (err) {
@@ -192,8 +194,6 @@ module.exports = {
                                     return res.status(500).send("Không thể lấy bình luận");
                                 }
 
-                                console.log(comments);
-
                                 // Render post detail view
                                 res.render("vwPost/post-detail", {
                                     layout: "main",
@@ -203,6 +203,7 @@ module.exports = {
                                     author: author, // Author information
                                     user: req.session.user, // User information
                                     comments: comments, // Comments for the post
+                                    tags: tags,
                                 });
                             });
                         });

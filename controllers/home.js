@@ -147,6 +147,8 @@ module.exports = {
                         return res.status(404).send("Bài viết không tồn tại hoặc chưa được xuất bản");
                     }
 
+                    const tags = post.tags?.split(',').map(tag => tag.trim());
+
                     postModel.getPostAuthorInfo(post.id, (err, author) => {
                         if (err) {
                             console.error("Lỗi khi lấy thông tin tác giả:", err);
@@ -178,6 +180,7 @@ module.exports = {
                                     category: categories[0],
                                     author,
                                     comments,
+                                    tags,
                                 });
                             });
                         });
