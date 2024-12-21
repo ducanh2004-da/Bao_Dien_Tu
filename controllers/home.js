@@ -3,114 +3,118 @@ const categoryModel = require("../models/category.js");
 const homeModel = require("../models/home.js");
 const commentModel = require("../models/comment.js");
 
+let categories = [];
+let filteredCategories = [];
+
+const initializeCategories = async () => {
+    return new Promise((resolve, reject) => {
+        categoryModel.getAllCategories((err, data) => {
+            if (err) {
+                console.error("Error initializing categories:", err);
+                reject(err);
+            } else {
+                categories = Array.isArray(data) ? data : [];
+                resolve(categories);
+            }
+        });
+    });
+};
+
+const updateFilteredCategories = async () => {
+    await initializeCategories(); // Ensure categories is populated
+    filteredCategories = categories
+        .filter((category) => category.parent_id === null)
+        .map((parent) => ({
+            ...parent,
+            children: categories.filter((child) => child.parent_id === parent.id),
+        }));
+};
+
+// Call the function to initialize and update
+updateFilteredCategories().then(() => {}).catch((error) => {
+    console.error("Error updating filtered categories:", error);
+});
+
 module.exports = {
     // Hiển thị trang chủ
     showHomePage: (req, res) => {
 
         let notification = req.session.notification || null;
-        categoryModel.getAllCategories((err, categories) => {
+
+        homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
             if (err) {
-              return res.status(500).send("Không thể lấy danh mục");
+                return res.status(500).send("Không thể lấy bài viết nổi bật");
             }
 
-            const filteredCategories = categories
-                .filter((category) => category.parent_id === null)
-                .map((parent) => ({
-                    ...parent,
-                    children: categories.filter((child) => child.parent_id === parent.id),
-                }));
-
-            homeModel.getHighlightedPostsNoPremium((err, highlightedPosts) => {
+            homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
                 if (err) {
-                  return res.status(500).send("Không thể lấy bài viết nổi bật");
+                    return res.status(500).send("Không thể lấy danh mục hàng đầu");
                 }
 
-                homeModel.getTopCategoriesWithNewestPostsNoPremium((err, posts) => {
+                const topCategories = posts.reduce((grouped, post) => {
+                    const { category_name, ...data } = post;
+                    if (!grouped[category_name]) {
+                        grouped[category_name] = [];
+                    }
+                    grouped[category_name].push(data);
+                    return grouped;
+                }, {});
+
+                homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
                     if (err) {
-                      return res.status(500).send("Không thể lấy danh mục hàng đầu");
+                        return res.status(500).send("Không thể lấy bài viết mới nhất");
                     }
 
-                    const topCategories = posts.reduce((grouped, post) => {
-                        const { category_name, ...data } = post;
-                        if (!grouped[category_name]) {
-                          grouped[category_name] = [];
-                        }
-                        grouped[category_name].push(data);
-                        return grouped;
-                    }, {});
-
-                    homeModel.getTop10NewestPostsNoPremium((err, latestPosts) => {
+                    homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
                         if (err) {
-                          return res.status(500).send("Không thể lấy bài viết mới nhất");
+                            return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
                         }
 
-                        homeModel.getTop10MostViewedPostsNoPremium((err, mostViewPosts) => {
-                            if (err) {
-                              return res.status(500).send("Không thể lấy bài viết được xem nhiều nhất");
-                            }
+                        notification = req.session.notification || null;
 
-                            notification = req.session.notification || null;
-
-                            res.render("vwUser/home", {
-                                layout: "main",
-                                title: "Trang chủ",
-                                notification,
-                                categories: filteredCategories,
-                                highlightedPosts,
-                                topCategories,
-                                latestPosts,
-                                mostViewPosts,
-                            });
+                        res.render("vwUser/home", {
+                            layout: "main",
+                            title: "Trang chủ",
+                            notification,
+                            categories: filteredCategories,
+                            highlightedPosts,
+                            topCategories,
+                            latestPosts,
+                            mostViewPosts,
                         });
                     });
                 });
             });
-        }); 
+        });
     },
     showCategory: (req, res) => {
         const id = parseInt(req.params.id || 0);
 
-        // Get all categories to populate the navigation bar
-        categoryModel.getAllCategories((err, categories) => {
+        categoryModel.getCatById(id, (err, category) => {
             if (err) {
-              return res.status(500).send("Không thể lấy danh mục");
+                return res.status(500).send("Không thể lấy danh mục");
             }
 
-            const filteredCategories = categories
-                .filter((category) => category.parent_id === null)
-                .map((parent) => ({
-                    ...parent,
-                    children: categories.filter((child) => child.parent_id === parent.id),
-                }));
-
-            categoryModel.getCatById(id, (err, category) => {
+            postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
                 if (err) {
-                  return res.status(500).send("Không thể lấy danh mục");
+                    return res.status(500).send("Không thể lấy bài viết của danh mục này");
                 }
-
-                postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
+                homeModel.getTop5MostLikedPostsByCategoryNoPremium(id, (err, hotPosts) => {
                     if (err) {
-                      return res.status(500).send("Không thể lấy bài viết của danh mục này");
-                    }if (err) {
-                          return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
-                        }
-                    homeModel.getTop5MostLikedPostsByCategoryNoPremium(id, (err, hotPosts) => {
-                        if (err) {
-                          return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
-                        }
-                        
-                        // Render the homepage view
-                        res.render("vwPost/byCat", {
-                            layout: "main",
-                            title: category[0].name,
-                            categories: filteredCategories,    // Hierarchical categories
-                            posts,
-                            hotPosts
-                        });
+                        return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
+                    }
+
+                    // Render the homepage view
+                    res.render("vwPost/byCat", {
+                        layout: "main",
+                        title: category[0].name,
+                        categories: filteredCategories,    // Hierarchical categories
+                        posts,
+                        hotPosts
                     });
                 });
             });
-        }); 
+        });
     },
 
     // Hiển thị chi tiết bài viết
@@ -174,7 +178,8 @@ module.exports = {
                                     layout: "main",
                                     title: post.title,
                                     post: post, // Single post data
-                                    categories: cats, // Category information
+                                    categories: filteredCategories, // Hierarchical categories
+                                    postCategories: cats, // Category information
                                     author: author, // Author information
                                     comments: comments, // Comments for the post
                                     tags: tags,
@@ -212,6 +217,7 @@ module.exports = {
                     layout: "main",
                     title: "Kết quả tìm kiếm cho " + query,
                     posts: results,
+                    categories: filteredCategories,
                     user: req.session.user,
                     message: "Không tìm thấy kết quả phù hợp",
                 });
@@ -258,6 +264,7 @@ module.exports = {
                     layout: "main",
                     title: "Kết quả tìm kiếm cho " + query,
                     posts: results,
+                    categories: filteredCategories,
                     currentPage: page,
                     totalPages,
                     pages,
@@ -270,7 +277,7 @@ module.exports = {
 };
 module.exports.showTag = (req,res) =>{
     const tag = req.params.name;
-    postModel.getPostByTag(tag,(err,posts)=>{
+    homeModel.getPostsByTagNoPremium(tag,(err, posts)=>{
         if (err) {
             console.error("Lỗi:", err);
             return res.status(500).send("Không thể ra kết quả");
@@ -278,6 +285,7 @@ module.exports.showTag = (req,res) =>{
         res.render("vwPost/byTag", {
             layout: "main",
             title: posts[0].tags,
+            categories: filteredCategories,
             posts,
         });
     })
