@@ -17,13 +17,20 @@ module.exports.showAll = (req,res) =>{
                 if (err) {
                     return res.status(500).json({ error: err.message });
                 }
+                Category.getParentCat((err,parentCat)=>{
+                    if(err){
+                        return res.status(500).json({ error: err.message });
+                    }
+                
             res.render('admin/home',{
                 posts,users,
                 categories,
-                user: req.session.user
+                user: req.session.user,
+                parentCat
             })
         })
     })
+})
 }
 )}
 module.exports.viewPost = (req,res) =>{

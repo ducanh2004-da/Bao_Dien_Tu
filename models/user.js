@@ -111,7 +111,7 @@ const editUser = (id,user,imageUrl,callback) =>{
 }
 
 const deletes = (id,callback) =>{
-    db.query('DELETE FROM users WHERE ProID = ?',
+    db.query('DELETE FROM users WHERE id = ?',
         [id],callback
     )
 }

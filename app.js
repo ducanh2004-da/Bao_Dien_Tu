@@ -43,8 +43,11 @@ app.engine(
                 return a === b;
             },
             ifEquals(a, b, options) {
-                return a === b ? options.fn(this) : options.inverse(this);
-            },
+                if (a === b) {
+                  return options.fn(this);
+                }
+                return options.inverse(this);
+              },
             length(array) {
                 return array.length;
             },

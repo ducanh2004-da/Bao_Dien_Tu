@@ -444,8 +444,20 @@ module.exports = {
     // Subscription page
     showSubscription: (req, res) => {
         const { user, isUser, isSubscriber } = req.session;
-
+        
         if (isSubscriber) {
+            // Fetch subscription details
+            subscriptionModel.getSubscriptionByUserId(user.id, (err, subscription) => {
+                if (err) {
+                    console.error("Lỗi khi lấy thông tin đăng ký:", err);
+                    return res.status(500).send("Không thể lấy thông tin đăng ký");
+                }
+                // Get subscription days left
+                subscriptionModel.getUserSubscriptionDaysLeft(user.id, (err, daysLeft) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy số ngày còn lại của đăng ký:", err);
+                        return res.status(500).send("Không thể lấy số ngày còn lại của người dùng");
+                    }
                     // Render subscription page
                     res.render("vwUser/subscription", {
                         layout: "main",
@@ -456,6 +468,8 @@ module.exports = {
                         daysLeft,
                         almostExpired: daysLeft <= 3,
                     });
+                });
+            });
         } else if (isUser) {
             // Render subscription page
             res.render("vwUser/subscription", {

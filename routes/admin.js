@@ -13,7 +13,7 @@ router.post('/category/:id/delete',AdminController.deleteCategory);
 router.get('/category/create',AdminController.viewAddCategory);
 router.get('/:id/detailUser',AdminController.viewUser);
 router.get('/user/:id/edit',AdminController.viewEditUser);
-router.get('user/:id/delete',AdminController.deleteUser);
+router.post('/user/:id/delete',AdminController.deleteUser);
 router.post('/user/:id/edit',AdminController.EditUser);
 router.get('/post/:id/edit',AdminController.viewEditPost);
 router.post('/post/:id/edit',AdminController.EditPost);
