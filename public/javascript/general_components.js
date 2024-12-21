@@ -1,10 +1,13 @@
 // <========================Heart button========================>
 $('a.like-button').on('click', function(e) {
-    $(this).toggleClass('liked');
-
-    setTimeout(() => {
-        $(e.target).removeClass('liked')
-    }, 1000)
+    // Check if liked class is present
+    if ($(this).hasClass('liked')) {
+        // Remove the liked class
+        $(this).removeClass('liked');
+    } else {
+        // Add the liked class
+        $(this).addClass('liked');
+    }
 });
 
 // <========================Scroll to top button========================>
@@ -291,4 +294,85 @@ function openPreviewWindow({
     previewWindow.document.close();
 }
 
+// <========================Generate PDF========================>
+function downloadPDF({
+                         title,
+                         abstract,
+                         thumbnailURL,
+                         content,
+                         categories,
+                         tags
+                     }) {
+    const previewWindow = window.open("", "previewWindow");
+    previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+            <style>
+                * {
+                    font-family: "Hubot Sans", sans-serif;
+                    font-optical-sizing: auto;
+                    font-variation-settings: "wdth" 100;
+                }
+            </style>
+            <title>Preview</title>
+        </head>
+        <body>
+            <div id="content" class="container my-5">
+                <article class="mb-5">
+                    <h1 class="h1 text-center font-weight-bold mb-4">${title}</h1>
+                    <div class="p-4 bg-light border rounded shadow-sm mb-4">
+                        <p class="mb-0">${abstract}</p>
+                    </div>
+                    <div class="text-center mb-4">
+                        <img src="${thumbnailURL}" class="img-fluid rounded shadow" alt="Main Image">
+                    </div>
+                    <div class="container-fluid mb-4">${content}</div>
+                    <div class="container-fluid mb-4">
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <p><i class="fas fa-folder"></i> Thể loại: ${categories.map((category) => `${category.name}`).join(", ")}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <p>Tags:&nbsp;${tags.map((tag) => `${tag}`).join(",&nbsp")}</p>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </article>
+            </div>
+            <button id="download-pdf-btn" style="display:none;">Download PDF</button>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js" integrity="sha512-MpDFIChbcXl2QgipQrt1VcPHMldRILetapBl5MPCA9Y8r7qvlwx1/Mc9hNTzY+kS5kX6PdoDq41ws1HiVNLdZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script>
+                document.getElementById("download-pdf-btn").addEventListener("click", function () {
+                    const content = document.getElementById("content");
+                    html2pdf().from(content).save("${title}.pdf").then(() => {
+                        setTimeout(() => {
+                            window.close();
+                        }, 5000);
+                    }).catch(() => {
+                        setTimeout(() => {
+                            window.close();
+                        }, 5000);
+                    });
+                });
+            </script>
+        </body>
+        </html>
+    `);
+    previewWindow.document.close();
 
+    // Trigger the hidden download button after 2 seconds
+    previewWindow.onload = () => {
+        const downloadBtn = previewWindow.document.getElementById("download-pdf-btn");
+        downloadBtn.click();
+    };
+}

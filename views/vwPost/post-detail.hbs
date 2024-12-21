@@ -1,21 +1,80 @@
+{{#section "js"}}
+    <script>
+        function getPostData() {
+            // Get the post title
+            const title = document.getElementById('post-title')?.textContent.trim();
+
+            // Get the post abstract
+            const abstract = document.getElementById('post-abstract')?.textContent.trim();
+
+            // Get the thumbnail URL
+            const thumbnailURL = document.querySelector('#post-image img')?.src;
+
+            // Get the post content (HTML or text based on your preference)
+            const content = document.getElementById('post-content')?.innerHTML.trim();
+
+            // Get categories
+            const categories = Array.from(
+                    document.querySelectorAll('.container-fluid p a.text-decoration-none[href*="category"]')
+            ).map((el) => ({
+                id: el.href.split('/').pop(),
+                name: el.textContent.trim(),
+            }));
+
+            // Get tags
+            const tags = Array.from(
+                    document.querySelectorAll('.container-fluid p a.text-decoration-none[href*="tag"]')
+            ).map((el) => el.textContent.trim().replace(/,$/, ''));
+
+            return {
+                title,
+                abstract,
+                thumbnailURL,
+                content,
+                categories,
+                tags,
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get the post data
+            document.querySelector('#download-pdf').addEventListener('click', () => {
+                const postData = getPostData();
+                console.log(postData);
+
+                downloadPDF({
+                    title: postData.title,
+                    abstract: postData.abstract,
+                    thumbnailURL: postData.thumbnailURL,
+                    content: postData.content,
+                    categories: postData.categories,
+                    tags: postData.tags,
+                });
+            });
+        });
+
+    </script>
+
+{{/section}}
+
 <div class="container-xl my-5">
     <!-- Article Section -->
     <article class="mb-5">
         <!-- Title -->
-        <h1 class="h1 text-center font-weight-bold mb-4">{{post.title}}</h1>
+        <h1 class="h1 text-center font-weight-bold mb-4" id="post-title">{{post.title}}</h1>
 
         <!-- Abstract Box -->
-        <div class="p-4 bg-light border rounded shadow-sm mb-4">
-            <p class="mb-0">{{post.abstract}}</p>
+        <div class="p-4 bg-light border rounded shadow-sm mb-4" id="post-abstract">
+            <p class="mb-0" >{{post.abstract}}</p>
         </div>
 
         <!-- Main Image -->
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" id="post-image">
             <img src="/public/posts/imgs/{{post.id}}/thumbnail.jpg" class="img-fluid rounded shadow" alt="Main Image">
         </div>
 
         <!-- Main Content -->
-        <div class="container-fluid mb-4">
+        <div class="container-fluid mb-4" id="post-content">
             {{{post.content}}}
         </div>
 
@@ -66,7 +125,7 @@
                             {{#if user}}
                                 <form action="/main/post/like/{{post.id}}" method="POST" id="like-form">
                                     <button style="all: unset;" type="submit">
-                                        <a class='like-button text-decoration-none'>
+                                        <a class='like-button text-decoration-none {{#if isLiked}}liked{{/if}}'>
                                         <span class='like-icon'>
                                             <div class='heart-animation-1'></div>
                                             <div class='heart-animation-2'></div>
@@ -128,6 +187,17 @@
             </div>
         </div>
 
+        <!-- Download PDF Section -->
+        <div class="container-fluid mb-4 text-center">
+            <button class="btn btn-secondary" id="download-pdf">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+                    <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6.5L14 4.5zm-3 .5V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5h-3z"/>
+                    <path d="M5.5 6v4h1V8h1v2h1V8h1V6h-1v2h-1V6h-1v2h-1V6h-1zm7.979.93l-.64.192A.498.498 0 0 0 13 7.5a.5.5 0 0 0-.5.5.5.5 0 0 0 .146.354l.146.146a.5.5 0 0 0 .354.146.5.5 0 0 0 .5-.5c0-.11-.01-.208-.03-.308l-.38-.192c-.018-.012-.035-.024-.053-.036z"/>
+                </svg>
+                Download PDF
+            </button>
+        </div>
+
     </article>
 
     <!-- Comment Section -->
@@ -170,5 +240,6 @@
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
             </svg>&nbsp;
             Back to main page
+        </a>
     </div>
 </div>
