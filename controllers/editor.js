@@ -1,4 +1,5 @@
 const editorModel = require("../models/editor.js");
+const postModel = require("../models/post.js");
 const path = require("path");
 
 module.exports = {
@@ -30,13 +31,21 @@ module.exports = {
     
                 // Sửa lỗi bằng cách kiểm tra article.tags và gán giá trị mặc định
                 const tags = (article?.tags ?? '').split(",").map(tag => tag.trim());
-    
-                res.render("vwEditor/editor_postreview", {
-                    layout: "main",
-                    title: "Xem bài viết",
-                    article: article,
-                    tags: tags,
-                    user: req.session.user
+
+                postModel.getPostAuthorInfo(id, (err, authorInfo) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy thông tin tác giả:", err);
+                        return res.status(500).send("Không thể lấy thông tin tác giả");
+                    }
+
+                    res.render("vwEditor/editor_postreview", {
+                        layout: "main",
+                        title: "Xem bài viết",
+                        article: article,
+                        author: authorInfo,
+                        tags: tags,
+                        user: req.session.user
+                    });
                 });
             });
         });

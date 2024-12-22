@@ -109,8 +109,14 @@
 
             <!-- Thumbnail Image -->
             <div class="form-group">
-                <label for="post-thumbnail">Ảnh đại diện</label>
+                <label for="post-thumbnail">Ảnh nền</label>
                 <img src="/public/posts/imgs/{{article.id}}/thumbnail.jpg" alt="Post Thumbnail" class="img-thumbnail" id="post-thumbnail" style="display: block; height: 100%; max-width: 400px"/>
+            </div>
+
+            <!-- Author -->
+            <div class="form-group">
+                <label for="author">Tài khoản</label>
+                <input type="text" class="form-control" id="author" name="author" value="{{#if author.penName}}{{author.penName}}{{else}}{{author.username}}{{/if}}" readonly/>
             </div>
 
             <!-- Tags Container -->
