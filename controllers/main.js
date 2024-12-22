@@ -306,8 +306,20 @@ module.exports = {
                     console.error("Lỗi khi cập nhật lượt thích:", err);
                     return res.status(500).send("Không thể cập nhật lượt thích");
                 }
-                // Redirect back to referer
-                res.redirect(req.headers.referer);
+
+                postModel.getLikes(id, (err, likes) => {
+                    if (err) {
+                        console.error("Lỗi khi lấy số lượt thích:", err);
+                        return res.status(500).send("Không thể lấy số lượt thích");
+                    }
+
+                    console.log(likes);
+
+                    res.json({
+                        success: true,
+                        likes: likes,
+                    });
+                });
             });
         } else {
             res.redirect("/login");

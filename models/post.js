@@ -206,6 +206,17 @@ const getPostsByCategoryNoPremium = (categoryId, callback) => {
     });
 };
 
+const getLikes = (postId, callback) => {
+    db.query(
+        "SELECT likes FROM posts WHERE id = ?",
+        [postId],
+        (err, results) => {
+            if (err) return callback(err);
+            callback(null, results[0].likes);
+        }
+    );
+};
+
 module.exports = {
     getAllPosts,
     getPostById,
@@ -221,4 +232,5 @@ module.exports = {
     insertLike,
     deleteLike,
     deletePost,
+    getLikes,
 };
