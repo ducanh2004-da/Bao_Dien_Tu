@@ -117,28 +117,15 @@ module.exports = {
         });
     },
 
-    showRefuseArticlePage: (req, res) => {
+    showRefuse: (req, res) => {
         const id = req.query.id;
         writerModel.getArticlesById(id, (err, article) => {
             if (err) {
                 return;
             }
-
-            categoryModel.getAllCategories((err, categories) => {
-                if (err) {
-                    console.error("Lỗi khi lấy danh mục:", err);
-                    return res.status(500).send("Lỗi khi lấy danh mục");
-                }
-                const filteredCategories = categories.filter(
-                    (category) => category.parent_id !== null
-                );
-                res.render("vwWriter/RefuseArticle", {
-                    layout: "main",
-                    categories: filteredCategories,
-                    user: req.session.user,
-                    article: article[0],
-                });
-            });
+            // Get the column refuse in the article
+            const refuse = article[0].refuse;
+            return res.json({ refuse });
         });
     },
 
