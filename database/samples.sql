@@ -5,6 +5,8 @@ VALUES
     ('Jane', 'jane@example.com', '$2a$10$Ufb9xTeA.1.e08gvS8KZt.uoREaCkyhJrrNMXwN1ExfB2SXyQ8bv.', 'writer', CURRENT_TIMESTAMP),
     ('Admin', 'admin@example.com', '$2a$10$Ufb9xTeA.1.e08gvS8KZt.uoREaCkyhJrrNMXwN1ExfB2SXyQ8bv.', 'admin', CURRENT_TIMESTAMP);
 
+    -- 0909090909 password
+
 -- Insert sample categories
 INSERT INTO categories (name, parent_id, editorId) VALUES
     ('Technology', NULL, NULL),
