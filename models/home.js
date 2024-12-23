@@ -15,7 +15,7 @@ const getHighlightedPosts = (callback) => {
                      JOIN categories c ON pc.categoryId = c.id
             WHERE p.statusName = 'Published'
               AND p.publish_date >= NOW() - INTERVAL ${currentInterval} DAY
-            ORDER BY p.views DESC, p.likes DESC
+            ORDER BY p.premium DESC, p.views DESC, p.likes DESC
                 LIMIT 4;
         `;
 
@@ -52,7 +52,7 @@ const getHighlightedPostsNoPremium = (callback) => {
                      JOIN categories c ON pc.categoryId = c.id
             WHERE p.statusName = 'Published'
               AND p.publish_date >= NOW() - INTERVAL ${currentInterval} DAY
-              AND p.premium = 0 
+              AND p.premium = 0
             ORDER BY p.views DESC, p.likes DESC
                 LIMIT 4;
         `;
@@ -86,7 +86,7 @@ const getTop10MostViewedPosts = (callback) => {
                  JOIN post_categories pc ON p.id = pc.postId
                  JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
-        ORDER BY p.views DESC
+        ORDER BY p.premium DESC, p.views DESC
             LIMIT 10;
     `;
     db.query(query, callback);
@@ -101,7 +101,7 @@ const getTop10MostViewedPostsNoPremium = (callback) => {
                  JOIN post_categories pc ON p.id = pc.postId
                  JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
-           AND p.premium = 0 
+          AND p.premium = 0
         ORDER BY p.views DESC
             LIMIT 10;
     `;
@@ -117,7 +117,7 @@ const getTop10NewestPosts = (callback) => {
                  JOIN post_categories pc ON p.id = pc.postId
                  JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
-        ORDER BY p.publish_date DESC
+        ORDER BY p.premium DESC, p.publish_date DESC
             LIMIT 10;
     `;
     db.query(query, callback);
@@ -131,7 +131,7 @@ const getTop10NewestPostsNoPremium = (callback) => {
                  JOIN post_categories pc ON p.id = pc.postId
                  JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
-           AND p.premium = 0 
+          AND p.premium = 0
         ORDER BY p.publish_date DESC
             LIMIT 10;
     `;
@@ -158,7 +158,7 @@ const getTopCategoriesWithNewestPosts = (callback) => {
         SELECT
             p.*,
             pc.categoryId,
-            ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.publish_date DESC) AS row_num
+            ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.premium DESC, p.publish_date DESC) AS row_num
         FROM posts p
             JOIN post_categories pc ON p.id = pc.postId
             JOIN TopCategories tc ON pc.categoryId = tc.category_id
@@ -178,42 +178,41 @@ const getTopCategoriesWithNewestPosts = (callback) => {
 const getTopCategoriesWithNewestPostsNoPremium = (callback) => {
     const query = `
         WITH TopCategories AS (
-    SELECT
-        c.id AS category_id,
-        c.name AS category_name,
-        SUM(p.views) AS total_views
-    FROM categories c
-    JOIN post_categories pc ON c.id = pc.categoryId
-    JOIN posts p ON pc.postId = p.id
-    WHERE p.statusName = 'Published'
-      AND p.premium = 0  -- Only consider non-premium posts for total views count
-    GROUP BY c.id, c.name
-    ORDER BY total_views DESC
-    LIMIT 10),
-            RankedPosts AS (
             SELECT
-                p.*,
-                pc.categoryId,
-                ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.publish_date DESC) AS row_num
-            FROM posts p
+                c.id AS category_id,
+                c.name AS category_name,
+                SUM(p.views) AS total_views
+            FROM categories c
+                     JOIN post_categories pc ON c.id = pc.categoryId
+                     JOIN posts p ON pc.postId = p.id
+            WHERE p.statusName = 'Published'
+              AND p.premium = 0  -- Only consider non-premium posts for total views count
+            GROUP BY c.id, c.name
+            ORDER BY total_views DESC
+            LIMIT 10),
+            RankedPosts AS (
+        SELECT
+            p.*,
+            pc.categoryId,
+            ROW_NUMBER() OVER (PARTITION BY pc.categoryId ORDER BY p.publish_date DESC) AS row_num
+        FROM posts p
             JOIN post_categories pc ON p.id = pc.postId
-                JOIN TopCategories tc ON pc.categoryId = tc.category_id
-                                    WHERE p.statusName = 'Published' 
-                                        AND p.premium = 0)
+            JOIN TopCategories tc ON pc.categoryId = tc.category_id
+        WHERE p.statusName = 'Published'
+          AND p.premium = 0)
         SELECT
             c.name AS category_name,
             rp.*
         FROM RankedPosts rp
-            JOIN categories c ON rp.categoryId = c.id
+                 JOIN categories c ON rp.categoryId = c.id
         WHERE rp.row_num <= 3
         ORDER BY c.name, rp.publish_date DESC;
-`;
+    `;
     db.query(query, callback);
 };
 
 
 const getTop5MostLikedPostsByCategory = (categoryId, callback) => {
-    // First, check if the category is a parent category
     const checkParentQuery = `
         SELECT COUNT(*) AS isParent
         FROM categories
@@ -229,7 +228,6 @@ const getTop5MostLikedPostsByCategory = (categoryId, callback) => {
         let params;
 
         if (isParent) {
-            // If it's a parent category, get posts from all its subcategories
             query = `
                 SELECT p.*, c.name AS category_name
                 FROM posts p
@@ -237,12 +235,11 @@ const getTop5MostLikedPostsByCategory = (categoryId, callback) => {
                          JOIN categories c ON pc.categoryId = c.id
                 WHERE c.parent_id = ?
                   AND p.statusName = 'Published'
-                ORDER BY p.likes DESC
+                ORDER BY p.premium DESC, p.likes DESC
                     LIMIT 5;
             `;
             params = [categoryId];
         } else {
-            // If it's not a parent category, get posts from the given category
             query = `
                 SELECT p.*, c.name AS category_name
                 FROM posts p
@@ -250,7 +247,7 @@ const getTop5MostLikedPostsByCategory = (categoryId, callback) => {
                          JOIN categories c ON pc.categoryId = c.id
                 WHERE c.id = ?
                   AND p.statusName = 'Published'
-                ORDER BY p.likes DESC
+                ORDER BY p.premium DESC, p.likes DESC
                     LIMIT 5;
             `;
             params = [categoryId];
@@ -260,12 +257,11 @@ const getTop5MostLikedPostsByCategory = (categoryId, callback) => {
     });
 };
 const getTop5MostLikedPostsByCategoryNoPremium = (categoryId, callback) => {
-    // First, check if the category is a parent category
     const checkParentQuery = `
         SELECT COUNT(*) AS isParent
         FROM categories
         WHERE id = ? AND parent_id IS NULL
-        
+
     `;
 
     db.query(checkParentQuery, [categoryId], (err, results) => {
@@ -277,7 +273,6 @@ const getTop5MostLikedPostsByCategoryNoPremium = (categoryId, callback) => {
         let params;
 
         if (isParent) {
-            // If it's a parent category, get posts from all its subcategories
             query = `
                 SELECT p.*, c.name AS category_name
                 FROM posts p
@@ -285,13 +280,12 @@ const getTop5MostLikedPostsByCategoryNoPremium = (categoryId, callback) => {
                          JOIN categories c ON pc.categoryId = c.id
                 WHERE c.parent_id = ?
                   AND p.statusName = 'Published'
-                  AND p.premium = 0 
+                  AND p.premium = 0
                 ORDER BY p.likes DESC
                     LIMIT 5;
             `;
             params = [categoryId];
         } else {
-            // If it's not a parent category, get posts from the given category
             query = `
                 SELECT p.*, c.name AS category_name
                 FROM posts p
@@ -369,67 +363,60 @@ const searchContentCountNoPremium = (content, callback) => {
 }
 
 const getPostsByTag = (tag, limit, offset, callback) =>{
-    // Thêm ký tự '%' để sử dụng LIKE
     const formattedTag = `%${tag}%`;
     const query =
         `SELECT p.*, c.name AS category_name
-        FROM posts p
-        JOIN post_categories pc ON p.id = pc.postId
-        JOIN categories c ON pc.categoryId = c.id
-        WHERE p.statusName = 'Published'
-        AND MATCH(p.tags) AGAINST (?)
-        ORDER BY p.updated_at DESC
-        LIMIT ? OFFSET ?;
+         FROM posts p
+                  JOIN post_categories pc ON p.id = pc.postId
+                  JOIN categories c ON pc.categoryId = c.id
+         WHERE p.statusName = 'Published'
+                   AND MATCH(p.tags) AGAINST (?)
+         ORDER BY p.premium DESC, p.updated_at DESC
+             LIMIT ? OFFSET ?;
         `;
 
-        // Truy vấn tổng số bài viết
-        const countQuery = `
-            SELECT COUNT(*) AS total
-            FROM posts p
-            WHERE p.statusName = 'Published'
-            AND MATCH(p.tags) AGAINST (?);
-        `;
-    
-        // Thực hiện truy vấn
-        db.query(query, [formattedTag, limit, offset], (err, posts) => {
-            if (err) return callback(err);
-    
-            db.query(countQuery, [formattedTag], (err, countResult) => {
-                if (err) return callback(err);
-    
-                const total = countResult[0].total;
-                callback(null, { posts, total });
-            });
-        });
-    };
-
-const getPostsByTagNoPremium = (tag, limit, offset, callback) => {
-    // Thêm ký tự '%' để sử dụng LIKE
-    const formattedTag = `%${tag}%`;
-
-    // Truy vấn bài viết có phân trang
-    const query = `
-        SELECT p.*, c.name AS category_name
-        FROM posts p
-        JOIN post_categories pc ON p.id = pc.postId
-        JOIN categories c ON pc.categoryId = c.id
-        WHERE p.statusName = 'Published'
-        AND p.premium = 0
-        AND MATCH(p.tags) AGAINST (?)
-        ORDER BY p.updated_at DESC
-        LIMIT ? OFFSET ?;
-    `;
-
-    // Truy vấn tổng số bài viết
     const countQuery = `
         SELECT COUNT(*) AS total
         FROM posts p
         WHERE p.statusName = 'Published'
-        AND p.premium = 0
-        AND MATCH(p.tags) AGAINST (?);
+                  AND MATCH(p.tags) AGAINST (?);
     `;
 
-    // Thực hiện truy vấn
+    db.query(query, [formattedTag, limit, offset], (err, posts) => {
+        if (err) return callback(err);
+
+        db.query(countQuery, [formattedTag], (err, countResult) => {
+            if (err) return callback(err);
+
+            const total = countResult[0].total;
+            callback(null, { posts, total });
+        });
+    });
+};
+
+const getPostsByTagNoPremium = (tag, limit, offset, callback) => {
+    const formattedTag = `%${tag}%`;
+
+    const query = `
+        SELECT p.*, c.name AS category_name
+        FROM posts p
+                 JOIN post_categories pc ON p.id = pc.postId
+                 JOIN categories c ON pc.categoryId = c.id
+        WHERE p.statusName = 'Published'
+                  AND p.premium = 0
+                  AND MATCH(p.tags) AGAINST (?)
+        ORDER BY p.updated_at DESC
+            LIMIT ? OFFSET ?;
+    `;
+
+    const countQuery = `
+        SELECT COUNT(*) AS total
+        FROM posts p
+        WHERE p.statusName = 'Published'
+                  AND p.premium = 0
+                  AND MATCH(p.tags) AGAINST (?);
+    `;
+
     db.query(query, [formattedTag, limit, offset], (err, posts) => {
         if (err) return callback(err);
 

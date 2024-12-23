@@ -1,8 +1,9 @@
 const db = require("../utils/db");
 
 const getAllPosts = (callback) => {
-    db.query("SELECT * FROM posts", callback);
+    db.query("SELECT * FROM posts ORDER BY premium DESC", callback);
 };
+
 const getPostById = (id, callback) => {
     db.query("SELECT * FROM posts WHERE id = ?", [id], (err, results) => {
         if (err) return callback(err);
@@ -21,9 +22,9 @@ const updatePublished = (id, callback) => {
 const getPostAuthorInfo = (id, callback) => {
     db.query(
         `SELECT users.id, users.username, users.penName, users.email
-        FROM users
-        JOIN posts ON users.id = posts.userId
-        WHERE posts.id = ?`,
+         FROM users
+                  JOIN posts ON users.id = posts.userId
+         WHERE posts.id = ?`,
         [id],
         (err, results) => {
             if (err) return callback(err);
@@ -39,13 +40,12 @@ const updatePost = (id, post, callback) => {
         callback
     );
 };
+
 const deletePost = (id, callback) => {
     db.query("DELETE FROM posts WHERE id = ?", [id], callback);
 };
 
 const updateView = (id, callback) => {
-
-
     db.query(
         "UPDATE posts SET views = views + 1 WHERE id = ?",
         [id],
@@ -54,7 +54,6 @@ const updateView = (id, callback) => {
 };
 
 const updateLike = (postId, userId, callback) => {
-    // Check if the user has already liked the post
     db.query(
         "SELECT COUNT(*) AS liked FROM likes WHERE postId = ? AND userId = ?",
         [postId, userId],
@@ -64,10 +63,8 @@ const updateLike = (postId, userId, callback) => {
             const liked = results[0].liked > 0;
 
             if (liked) {
-                // If the user has already liked the post, delete the like
                 deleteLike(postId, userId, callback);
             } else {
-                // If the user has not liked the post, insert a new like
                 insertLike(postId, userId, callback);
             }
         }
@@ -100,8 +97,8 @@ const deleteLike = (postId, userId, callback) => {
         callback
     );
 };
+
 const getPostsByCategory = (categoryId, limit, offset, callback) => {
-    // First, check if the category is a parent category
     const checkParentQuery = `
         SELECT COUNT(*) AS isParent
         FROM categories
@@ -117,35 +114,33 @@ const getPostsByCategory = (categoryId, limit, offset, callback) => {
         let params;
 
         if (isParent) {
-            // If it's a parent category, get posts from all its subcategories
             query = `
-                SELECT 
-                    p.*, 
+                SELECT
+                    p.*,
                     c.name AS category_name
                 FROM posts p
-                JOIN post_categories pc ON p.id = pc.postId
-                JOIN categories c ON pc.categoryId = c.id
+                         JOIN post_categories pc ON p.id = pc.postId
+                         JOIN categories c ON pc.categoryId = c.id
                 WHERE c.parent_id = ?
                   AND p.statusName = 'Published'
-                ORDER BY p.created_at DESC
-                LIMIT ? OFFSET ?;
+                ORDER BY p.premium DESC, p.created_at DESC
+                    LIMIT ? OFFSET ?;
             `;
-            params = [categoryId,limit, offset];
+            params = [categoryId, limit, offset];
         } else {
-            // If it's not a parent category, get posts from the given category
             query = `
-                SELECT 
-                    p.*, 
+                SELECT
+                    p.*,
                     c.name AS category_name
                 FROM posts p
-                JOIN post_categories pc ON p.id = pc.postId
-                JOIN categories c ON pc.categoryId = c.id
+                         JOIN post_categories pc ON p.id = pc.postId
+                         JOIN categories c ON pc.categoryId = c.id
                 WHERE c.id = ?
                   AND p.statusName = 'Published'
-                ORDER BY p.created_at DESC
-                LIMIT ? OFFSET ?;
+                ORDER BY p.premium DESC, p.created_at DESC
+                    LIMIT ? OFFSET ?;
             `;
-            params = [categoryId,limit, offset];
+            params = [categoryId, limit, offset];
         }
 
         db.query(query, params, callback);
@@ -157,7 +152,6 @@ const isPremium = (id, callback) => {
 };
 
 const getPostsByCategoryNoPremium = (categoryId, limit, offset, callback) => {
-    // First, check if the category is a parent category
     const checkParentQuery = `
         SELECT COUNT(*) AS isParent
         FROM categories
@@ -173,37 +167,35 @@ const getPostsByCategoryNoPremium = (categoryId, limit, offset, callback) => {
         let params;
 
         if (isParent) {
-            // If it's a parent category, get posts from all its subcategories
             query = `
-                SELECT 
-                    p.*, 
+                SELECT
+                    p.*,
                     c.name AS category_name
                 FROM posts p
-                JOIN post_categories pc ON p.id = pc.postId
-                JOIN categories c ON pc.categoryId = c.id
+                         JOIN post_categories pc ON p.id = pc.postId
+                         JOIN categories c ON pc.categoryId = c.id
                 WHERE c.parent_id = ?
                   AND p.statusName = 'Published'
-                  AND p.premium = 0  -- Exclude premium posts
+                  AND p.premium = 0
                 ORDER BY p.created_at DESC
-                LIMIT ? OFFSET ?;
+                    LIMIT ? OFFSET ?;
             `;
-            params = [categoryId,limit, offset];
+            params = [categoryId, limit, offset];
         } else {
-            // If it's not a parent category, get posts from the given category
             query = `
-                SELECT 
-                    p.*, 
+                SELECT
+                    p.*,
                     c.name AS category_name
                 FROM posts p
-                JOIN post_categories pc ON p.id = pc.postId
-                JOIN categories c ON pc.categoryId = c.id
+                         JOIN post_categories pc ON p.id = pc.postId
+                         JOIN categories c ON pc.categoryId = c.id
                 WHERE c.id = ?
                   AND p.statusName = 'Published'
-                  AND p.premium = 0  -- Exclude premium posts
-                ORDER BY p.created_at DESC;
-                LIMIT ? OFFSET ?;
+                  AND p.premium = 0
+                ORDER BY p.created_at DESC
+                    LIMIT ? OFFSET ?;
             `;
-            params = [categoryId,limit, offset];
+            params = [categoryId, limit, offset];
         }
 
         db.query(query, params, callback);
@@ -212,60 +204,63 @@ const getPostsByCategoryNoPremium = (categoryId, limit, offset, callback) => {
 
 const get5PostsByCatNoPremium = (postId, callback) => {
     db.query(`
-        SELECT p.* 
+        SELECT p.*
         FROM posts p
-        JOIN post_categories pc ON p.id = pc.postId
+                 JOIN post_categories pc ON p.id = pc.postId
         WHERE p.premium = 0
-        AND p.statusName = 'Published'
-        AND pc.categoryId IN (
+          AND p.statusName = 'Published'
+          AND pc.categoryId IN (
             SELECT categoryId
             FROM post_categories
             WHERE postId = ?
         )
-        AND p.id != ?
-        LIMIT 5
-    `, [postId, postId], callback);
-};
-const get5PostsByCat = (postId, callback) => {
-    db.query(`
-        SELECT p.* 
-        FROM posts p
-        JOIN post_categories pc ON p.id = pc.postId
-        WHERE p.statusName = 'Published'
-        AND pc.categoryId IN (
-            SELECT categoryId
-            FROM post_categories
-            WHERE postId = ?
-        )
-        AND p.id != ?
-        LIMIT 5
+          AND p.id != ?
+        ORDER BY p.created_at DESC
+            LIMIT 5
     `, [postId, postId], callback);
 };
 
+const get5PostsByCat = (postId, callback) => {
+    db.query(`
+        SELECT p.*
+        FROM posts p
+                 JOIN post_categories pc ON p.id = pc.postId
+        WHERE p.statusName = 'Published'
+          AND pc.categoryId IN (
+            SELECT categoryId
+            FROM post_categories
+            WHERE postId = ?
+        )
+          AND p.id != ?
+        ORDER BY p.premium DESC, p.created_at DESC
+            LIMIT 5
+    `, [postId, postId], callback);
+};
 
 const getPostsByCategoryCountNoPremium = (categoryId, callback) => {
     const query = `
         SELECT COUNT(*) AS total
         FROM posts p
-        JOIN post_categories pc ON p.id = pc.postId
-        JOIN categories c ON pc.categoryId = c.id
+                 JOIN post_categories pc ON p.id = pc.postId
+                 JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
           AND p.premium = 0
           AND (c.id = ? OR c.parent_id = ?);
     `;
     db.query(query, [categoryId, categoryId], callback);
-}
+};
+
 const getPostsByCategoryCount = (categoryId, callback) => {
     const query = `
         SELECT COUNT(*) AS total
         FROM posts p
-        JOIN post_categories pc ON p.id = pc.postId
-        JOIN categories c ON pc.categoryId = c.id
+                 JOIN post_categories pc ON p.id = pc.postId
+                 JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
           AND (c.id = ? OR c.parent_id = ?);
     `;
     db.query(query, [categoryId, categoryId], callback);
-}
+};
 
 const getLikes = (postId, callback) => {
     db.query(
