@@ -210,6 +210,39 @@ const getPostsByCategoryNoPremium = (categoryId, limit, offset, callback) => {
     });
 };
 
+const get5PostsByCatNoPremium = (postId, callback) => {
+    db.query(`
+        SELECT p.* 
+        FROM posts p
+        JOIN post_categories pc ON p.id = pc.postId
+        WHERE p.premium = 0
+        AND p.statusName = 'Published'
+        AND pc.categoryId IN (
+            SELECT categoryId
+            FROM post_categories
+            WHERE postId = ?
+        )
+        AND p.id != ?
+        LIMIT 5
+    `, [postId, postId], callback);
+};
+const get5PostsByCat = (postId, callback) => {
+    db.query(`
+        SELECT p.* 
+        FROM posts p
+        JOIN post_categories pc ON p.id = pc.postId
+        WHERE p.statusName = 'Published'
+        AND pc.categoryId IN (
+            SELECT categoryId
+            FROM post_categories
+            WHERE postId = ?
+        )
+        AND p.id != ?
+        LIMIT 5
+    `, [postId, postId], callback);
+};
+
+
 const getPostsByCategoryCountNoPremium = (categoryId, callback) => {
     const query = `
         SELECT COUNT(*) AS total
@@ -262,5 +295,7 @@ module.exports = {
     deletePost,
     getLikes,
     getPostsByCategoryCountNoPremium,
-    getPostsByCategoryCount
+    getPostsByCategoryCount,
+    get5PostsByCat,
+    get5PostsByCatNoPremium
 };

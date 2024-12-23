@@ -205,6 +205,11 @@ module.exports = {
                                     console.error("Lỗi khi lấy bình luận:", err);
                                     return res.status(500).send("Không thể lấy bình luận");
                                 }
+                                postModel.get5PostsByCatNoPremium(id,(err,relatedPosts)=>{
+                                    if (err) {
+                                        console.error("Lỗi khi lấy bình luận:", err);
+                                        return res.status(500).send("Không thể lấy bình luận");
+                                    }
 
                                 // Render post detail view
                                 res.render("vwPost/post-detail", {
@@ -216,10 +221,12 @@ module.exports = {
                                     author: author, // Author information
                                     comments: comments, // Comments for the post
                                     tags: tags,
+                                    relatedPosts
                                 });
                             });
                         });
                     });
+                })
                 });
             }
         });

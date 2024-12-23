@@ -208,6 +208,11 @@ module.exports = {
                                         console.error("Lỗi khi kiểm tra lượt thích:", err);
                                         return res.status(500).send("Không thể kiểm tra lượt thích");
                                     }
+                                    postModel.get5PostsByCat(id,(err,relatedPosts)=>{
+                                        if (err) {
+                                            console.error("Lỗi khi lấy bình luận:", err);
+                                            return res.status(500).send("Không thể lấy bình luận");
+                                        }
 
                                     // Render post detail view
                                     res.render("vwPost/post-detail", {
@@ -221,9 +226,11 @@ module.exports = {
                                         comments: comments, // Comments for the post
                                         tags: tags,
                                         isLiked: isLiked,
+                                        relatedPosts
                                     });
                                 });
                             });
+                        });
                         });
                     });
                 });
