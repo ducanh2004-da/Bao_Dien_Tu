@@ -1,0 +1,52 @@
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang chủ</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; padding: 0;
+      background-color: #f0f0f0; } header { display: flex; justify-content:
+      center; align-items: center; background-color: #333; color: white;
+      padding: 50px 0; position: relative; } .logo { position: absolute; left:
+      50%; transform: translateX(-50%); } .logo a { text-decoration: none;
+      color: white; font-size: 24px; font-weight: bold; } .search-container {
+      position: absolute; left: 10px; } .search-container input { padding: 10px;
+      font-size: 14px; border: 1px solid #ccc; border-radius: 5px; }
+      .login-button { position: absolute; right: 10px; top: 10px; padding: 5px
+      10px; background-color: #00bcd4; border: none; color: white; cursor:
+      pointer; font-size: 16px; } .login-button:hover { background-color:
+      #0097a7; } .category-menu { display: flex; justify-content: center; gap:
+      30px; margin-top: 20px; } .category-menu a { text-decoration: none; color:
+      #333; font-size: 16px; } .category-menu a:hover { color: #00bcd4; } main {
+      background-color: white; margin: 20px; padding: 20px; border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } main button { padding: 10px
+      20px; background-color: #00bcd4; border: none; color: white; cursor:
+      pointer; font-size: 16px; margin-bottom: 20px; } main button:hover {
+      background-color: #0097a7; } footer { text-align: center; padding: 10px;
+      background-color: #333; color: white; margin-top: 20px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="search-container">
+        <input type="text" placeholder="Tìm kiếm..." />
+      </div>
+
+      <div class="logo">
+        <a href="/">Logo</a>
+      </div>
+
+      <button class="login-button">Đăng nhập</button>
+    </header>
+
+    <main>
+      <button onclick="window.location.href='/writer/post-article'">Viết bài</button>
+      <button onclick="window.location.href='/writer/my-article'">Xem bài của tôi</button>
+    </main>
+    {{{body}}}
+
+    <footer>
+      <p>© 2024 All Rights Reserved</p>
+    </footer>
+  </body>
+</html>

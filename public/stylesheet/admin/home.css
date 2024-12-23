@@ -1,0 +1,74 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.sidebar {
+    background-color: #343a40;
+    color: #fff;
+    height: 100vh;
+    padding: 1rem;
+    position: fixed;
+    width: 250px;
+}
+
+.sidebar h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar nav ul li {
+    margin-bottom: 1rem;
+}
+
+.sidebar nav ul li a {
+    color: #adb5bd;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.sidebar nav ul li a:hover {
+    color: #fff;
+}
+
+/* Tùy chỉnh nút chào mừng */
+.greeting-btn {
+    background: linear-gradient(45deg, #28a745, #218838); /* Hiệu ứng chuyển màu */
+    border: none;
+    border-radius: 50px;
+    font-size: 1.25rem; /* Kích thước chữ lớn */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+    transition: all 0.3s ease-in-out; /* Hiệu ứng chuyển động */
+}
+
+.greeting-btn:hover {
+    background: linear-gradient(45deg, #218838, #1e7e34); /* Màu sắc khi hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Tăng hiệu ứng bóng */
+    transform: scale(1.05); /* Phóng to nhẹ */
+}
+
+.greeting-btn:focus {
+    outline: none;
+    box-shadow: 0 0 10px #218838; /* Hiệu ứng khi focus */
+}
+.content {
+    margin-left: 260px;
+    padding: 2rem;
+}
+
+.section {
+    display: none;
+    margin-top: 2rem;
+}
+
+.section.active {
+    display: block;
+}
+
+.btn-toggle {
+    cursor: pointer;
+}
