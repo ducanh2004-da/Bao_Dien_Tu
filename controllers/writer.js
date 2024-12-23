@@ -163,11 +163,12 @@ module.exports = {
                     return res.status(500).send("Lỗi khi upload ảnh");
                 }
     
-                const { title, abstract, content, category, tags, is_premium } = req.body;
+                const { title, abstract, content, category, tags } = req.body;
+                const is_premium = req.body.is_premium === "on" ? 1 : 0;
     
                 // Check if the categories are passed as an array
                 const categories = Array.isArray(category) ? category : [category];
-    
+
                 writerModel.insertArticle(
                     {
                         title: title,
@@ -217,15 +218,17 @@ module.exports = {
             }
 
             const { title, abstract, content, category, tags } = req.body;
+            const is_premium = req.body.is_premium === "on"? 1 : 0;
 
             writerModel.updateArticle(
                 {
                     title: title,
-                    category: parseInt(category, 10),
                     abstract: abstract,
                     content: content,
-                    id: id,
+                    category: parseInt(category, 10),
+                    is_premium: is_premium,
                     tags: tags,
+                    id: id,
                 },
                 (insertErr, result) => {
                     if (insertErr) {
