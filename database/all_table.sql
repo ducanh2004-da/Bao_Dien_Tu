@@ -142,15 +142,16 @@ BEGIN
     SET status = 'Expired'
     WHERE end_date < CURRENT_DATE AND status = 'Active';
 
-    -- Update users with expired subscriptions to Non-subscriber
+    -- Update users with expired subscriptions to 'non-subscriber'
     UPDATE users
     SET role = 'non-subscriber'
     WHERE id IN (
         SELECT userId
         FROM subscriptions
         WHERE status = 'Expired'
-    );
-END$$
+    )
+    AND role = 'subscriber'; -- Only downgrade subscribers
+END;
 
 DELIMITER ;
 
@@ -165,11 +166,6 @@ BEGIN
     SET likes = likes + 1
     WHERE id = NEW.postId;
 END$$
-
-DELIMITER ;
-
--- Create a trigger to handle likes removal and decrement the `likes` count
-DELIMITER $$
 
 CREATE TRIGGER after_like_delete
 AFTER DELETE ON likes
