@@ -16,10 +16,11 @@ npm run start
  http://localhost:5000/home
 ```
 **Trang home(guest)**:
-- tìm kiếm theo từ khóa fulltext
+- tìm kiếm theo từ khóa fulltext (có phân trang)
 <img width="500" alt="Screenshot" src="./imgREADME/guest1.png"><br>
-- tìm bài theo chuyên mục:
+- tìm bài theo chuyên mục: (có phân trang)
 <img width="500" alt="Screenshot" src="./imgREADME/guest2.png"><br>
+-tìm bài theo tag:(có phân trang) bấm xem chi tiết bài thì tag bài viết sẽ hiển thị dạng link khi bấm vào sẽ hiển thị các bài viết có tag đó
 
 **Đăng ký/Đăng nhập**:
 - Với form thường:

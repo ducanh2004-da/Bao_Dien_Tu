@@ -368,38 +368,80 @@ const searchContentCountNoPremium = (content, callback) => {
     db.query(query, [content], callback);
 }
 
-const getPostsByTag = (tag, callback) =>{
+const getPostsByTag = (tag, limit, offset, callback) =>{
     // Thêm ký tự '%' để sử dụng LIKE
     const formattedTag = `%${tag}%`;
-    db.query(
+    const query =
         `SELECT p.*, c.name AS category_name
         FROM posts p
         JOIN post_categories pc ON p.id = pc.postId
         JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
         AND MATCH(p.tags) AGAINST (?)
-        ORDER BY p.updated_at DESC`,
-        [formattedTag],
-        callback
-    )
-}
+        ORDER BY p.updated_at DESC
+        LIMIT ? OFFSET ?;
+        `;
 
-const getPostsByTagNoPremium = (tag, callback) => {
+        // Truy vấn tổng số bài viết
+        const countQuery = `
+            SELECT COUNT(*) AS total
+            FROM posts p
+            WHERE p.statusName = 'Published'
+            AND MATCH(p.tags) AGAINST (?);
+        `;
+    
+        // Thực hiện truy vấn
+        db.query(query, [formattedTag, limit, offset], (err, posts) => {
+            if (err) return callback(err);
+    
+            db.query(countQuery, [formattedTag], (err, countResult) => {
+                if (err) return callback(err);
+    
+                const total = countResult[0].total;
+                callback(null, { posts, total });
+            });
+        });
+    };
+
+const getPostsByTagNoPremium = (tag, limit, offset, callback) => {
     // Thêm ký tự '%' để sử dụng LIKE
     const formattedTag = `%${tag}%`;
-    db.query(
-        `SELECT p.*, c.name AS category_name
+
+    // Truy vấn bài viết có phân trang
+    const query = `
+        SELECT p.*, c.name AS category_name
         FROM posts p
         JOIN post_categories pc ON p.id = pc.postId
         JOIN categories c ON pc.categoryId = c.id
         WHERE p.statusName = 'Published'
         AND p.premium = 0
         AND MATCH(p.tags) AGAINST (?)
-        ORDER BY p.updated_at DESC`,
-        [formattedTag],
-        callback
-    );
-}
+        ORDER BY p.updated_at DESC
+        LIMIT ? OFFSET ?;
+    `;
+
+    // Truy vấn tổng số bài viết
+    const countQuery = `
+        SELECT COUNT(*) AS total
+        FROM posts p
+        WHERE p.statusName = 'Published'
+        AND p.premium = 0
+        AND MATCH(p.tags) AGAINST (?);
+    `;
+
+    // Thực hiện truy vấn
+    db.query(query, [formattedTag, limit, offset], (err, posts) => {
+        if (err) return callback(err);
+
+        db.query(countQuery, [formattedTag], (err, countResult) => {
+            if (err) return callback(err);
+
+            const total = countResult[0].total;
+            callback(null, { posts, total });
+        });
+    });
+};
+
 
 module.exports = {
     getHighlightedPosts,

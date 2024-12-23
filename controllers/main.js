@@ -678,16 +678,28 @@ module.exports = {
 
 module.exports.showTag = (req,res) =>{
     const tag = req.params.name;
-    homeModel.getPostsByTag(tag,(err, posts)=>{
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại (mặc định là 1)
+    const limit = 2; // Số bài viết trên mỗi trang
+    const offset = (page - 1) * limit;
+
+    homeModel.getPostsByTag(tag, limit, offset,(err, result)=>{
         if (err) {
             console.error("Lỗi:", err);
             return res.status(500).send("Không thể ra kết quả");
         }
+        const { posts, total } = result; // Lấy posts và tổng số bài viết
+        const totalPages = Math.ceil(total / limit);
+
         res.render("vwPost/byTag", {
             layout: "main",
             categories: filteredCategories,
+            user: req.session.user,
             title: tag,
             posts,
+            currentPage: page,
+            totalPages,
+            pages: Array.from({ length: totalPages }, (_, i) => ({ value: i + 1 })),
+            query: tag, // Truyền query để sử dụng trong View
         });
     })
 }
