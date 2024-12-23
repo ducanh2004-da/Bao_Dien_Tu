@@ -23,13 +23,13 @@ npm run start
 
 **Đăng ký/Đăng nhập**:
 - Với form thường:
-+ có tích hợp dùng passportJS cho form thườngthường
-+ sau khi đăng ký xong thì đăng nhập theo role của tài khoản
+ có tích hợp dùng passportJS cho form thườngthường
+ sau khi đăng ký xong thì đăng nhập theo role của tài khoản
 - Với Google:
-+ có tích hợp dùng passportJS
-+ Mới đầu đăng ký bằng google do chưa có dữ liệu ở CSDL nên trả về trang yêu cầu đăng nhập lần nữa, nhưng nó có lưu lại nên khi lần tiếp theo thì sẽ được vô thẳng trang mình mong muốn luôn 
+ có tích hợp dùng passportJS
+ Mới đầu đăng ký bằng google do chưa có dữ liệu ở CSDL nên trả về trang yêu cầu đăng nhập lần nữa, nhưng nó có lưu lại nên khi lần tiếp theo thì sẽ được vô thẳng trang mình mong muốn luôn 
 - Trường hợp quên mật khẩu:
-+ Có xác thực mã OTP gửi về mail để thay đổi mật khẩu
+ Có xác thực mã OTP gửi về mail để thay đổi mật khẩu
 - Nhập tối thiểu 5 ký tự vì Có tích hợp validators để validate form nhập liệu
 
 **Trang main(subscriber)**:
