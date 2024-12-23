@@ -240,8 +240,18 @@ module.exports = {
 
     // Show the category page
     showCategory: (req, res) => {
+        const query = req.query.q || ""; // Lấy giá trị q từ query string hoặc để trống
         const id = parseInt(req.params.id || 0);
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).send("ID danh mục không hợp lệ");
+        }
         const { isSubscriber, isUser } = req.session;
+
+        let page = parseInt(req.query.page) || 1;
+            if (page < 1) page = 1;
+    
+            const limit = 5;
+            const startIndex = (page - 1) * limit;
 
         categoryModel.getCatById(id, (err, category) => {
             if (err) {
@@ -249,7 +259,7 @@ module.exports = {
             }
 
             if (isSubscriber) {
-                postModel.getPostsByCategory(id, (err, posts) => {
+                postModel.getPostsByCategory(id, limit, startIndex, (err, posts) => {
                     if (err) {
                         return res.status(500).send("Không thể lấy bài viết của danh mục này");
                     }
@@ -258,7 +268,22 @@ module.exports = {
                         if (err) {
                             return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
                         }
+                        postModel.getPostsByCategoryCount(id,(err,countResult)=>{
+                            if (err) {
+                                return res.status(500).send("Không thể lấy danh mục");
+                            }
 
+                            console.log("Count Result:", countResult);
+
+                            const nRows = countResult[0]?.total || 0;
+                            const totalPages = Math.ceil(nRows / limit);
+                    
+                            if (page > totalPages && totalPages > 0) {
+                                return res.status(404).send("Không tìm thấy trang");
+                            }
+                    
+                            // Tạo danh sách số trang
+                            const pages = Array.from({ length: totalPages }, (_, i) => ({ value: i + 1 }));
                         // Render the homepage view
                         res.render("vwPost/byCat", {
                             layout: "main",
@@ -266,12 +291,18 @@ module.exports = {
                             title: category[0].name,
                             categories: filteredCategories,    // Hierarchical categories
                             posts,
-                            hotPosts
+                            hotPosts,
+                            currentPage: page,
+                            totalPages,
+                            pages,
+                            id,
+                            message: nRows > 0 ? `Tìm thấy ${nRows} bài viết` : "Không có bài viết nào trong danh mục này",
                         });
+                    });
                     });
                 })
             } else if (isUser) {
-                postModel.getPostsByCategoryNoPremium(id, (err, posts) => {
+                postModel.getPostsByCategoryNoPremium(id,limit, startIndex, (err, posts) => {
                     if (err) {
                         return res.status(500).send("Không thể lấy bài viết của danh mục này");
                     }
@@ -280,6 +311,20 @@ module.exports = {
                             return res.status(500).send("Không thể lấy bài viết được yêu thích nhất của danh mục này");
                         }
 
+                        postModel.getPostsByCategoryCount(id,(err,countResult)=>{
+                            if (err) {
+                                return res.status(500).send("Không thể lấy danh mục");
+                            }
+
+                            const nRows = countResult[0]?.total || 0;
+                            const totalPages = Math.ceil(nRows / limit);
+                    
+                            if (page > totalPages && totalPages > 0) {
+                                return res.status(404).send("Không tìm thấy trang");
+                            }
+                    
+                            // Tạo danh sách số trang
+                            const pages = Array.from({ length: totalPages }, (_, i) => ({ value: i + 1 }));
                         // Render the homepage view
                         res.render("vwPost/byCat", {
                             layout: "main",
@@ -287,9 +332,15 @@ module.exports = {
                             title: category[0].name,
                             categories: filteredCategories,    // Hierarchical categories
                             posts,
-                            hotPosts
+                            hotPosts,
+                            currentPage: page,
+                            totalPages,
+                            pages,
+                            id,
+                            message: nRows > 0 ? `Tìm thấy ${nRows} bài viết` : "Không có bài viết nào trong danh mục này",
                         });
                     });
+                });
                 })
             }
         });
