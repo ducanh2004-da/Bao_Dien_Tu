@@ -11,6 +11,7 @@ const numeral = require("numeral");
 const path = require("path");
 const app = express();
 const authMiddleware = require('./middlewares/auth.js')
+const { updateScheduledPosts } = require('./middlewares/publishPost.js');
 
 // Routes
 const mainRoutes = require("./routes/main");
@@ -24,6 +25,9 @@ require("./config/passport"); // Passport configuration should be required here
 
 dotenv.config(); // Load environment variables from .env file
 const PORT = process.env.PORT || 5000;
+
+//check time and publish post
+updateScheduledPosts();
 
 // // Middleware setup
 app.use(express.urlencoded({ extended: true })); // To parse URL-encoded bodies

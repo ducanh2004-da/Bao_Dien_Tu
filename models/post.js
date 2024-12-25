@@ -19,6 +19,15 @@ const updatePublished = (id, callback) => {
     );
 };
 
+const updateScheduledPublishDate = (id, publishDate, callback) => {
+    db.query(
+        "UPDATE posts SET scheduled_publish_date = ?, statusName = 'Approved' WHERE id = ?",
+        [publishDate, id],
+        callback
+    );
+};
+
+
 const getPostAuthorInfo = (id, callback) => {
     db.query(
         `SELECT users.id, users.username, users.penName, users.email
@@ -292,5 +301,6 @@ module.exports = {
     getPostsByCategoryCountNoPremium,
     getPostsByCategoryCount,
     get5PostsByCat,
-    get5PostsByCatNoPremium
+    get5PostsByCatNoPremium,
+    updateScheduledPublishDate
 };

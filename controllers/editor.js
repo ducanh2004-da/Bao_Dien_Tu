@@ -174,3 +174,27 @@ module.exports = {
         });
     },
 };
+
+module.exports.acceptPost = (req,res) =>{
+    const id = req.params.id;
+    postModel.updatePublished(id,(err)=>{
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.redirect('/editor');
+    })
+}
+
+module.exports.schedulePost = (req, res) => {
+    const id = req.params.id;
+    const { publish_date } = req.body;
+
+    // Cập nhật thời gian đăng bài
+    postModel.updateScheduledPublishDate(id, publish_date, (err) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.redirect('/editor');
+    });
+};
+

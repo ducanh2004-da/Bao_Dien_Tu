@@ -44,6 +44,7 @@ CREATE TABLE posts (
     media VARCHAR(255),
     userId INT NOT NULL,
     refuse VARCHAR(255),
+    scheduled_publish_date DATETIME NULL,
     views INT DEFAULT 0,
     likes INT DEFAULT 0,
     tags VARCHAR(255),

@@ -68,7 +68,9 @@
     </script>
 {{/section}}
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 <!-- Sidebar -->
+
 <div class="sidebar-overlay" id="sidebar">
     <button class="sidebar-toggle-btn" id="toggle-sidebar">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
@@ -133,8 +135,8 @@
             <!-- Action Buttons -->
             <div class="d-flex justify-content-center">
                 <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#approve-modal">
-                        Duyệt bài
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#approve-modal">
+                        Chấp nhận bài(chờ admin duyệt)
                     </button>
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#reject-modal">
                         Từ chối
@@ -142,6 +144,11 @@
                 </div>
             </div>
         </form>
+        <form action="/editor/post/{{article.id}}/accept" method="POST">
+        <button style="margin-left:45%;" type="submit" class="btn btn-success btn-lg d-flex align-items-center gap-2">
+            <i class="fas fa-check"></i> Duyệt luôn(không lên lịch)
+        </button>
+       </form>
 
         <!-- Approve Modal -->
         <div class="modal fade" id="approve-modal" tabindex="-1" role="dialog" aria-labelledby="approve-modal-label" aria-hidden="true">
@@ -154,7 +161,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Bạn có chắc chắn muốn duyệt bài viết này?</p>
+                        <p>Bạn có chắc chắn muốn để admin duyệt bài viết này?</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
@@ -163,6 +170,38 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal chỉnh thời gian đăng bài -->
+<div class="modal fade" id="schedule-modal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scheduleModalLabel">Chỉnh thời gian đăng bài</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/editor/post/{{article.id}}/schedule" method="POST">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="publish_date">Chọn thời gian đăng bài:</label>
+            <input type="datetime-local" class="form-control" id="publish_date" name="publish_date" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Chấp nhận & Lên lịch</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Nút mở modal -->
+<div class="d-flex justify-content-center mt-3">
+  <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#schedule-modal">
+    Chỉnh thời gian đăng bài
+  </button>
+</div>
+
 
         <!-- Reject Modal -->
         <div class="modal fade" id="reject-modal" tabindex="-1" role="dialog" aria-labelledby="reject-modal-label" aria-hidden="true">
