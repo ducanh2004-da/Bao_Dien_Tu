@@ -2,8 +2,17 @@ const db = require('../utils/db');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const {v4: uuidv4} = require("uuid");
+const validator = require("validator");
+
 
 //Prepared Statements for SQL Injection
+
+function validateInput(input) {
+    if (!validator.isAlphanumeric(input)) {
+      throw new Error("Dữ liệu không hợp lệ!");
+    }
+    return input;
+  }
 
 const getAllUser = (callback) => {
     db.query('SELECT * FROM users', callback);
@@ -32,11 +41,11 @@ const add = (newUser, callback) => {
     const userId = uuidv4(); // Tạo UUID mới cho mỗi lần thêm user
     if (newUser.password) {
         // Only hash the password if it's provided (for normal registrations)
-        bcrypt.hash(newUser.password, 10, (err, hash) => {
+        bcrypt.hash(validateInput(newUser.password), 10, (err, hash) => {
             if (err) throw err;
             db.query(
                 'INSERT INTO users(id,username, email, password,birthday) VALUES (?,?, ?, ?, ?)',
-                [userId,newUser.username, newUser.email, hash,birthday],
+                [userId,validateInput(newUser.username), newUser.email, hash, birthday],
                 callback
             );
         });
@@ -44,7 +53,7 @@ const add = (newUser, callback) => {
     else if(newUser.githubId) {
         db.query(
             'INSERT INTO users(id,username, email, githubId) VALUES (?,?, ?, ?)',
-            [userId,newUser.username, newUser.email, newUser.githubId],
+            [userId,validateInput(newUser.username), newUser.email, newUser.githubId],
             callback
         );
     }
@@ -52,7 +61,7 @@ const add = (newUser, callback) => {
         // If no password, create the user without hashing (for Google/Github logins)
             db.execute(
                 'INSERT INTO users (id,username, email, googleId, role) VALUES (?,?, ?, ?, ?)',
-                [userId,newUser.username, newUser.email, newUser.googleId, newUser.role || 'user'],
+                [userId,validateInput(newUser.username), newUser.email, newUser.googleId, newUser.role || 'user'],
                 callback
             );
     }
@@ -102,7 +111,7 @@ const verifyOtp = (email,otp,callback) =>{
 }
 
 const resetPassword = (email,newPassword,callback) =>{
-    db.query('UPDATE users SET password = ? WHERE email = ?', [newPassword, email], callback);
+    db.query('UPDATE users SET password = ? WHERE email = ?', [validateInput(newPassword), email], callback);
 }
 
 const updateRole = (id,user, callback) =>{

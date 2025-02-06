@@ -2,9 +2,17 @@ const postModel = require("../models/post.js");
 const categoryModel = require("../models/category.js");
 const homeModel = require("../models/home.js");
 const commentModel = require("../models/comment.js");
+const validator = require("validator");
 
 let categories = [];
 let filteredCategories = [];
+
+function validateInput(input) {
+    if (!validator.isAlphanumeric(input)) {
+      throw new Error("Dữ liệu không hợp lệ!");
+    }
+    return input;
+  }
 
 const initializeCategories = async () => {
     return new Promise((resolve, reject) => {
@@ -234,7 +242,7 @@ module.exports = {
 
     // Tìm kiếm bài viết
     search: (req, res) => {
-        const query = req.query.q || "";
+        const query = validateInput(req.query.q) || "";
 
         if (!req.query.page) {
             return res.redirect("./search?q=" + query + "&page=1");

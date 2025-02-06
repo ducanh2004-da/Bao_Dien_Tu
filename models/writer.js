@@ -1,7 +1,15 @@
 const db = require("../utils/db");
 const {v4: uuidv4} = require("uuid");
+const validator = require("validator");
 
 //Prepared Statements for SQL Injection
+
+function validateInput(input) {
+    if (!validator.isAlphanumeric(input)) {
+      throw new Error("Dữ liệu không hợp lệ!");
+    }
+    return input;
+  }
 
 const getNextId = (tableName, callback) => {
     const query = "SHOW TABLE STATUS WHERE Name = ?";
@@ -26,9 +34,9 @@ const insertArticle = (article, callback) => {
         query,
         [
             postId,
-            article.title,
+            validateInput(article.title),
             article.publish_date || null,
-            article.abstract,
+            validateInput(article.abstract),
             article.content,
             article.tags,
             "Pending-Approval",
@@ -118,8 +126,8 @@ const updateArticle = (article, callback) => {
     db.query(
         query,
         [
-            article.title,
-            article.abstract,
+            validateInput(article.title),
+            validateInput(article.abstract),
             article.content,
             "Pending-Approval",
             article.tags,
