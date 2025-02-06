@@ -1,6 +1,9 @@
 const db = require('../utils/db');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const {v4: uuidv4} = require("uuid");
+
+//Prepared Statements for SQL Injection
 
 const getAllUser = (callback) => {
     db.query('SELECT * FROM users', callback);
@@ -21,29 +24,35 @@ const findUser = (id,callback) =>{
 const add = (newUser, callback) => {
     //chuyển định dạng nam-thang-ngay để lưu được vào database
     const birthday = moment(newUser.birthday,'DD/MM/YYYY').format('YYYY-MM-DD');
+    // Kiểm tra định dạng email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newUser.email)) {
+        return callback(new Error("Invalid email format."));
+    }
+    const userId = uuidv4(); // Tạo UUID mới cho mỗi lần thêm user
     if (newUser.password) {
         // Only hash the password if it's provided (for normal registrations)
         bcrypt.hash(newUser.password, 10, (err, hash) => {
             if (err) throw err;
             db.query(
-                'INSERT INTO users(username, email, password,birthday) VALUES (?, ?, ?, ?)',
-                [newUser.username, newUser.email, hash,birthday],
+                'INSERT INTO users(id,username, email, password,birthday) VALUES (?,?, ?, ?, ?)',
+                [userId,newUser.username, newUser.email, hash,birthday],
                 callback
             );
         });
     }
     else if(newUser.githubId) {
         db.query(
-            'INSERT INTO users(username, email, githubId) VALUES (?, ?, ?)',
-            [newUser.username, newUser.email, newUser.githubId],
+            'INSERT INTO users(id,username, email, githubId) VALUES (?,?, ?, ?)',
+            [userId,newUser.username, newUser.email, newUser.githubId],
             callback
         );
     }
     else {
         // If no password, create the user without hashing (for Google/Github logins)
             db.execute(
-                'INSERT INTO users (username, email, googleId, role) VALUES (?, ?, ?, ?)',
-                [newUser.username, newUser.email, newUser.googleId, newUser.role || 'user'],
+                'INSERT INTO users (id,username, email, googleId, role) VALUES (?,?, ?, ?, ?)',
+                [userId,newUser.username, newUser.email, newUser.googleId, newUser.role || 'user'],
                 callback
             );
     }

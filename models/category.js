@@ -1,5 +1,7 @@
 const db = require('../utils/db');
 
+//Prepared Statements for SQL Injection
+
 const getAllCategories = (callback) => {
     db.query('SELECT * FROM categories', callback);
 };

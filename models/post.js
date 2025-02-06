@@ -1,5 +1,7 @@
 const db = require("../utils/db");
 
+//Prepared Statements for SQL Injection
+
 const getAllPosts = (callback) => {
     db.query("SELECT * FROM posts ORDER BY premium DESC", callback);
 };

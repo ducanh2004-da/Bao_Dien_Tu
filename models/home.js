@@ -1,5 +1,7 @@
 const db = require("../utils/db.js");
 
+//Prepared Statements for SQL Injection
+
 // Fetch 3-4 highlighted posts in the past week
 const getHighlightedPosts = (callback) => {
     const baseInterval = 7; // Initial interval in days

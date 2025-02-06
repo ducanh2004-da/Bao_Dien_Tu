@@ -1,4 +1,7 @@
 const db = require("../utils/db");
+const {v4: uuidv4} = require("uuid");
+
+//Prepared Statements for SQL Injection
 
 const getNextId = (tableName, callback) => {
     const query = "SHOW TABLE STATUS WHERE Name = ?";
@@ -12,15 +15,17 @@ const getNextId = (tableName, callback) => {
     });
 };
 const insertArticle = (article, callback) => {
+    const postId = uuidv4(); 
     const query = `
         INSERT INTO posts
-        (title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId, premium)
-        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)
+        (id,title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId, premium)
+        VALUES (?,?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)
     `;
 
     db.query(
         query,
         [
+            postId,
             article.title,
             article.publish_date || null,
             article.abstract,

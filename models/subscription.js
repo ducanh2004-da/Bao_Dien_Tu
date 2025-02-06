@@ -1,5 +1,7 @@
 const db = require("../utils/db");
 
+//Prepared Statements for SQL Injection
+
 // -- Create the `subscriptions` table
 // CREATE TABLE subscriptions (
 //     id INT AUTO_INCREMENT PRIMARY KEY,

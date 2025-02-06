@@ -10,6 +10,9 @@ const bodyParser = require("body-parser");
 const numeral = require("numeral");
 const path = require("path");
 const app = express();
+const cors = require('cors');
+// const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const authMiddleware = require('./middlewares/auth.js')
 const { updateScheduledPosts } = require('./middlewares/publishPost.js');
 
@@ -32,6 +35,35 @@ updateScheduledPosts();
 // // Middleware setup
 app.use(express.urlencoded({ extended: true })); // To parse URL-encoded bodies
 app.use(express.json()); // To parse JSON bodies
+
+//ngăn chặn request từ các trang web khác
+app.use(cors({
+    origin: 'http://localhost:8000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+// tránh xài helmet vì có thể gây lỗi form đăng nhập (nếu bị lỗi thì đổi Port khác trong file .env)
+// app.use(helmet()); 
+//thiết lập HTTP Strict Transport Security (HSTS) để bảo vệ truy cập trang web qua HTTPS
+// app.use(helmet.hsts({
+//     maxAge: 31536000,  //1 năm
+//     includeSubDomains: false, // Chưa áp dụng cho subdomain nếu chưa sẵn sàng 
+//     preload: false            // Không đăng ký preload nếu chưa hoàn toàn chuyển đổi HTTPS hoặc có subdomain chưa hỗ trợ HTTPS
+// }));
+// Thiết lập giới hạn request
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 phút
+    max: 300, // Giới hạn mỗi IP chỉ được 300 requests trong 15 phút
+    message: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+    headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
+});
+const loginLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 phút
+    max: 6, // Chỉ cho phép 5 lần thử đăng nhập mỗi 10 phút(ko hiểu sao bị mất 1 lần :"(( )
+    message: "Bạn đã nhập sai quá nhiều lần. Hãy thử lại sau 10 phút.",
+});
+// Áp dụng rate limiting cho tất cả các routes để tránh tấn công DDoS
+app.use(limiter);
 
 // Set up Handlebars view engine
 app.engine(
@@ -177,7 +209,7 @@ app.use("/main", authMiddleware.isSubscriber, mainRoutes);
 app.use("/writer", authMiddleware.isWriter, writerRoutes);
 app.use("/editor", authMiddleware.isEditor, editorRoutes);
 app.use("/home", homeRoutes);
-app.use("/api", authRoutes);
+app.use("/api",loginLimiter, authRoutes);
 app.use("/admin", authMiddleware.isAdmin, adminRoutes);
 
 app.use((err, req, res, next) => {

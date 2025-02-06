@@ -1,5 +1,7 @@
 const db = require("../utils/db");
 
+//Prepared Statements for SQL Injection
+
 const getAllComments = (callback) => {
     db.query("SELECT * FROM comments", callback);
 }
