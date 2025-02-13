@@ -13,7 +13,7 @@ npm run start
 - Execute file database/add_admin: nếu muốn thay đổi user nào đó thành role admin để tiện thao tác
 **Truy cập web**
 ```sh
- http://localhost:5000/home
+ http://localhost:8000/home
 ```
 **Trang home(guest)**:
 - tìm kiếm theo từ khóa fulltext (có phân trang)
@@ -42,3 +42,5 @@ npm run start
 - danh sách người dùng: bấm vào button 'Xem' để hiện các thao tác CRUD với người dùng đó và nếu ai có role Subscriber thì sẽ có thêm button "Gia hạn"
 - Quản lý bài viết: button "Xem chi tiết" để vừa xem và chỉnh sửa nếu muốn
 
+**LƯU Ý** :
+- Web có giới hạn request gửi đi theo thời gian để tránh DoS nên nếu thao tác nhiều quá web không cho truy cập thì khởi động lại web trên code để làm mới lại từ đầu
