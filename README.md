@@ -42,5 +42,9 @@ npm run start
 - danh sách người dùng: bấm vào button 'Xem' để hiện các thao tác CRUD với người dùng đó và nếu ai có role Subscriber thì sẽ có thêm button "Gia hạn"
 - Quản lý bài viết: button "Xem chi tiết" để vừa xem và chỉnh sửa nếu muốn
 
-**LƯU Ý** :
+**LƯU Ý VÌ WEB CÓ CÁC BẢO MẬT SAU** :
 - Web có giới hạn request gửi đi theo thời gian để tránh DoS nên nếu thao tác nhiều quá web không cho truy cập thì khởi động lại web trên code để làm mới lại từ đầu
+- validate dữ liệu nhập liệu để tránh tấn công SQL injection, XSS
+- Chặn các request từ trang web khác với CORS để tránh tấn công CSRF
+- Giới hạn lần nhập của form đăng nhập để tránh kẻ tấn công thử sai nhiều lần
+- Tạo mã id bất kì và dài để tránh kẻ tấn công tìm ra được id của user hoặc bài viết để chỉnh sửa
