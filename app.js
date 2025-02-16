@@ -53,13 +53,13 @@ app.use(cors({
 // Thiết lập giới hạn request
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 phút
-    max: 300, // Giới hạn mỗi IP chỉ được 300 requests trong 15 phút
+    max: 500, // Giới hạn mỗi IP chỉ được 500 requests trong 15 phút
     message: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
     headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
 });
 const loginLimiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 phút
-    max: 6, // Chỉ cho phép 5 lần thử đăng nhập mỗi 10 phút(ko hiểu sao bị mất 1 lần :"(( )
+    max: 8, // Chỉ cho phép 6 lần thử đăng nhập mỗi 10 phút(ko hiểu sao bị mất 2 lần :"(( )
     message: "Bạn đã nhập sai quá nhiều lần. Hãy thử lại sau 10 phút.",
 });
 // Áp dụng rate limiting cho tất cả các routes để tránh tấn công DDoS
