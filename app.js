@@ -65,6 +65,12 @@ const loginLimiter = rateLimit({
 // Áp dụng rate limiting cho tất cả các routes để tránh tấn công DDoS
 app.use(limiter);
 
+// Anti-clickjacking Header
+app.use((req, res, next) => {
+    res.setHeader("X-Frame-Options", "DENY");
+    next();
+  });
+
 // Set up Handlebars view engine
 app.engine(
     "hbs",
