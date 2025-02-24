@@ -5,6 +5,7 @@ npm i
 
 ### Chạy chương trình:
 node app.js
+hoặc
 npm run start
 ### Hướng dẫn chạy đồ án:
 **cài đặt CSDL**
