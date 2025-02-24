@@ -18,6 +18,12 @@ npm run start
 ```sh
  http://localhost:8000/home
 ```
+**Các tài khoản mẫu mà có thể truy cập để test từng vai trò**
+```sh
+subscriber: email: john@example.com    password: 0909090909
+writer: email: jane@example.com    password: 0909090909
+admin: admin@example.com   password: 0909090909
+```
 **Trang home(guest)**:
 - tìm kiếm theo từ khóa fulltext (có phân trang)
 <img width="500" alt="Screenshot" src="./imgREADME/guest1.png"><br>
