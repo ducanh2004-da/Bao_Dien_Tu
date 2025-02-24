@@ -16,7 +16,7 @@ npm run start
 ```
 ### Hướng dẫn chạy đồ án:
 **cài đặt CSDL**
-- Có thể cài trên phpmyadmin hoặc navicat
+- Có thể cài CSDL trên phpmyadmin hoặc navicat
 + Execute file database/all_table.sql: để thêm các bảng vào CSDL
 + Execute file database/samples.sql: để insert các hàng vào từng bảng gồm: 3 user, 20 posts
 + Execute file database/add_admin: nếu muốn thay đổi user nào đó thành role admin để tiện thao tác
