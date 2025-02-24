@@ -7,9 +7,13 @@ npm i
 ```
 
 ### Chạy chương trình:
+```sh
 node app.js
+```
 hoặc
+```sh
 npm run start
+```
 ### Hướng dẫn chạy đồ án:
 **cài đặt CSDL**
 - Có thể cài trên phpmyadmin hoặc navicat
