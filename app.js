@@ -12,7 +12,7 @@ const path = require("path");
 const app = express();
 const cors = require('cors');
 const csurf = require('csurf');
-// const helmet = require('helmet');
+const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const authMiddleware = require('./middlewares/auth.js')
 const { updateScheduledPosts } = require('./middlewares/publishPost.js');
@@ -64,6 +64,72 @@ const loginLimiter = rateLimit({
 // Áp dụng rate limiting cho tất cả các routes để tránh tấn công DDoS
 // app.use(limiter);
 
+// CSP (Content Security Policy) để ngăn chặn tấn công XSS
+// 1) Bật Helmet mặc định (hỗ trợ nhiều header bảo mật khác)
+app.use(helmet());
+// 2) Cấu hình CSP chi tiết
+// app.use(
+//     helmet.contentSecurityPolicy({
+//         directives: {
+//             defaultSrc: ["'self'"],
+//             scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+//             styleSrc: ["'self'", "'unsafe-inline'"],
+//             imgSrc: ["'self'", "data:", "https://example.com"], // Thay thế bằng nguồn hình ảnh của bạn
+//             connectSrc: ["'self'", "https://api.example.com"], // Thay thế bằng nguồn kết nối của bạn
+//             fontSrc: ["'self'", "https://fonts.googleapis.com"],
+//             objectSrc: ["'none'"],
+//             upgradeInsecureRequests: [],
+//         },
+//         reportOnly: false, // Chỉ báo cáo vi phạm CSP mà không chặn
+//         setAllHeaders: false, // Không thiết lập tất cả các header CSP cho mọi yêu cầu
+//     }))
+app.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        // Cho phép script từ cùng origin, các CDN phổ biến, và (nếu cần) inline scripts
+        scriptSrc: [
+          "'self'",
+          "https://cdnjs.cloudflare.com",
+          "https://cdn.jsdelivr.net",
+          // Nếu có các domain khác (ví dụ Google APIs), thêm vào đây:
+          // "https://accounts.google.com",
+          "'unsafe-inline'"
+        ],
+        // Cho phép style từ cùng origin, CDN Google Fonts, và inline styles (nếu bạn dùng <style> hoặc style="" trong HTML)
+        styleSrc: [
+          "'self'",
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com",
+          "https://cdn.jsdelivr.net",
+          "'unsafe-inline'"
+        ],
+        // Cho phép font từ cùng origin, Google Fonts, hoặc data URI
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "data:"
+        ],
+        // Cho phép hình ảnh từ cùng origin hoặc data URI
+        imgSrc: [
+          "'self'",
+          "data:"
+        ],
+        // Cho phép AJAX/WebSocket về cùng origin (thêm domain API nếu có)
+        connectSrc: [
+          "'self'"
+        ],
+        // Chặn mọi object/embed
+        objectSrc: ["'none'"],
+        // Ngăn clickjacking
+        frameAncestors: ["'self'"],
+        // Giới hạn nơi form có thể submit đến
+        formAction: ["'self'"],
+        // Chỉ cho phép base URI là chính origin
+        baseUri: ["'self'"]
+      }
+    })
+  );
 // Anti-clickjacking Header
 app.use((req, res, next) => {
     res.setHeader("X-Frame-Options", "DENY");
