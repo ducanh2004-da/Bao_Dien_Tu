@@ -36,10 +36,30 @@ updateScheduledPosts();
 // // Middleware setup
 
 //ngăn chặn request từ các trang web khác
+const allowedOrigins = [
+    'http://localhost:8000',
+  'http://localhost:3000',
+  'http://127.0.0.1:5500'
+];
 app.use(cors({
-    origin: 'http://localhost:8000',
+    origin: (incomingOrigin, callback) => {
+        console.log('[CORS] incomingOrigin =', incomingOrigin);
+         // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
+    if (!incomingOrigin || incomingOrigin === 'null') {
+        return callback(null, true);
+      }
+  
+      // 2) Nếu Origin nằm trong whitelist, cho qua
+      if (allowedOrigins.includes(incomingOrigin)) {
+        return callback(null, true);
+      }
+  
+      // 3) Còn lại, block
+      callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 // tránh xài helmet vì có thể gây lỗi form đăng nhập (nếu bị lỗi thì đổi Port khác trong file .env)
 // app.use(helmet()); 
