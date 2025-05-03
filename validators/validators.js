@@ -8,7 +8,8 @@ const userSchema = Joi.object({
     penName: Joi.string().max(100).optional().trim().escapeHTML(),
     birthday: Joi.date().optional(),
     otp_code: Joi.string().length(6).optional().escapeHTML(),
-    otp_expires_at: Joi.date().iso().optional()
+    otp_expires_at: Joi.date().iso().optional(),
+    _csrf: Joi.string().required()
 });
 
 const querySchema = customJoi.object({

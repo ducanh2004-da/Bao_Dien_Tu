@@ -60,6 +60,8 @@
     <br>
     <!-- Form đăng nhập Subscriber -->
     <form action="/api/login" method="POST" class="form role-form" id="sub-login-form">
+    <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
       <h3 class="text-center mb-4">Đăng Nhập Subscriber</h3>
       <input type="email" name="email" class="form-control" id="sub-login-email" placeholder="Email" required>
       <input type="password" name="password" class="form-control" id="sub-login-password" placeholder="Mật khẩu" required>
@@ -71,6 +73,8 @@
 
     <!-- Form đăng nhập Writer -->
     <form action="/api/login-writer" method="POST" class="form role-form" id="writer-login-form" style="display:none;">
+    <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
       <h3 class="text-center mb-4">Đăng Nhập Writer</h3>
       <input type="email" name="email" class="form-control" id="writer-login-email" placeholder="Email" required>
       <input type="password" name="password" class="form-control" id="writer-login-password" placeholder="Mật khẩu" required>
@@ -82,6 +86,8 @@
 
     <!-- Form đăng nhập Editor -->
     <form action="/api/login-editor" method="POST" class="form role-form" id="editor-login-form" style="display:none;">
+      <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
       <h3 class="text-center mb-4">Đăng Nhập Editor</h3>
       <input type="email" name="email" class="form-control" id="editor-login-email" placeholder="Email" required>
       <input type="password" name="password" class="form-control" id="editor-login-password" placeholder="Mật khẩu" required>
@@ -93,6 +99,8 @@
 
     <!-- Form đăng nhập Admin -->
     <form action="/api/login-admin" method="POST" class="form role-form" id="admin-login-form" style="display:none;">
+      <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
       <h3 class="text-center mb-4">Đăng Nhập Admin</h3>
       <input type="email" name="email" class="form-control" id="admin-login-email" placeholder="Email" required>
       <input type="password" name="password" class="form-control" id="admin-login-password" placeholder="Mật khẩu" required>
@@ -104,6 +112,8 @@
 
     <!-- Form đăng ký -->
     <form action="/api/register" method="POST" class="form" id="register-form" style="display:none;">
+      <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
       <h3 class="text-center mb-4">Đăng Ký</h3>
       <input type="text" name="username" class="form-control" id="register-username" placeholder="Tên người dùng" required>
       <input type="email" name="email" class="form-control" id="register-email" placeholder="Email" required>

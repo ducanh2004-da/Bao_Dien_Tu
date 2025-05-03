@@ -262,6 +262,8 @@
     <div class="card shadow-sm mb-5">
         <div class="card-body">
             <form action="/main/post/{{post.id}}/comment" method="POST" id="comment-form">
+            <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <div class="form-group mb-3">
                     <label for="content" class="form-label font-weight-bold">Nội dung</label>
                     <textarea id="content" name="content" class="form-control" rows="3" placeholder="Viết bình luận của bạn..."></textarea>

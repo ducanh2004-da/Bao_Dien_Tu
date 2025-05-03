@@ -24,6 +24,8 @@
             </div>
             {{/if}}
             <form action="/api/verify-otp" method="POST">
+            <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <!-- Email Field -->
                 <div class="mb-3">
                     <label for="email" class="form-label">Enter your email:</label>

@@ -11,6 +11,7 @@ const numeral = require("numeral");
 const path = require("path");
 const app = express();
 const cors = require('cors');
+const csurf = require('csurf');
 // const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const authMiddleware = require('./middlewares/auth.js')
@@ -33,8 +34,6 @@ const PORT = process.env.PORT || 5000;
 updateScheduledPosts();
 
 // // Middleware setup
-app.use(express.urlencoded({ extended: true })); // To parse URL-encoded bodies
-app.use(express.json()); // To parse JSON bodies
 
 //ngăn chặn request từ các trang web khác
 app.use(cors({
@@ -172,15 +171,21 @@ app.use(cookieParser());
 // // Session setup (Express session with flash messages)
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "secret", // Use environment variable for session secret
+    secret: process.env.SESSION_SECRET || "keyboard_cat", // Use environment variable for session secret
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: false,
+      httpOnly: true, // Chỉ cho phép truy cập cookie từ server
+      sameSite: 'lax', // Ngăn chặn CSRF (Cross-Site Request Forgery)
       maxAge: 1000 * 60 * 60, // 1 giờ
     }, // Đặt secure thành true nếu sử dụng HTTPS
   })
 );
+
+// 2) Phân tích body để đọc form POST
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // // Passport initialization
 app.use(passport.initialize());
@@ -193,6 +198,16 @@ app.use((req, res, next) => {
   res.locals.error_msg = req.flash("error_msg");
   res.locals.error = req.flash("error");
   next();
+});
+
+// 3) Khởi tạo CSRF protection, lưu token vào cookie
+const csrfProtection = csurf({ cookie: true });
+// 4) Sử dụng middleware cho tất cả các route GET/POST
+app.use(csrfProtection);
+// 5) Truyền token vào template mỗi khi render form
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 // Redirect based on user role
