@@ -111,8 +111,15 @@ module.exports = {
     
             categoryModel.getCatById(id, (err, category) => {
                 if (err) {
+                    console.error("Lỗi khi lấy danh mục:", err);
                     return res.status(500).send("Không thể lấy danh mục");
-                }
+                  }
+                  // Kiểm tra mảng trả về
+                  if (!Array.isArray(categories) || categories.length === 0) {
+                    return res.status(404).send("Danh mục không tồn tại");
+                  }
+              
+                  const categoryItem = categories[0];  // Phần tử đầu
     
                     postModel.getPostsByCategoryNoPremium(id, limit, startIndex, (err, posts) => {
                         if (err) {
@@ -142,7 +149,7 @@ module.exports = {
                             // Render the homepage view
                             res.render("vwPost/byCat", {
                                 layout: "main",
-                                title: category[0].name,
+                                title: categoryItem.name,
                                 categories: filteredCategories,    // Hierarchical categories
                                 posts,
                                 hotPosts,
@@ -175,7 +182,14 @@ module.exports = {
                 return res.status(500).send("Không thể kiểm tra bài viết");
             }
 
-            if (result[0].premium) {
+             // 1. Nếu không tìm thấy bản ghi nào, trả về 404 hoặc coi như không phải premium
+    if (!Array.isArray(result) || result.length === 0) {
+        console.warn(`Không tìm thấy bài viết với id=${id}`);
+        return res.status(404).send("Bài viết không tồn tại");
+    }
+    // 2. Lấy giá trị premium an toàn với optional chaining
+    const isPremium = result[0]?.premium;
+            if (isPremium) {
                 req.session.notification = {
                     type: "danger",
                     message: "Bạn không có đủ quyền truy cập bài viết này",
