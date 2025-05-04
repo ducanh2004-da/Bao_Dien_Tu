@@ -15,17 +15,17 @@ const userSchema = Joi.object({
 });
 // Schema cho Post (Article)
 const articleSchema = Joi.object({
-  title: Joi.string().min(3).max(255).required(),
-  abstract: Joi.string().max(500).required(),
-  content: Joi.string().required(),
-  category: Joi.array().items(Joi.number().integer()).required(),
-  tags: Joi.array().items(Joi.string()).optional(),
-  is_premium: Joi.boolean().optional(),
-  userId: Joi.number().integer().optional(),
-  thumbnail: Joi.string().optional(),
-  _csrf: Joi.string().required(),
-  author_name: Joi.string().max(100).optional().trim().escapeHTML()
-})
+    title: Joi.string().min(3).max(255).required(),
+    abstract: Joi.string().max(500).required(),
+    content: Joi.string().required(),
+    category: Joi.array().items(Joi.number().integer()).required(),
+    tags: Joi.array().items(Joi.string()).optional(),
+    is_premium: Joi.boolean().optional(),
+    userId: Joi.number().integer().optional(),
+    thumbnail: Joi.string().optional(),
+    _csrf: Joi.string().required(),
+    author_name: Joi.string().max(100).optional().trim().escapeHTML()
+  })
 // Schema cho search query (tìm kiếm nội dung)
 const searchQuerySchema = customJoi.object({
   q: customJoi.string()
@@ -46,7 +46,8 @@ const searchQuerySchema = customJoi.object({
     .messages({
       'number.base': 'Tham số page phải là số',
       'number.min': 'Page phải lớn hơn hoặc bằng 1'
-    })
+    }),
+    _csrf: Joi.optional()
 });
 
 // Schema cho pagination (chỉ page) dùng trong category/tag
@@ -58,7 +59,8 @@ const pageQuerySchema = customJoi.object({
     .messages({
       'number.base': 'Tham số page phải là số',
       'number.min': 'Page phải lớn hơn hoặc bằng 1'
-    })
+    }),
+    _csrf: Joi.optional()
 });
 
 // Middleware validate cho POST người dùng

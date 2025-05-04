@@ -42,6 +42,7 @@ module.exports = {
                         layout: "main",
                         title: "Xem bài viết",
                         article: article,
+                        csrfToken: req.csrfToken(),
                         author: authorInfo,
                         tags: tags,
                         user: req.session.user
@@ -94,6 +95,7 @@ module.exports = {
                         res.render("vwEditor/editor_review", {
                             layout: "main",
                             title: "Danh sách bài viết",
+                            csrfToken: req.csrfToken(),
                             articles: articlesWithNames,
                             user: req.session.user
                         });
@@ -104,6 +106,7 @@ module.exports = {
                     layout: "main",
                     title: "Danh sách bài viết",
                     articles: null,
+                    csrfToken: req.csrfToken(),
                     user: req.session.user
                 });
             }

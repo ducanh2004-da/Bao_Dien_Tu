@@ -28,7 +28,7 @@ const db = mysql.createPool({
   port: 3306,
   user: "root",
   password: "",
-  database: "baodientu",
+  database: "baodientu1",
   // Không giới hạn số lượng truy vấn trong hàng đợi
 });
 

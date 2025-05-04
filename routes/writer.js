@@ -38,8 +38,9 @@ router.get("/", authMiddleware.isUser, authMiddleware.isWriter, (req, res) => {
 });
 router.get("/post-article",csrfProtection, writerController.showPostArticlePage);
 router.get("/my-articles", writerController.showMyArticlePage);
-router.get("/fix-article", writerController.showFixArticlePage);
-router.post("/fix-article/submit", validateArticlePost, writerController.submitFixArticle);
+router.get("/fix-article",csrfProtection, writerController.showFixArticlePage);
+router.post("/fix-article/submit",attachNextId, upload.single('thumbnail'),
+csrfProtection, validateArticlePost, writerController.submitFixArticle);
 router.get("/refuse-article", writerController.showRefuse);
 router.get("/category", writerController.showCategoryPage);
 router.post("/submit-article",attachNextId, upload.single('thumbnail'),

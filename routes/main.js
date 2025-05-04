@@ -1,25 +1,28 @@
 const express = require('express');
 const profileController = require('../controllers/profile');
 const { validateSearch, validatePage } = require('../validators/validators');
+const csurf = require('csurf');
 const { upload } = require('../cloudinary/Cloud');
 
 
 const router = express.Router();
 const MainController = require('../controllers/main');
 
-router.get('/',MainController.showMainPage);
-router.get('/post/:id', MainController.showDetail);
-router.post('/post/like/:id', MainController.likePost);
-router.get('/category/:id',validatePage, MainController.showCategory);
-router.get('/search', validateSearch, MainController.search);
-router.get('/profile', profileController.show);
-router.get('/profile/edit', profileController.viewEdit);
-router.post('/profile/update',upload.single('image'), profileController.Edit);
-router.post('/post/:id/comment', MainController.comment);
-router.get('/subscription', MainController.showSubscription);
-router.post('/subscribe', MainController.subscribe);
-router.post('/extendSubscription', MainController.extendSubscription);
-router.get('/tag/:name',validatePage, MainController.showTag);
+const csrfProtection = csurf({ cookie: true });
+
+router.get('/', csrfProtection, MainController.showMainPage);
+router.get('/post/:id', csrfProtection, MainController.showDetail);
+router.post('/post/like/:id', csrfProtection, MainController.likePost);
+router.get('/category/:id', csrfProtection, validatePage, MainController.showCategory);
+router.get('/search',csrfProtection, validateSearch, MainController.search);
+router.get('/profile',csrfProtection, profileController.show);
+router.get('/profile/edit',csrfProtection, profileController.viewEdit);
+router.post('/profile/update',upload.single('image'),csrfProtection, profileController.Edit);
+router.post('/post/:id/comment',csrfProtection, MainController.comment);
+router.get('/subscription',csrfProtection, MainController.showSubscription);
+router.post('/subscribe',csrfProtection, MainController.subscribe);
+router.post('/extendSubscription',csrfProtection, MainController.extendSubscription);
+router.get('/tag/:name',csrfProtection, validatePage, MainController.showTag);
 // router.post('/unsubscribe', MainController.unsubscribe);
 
 module.exports = router;

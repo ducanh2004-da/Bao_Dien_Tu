@@ -1,5 +1,5 @@
 const db = require("../utils/db");
-const {v4: uuidv4} = require("uuid");
+// const {v4: uuidv4} = require("uuid");
 const validator = require("validator");
 
 //Prepared Statements for SQL Injection
@@ -23,17 +23,34 @@ const getNextId = (tableName, callback) => {
     });
 };
 const insertArticle = (article, callback) => {
-    const postId = uuidv4(); 
+    // const postId = uuidv4(); 
+    // const query = `
+    //     INSERT INTO posts
+    //     (id,title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId, premium)
+    //     VALUES (?,?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)
+    // `;
+
+    // db.query(
+    //     query,
+    //     [
+    //         postId,
+    //         validateInput(article.title),
+    //         article.publish_date || null,
+    //         validateInput(article.abstract),
+    //         article.content,
+    //         article.tags,
+    //         "Pending-Approval",
+    //         article.userId,
+    //         article.is_premium
+    //     ],
     const query = `
         INSERT INTO posts
-        (id,title,  publish_date, abstract, content, tags, statusName, created_at, updated_at, userId, premium)
-        VALUES (?,?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)
+        (title, publish_date, abstract, content, tags, statusName, created_at, updated_at, userId, premium)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)
     `;
-
     db.query(
         query,
         [
-            postId,
             validateInput(article.title),
             article.publish_date || null,
             validateInput(article.abstract),
@@ -46,20 +63,37 @@ const insertArticle = (article, callback) => {
         (err, result) => {
             if (err) return callback(err);
 
-            // Insert into post_categories for multiple categories
+            // // Insert into post_categories for multiple categories
+            // if (article.categories && article.categories.length > 0) {
+            //     const categoryQuery = `
+            //         INSERT INTO post_categories (postId, categoryId)
+            //         VALUES ?
+            //     `;
+            //     const categoryValues = article.categories.map((catId) => [
+            //         result.insertId,
+            //         catId,
+            //     ]);
+            //     db.query(categoryQuery, [categoryValues], callback);
+            // } else {
+            //     callback(null, result);
+            // Lấy đúng ID mới sinh
+          const newPostId = result.insertId;
+
+            // Nếu có categories, chèn batch vào post_categories
             if (article.categories && article.categories.length > 0) {
                 const categoryQuery = `
-                    INSERT INTO post_categories (postId, categoryId)
-                    VALUES ?
+                   INSERT INTO post_categories (postId, categoryId)
+                   VALUES ?
                 `;
-                const categoryValues = article.categories.map((catId) => [
-                    result.insertId,
-                    catId,
+                const categoryValues = article.categories.map(catId => [
+                    newPostId,
+                    catId
                 ]);
-                db.query(categoryQuery, [categoryValues], callback);
-            } else {
-                callback(null, result);
+                return db.query(categoryQuery, [categoryValues], callback);
             }
+
+            // Không có category thì hoàn thành luôn
+            callback(null, { insertId: newPostId });
         }
     );
 };

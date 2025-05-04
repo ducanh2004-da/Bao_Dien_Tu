@@ -14,6 +14,7 @@ module.exports.show = (req,res) =>{
         res.render('vwUser/profile',{
             layout: "main",
             title: "Hồ sơ cá nhân",
+            csrfToken: req.csrfToken(),
             user: user
         })
     })
@@ -25,6 +26,7 @@ module.exports.viewEdit = (req,res) =>{
     res.render('vwUser/editProfile',{
         layout: "main",
         title: "Chỉnh sửa hồ sơ",
+        csrfToken: req.csrfToken(),
         user: req.session.user
     })
 }

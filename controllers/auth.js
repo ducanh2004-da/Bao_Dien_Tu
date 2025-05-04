@@ -141,7 +141,10 @@ module.exports.LoginAdmin = (req, res, next) => {
 };
 
 module.exports.showForgotForm = (req, res) => {
-  res.render("account/sendOtp");
+  res.render("account/sendOtp", {
+    csrfToken: req.csrfToken(),
+    message: req.flash("error_msg"),
+  });
 };
 
 // Gửi mã OTP qua email
@@ -153,6 +156,7 @@ module.exports.sendOtp = async (req, res) => {
       if (!user) {
         req.flash("error_msg", "Không tìm thấy email nào");
         return res.render("account/sendOtp", {
+          csrfToken: req.csrfToken(),
           error: "Không tìm thấy email nào",
         });
       }

@@ -26,6 +26,7 @@ module.exports.showAll = (req,res) =>{
                 posts,users,
                 categories,
                 user: req.session.user,
+                csrfToken: req.csrfToken(),
                 parentCat
             })
         })
@@ -65,7 +66,7 @@ module.exports.viewEditCategory = (req,res) =>{
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.render('admin/editCategory',{category: category[0]})
+        res.render('admin/editCategory',{category: category[0], csrfToken: req.csrfToken()})
     })
 }
 module.exports.viewAddCategory = (req,res) =>{
@@ -81,7 +82,8 @@ module.exports.viewAddCategory = (req,res) =>{
                 { 
                     layout:false ,
                     user:user,
-                    category:category
+                    category:category,
+                    csrfToken: req.csrfToken()
     
                 });
         })
@@ -127,7 +129,7 @@ module.exports.viewUser = (req,res) =>{
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.render('admin/showUser',{users: users[0]})
+        res.render('admin/showUser',{users: users[0], csrfToken: req.csrfToken()});
     })
 }
 module.exports.viewEditUser = (req,res) =>{
@@ -136,7 +138,7 @@ module.exports.viewEditUser = (req,res) =>{
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.render('admin/editUser',{user: user[0]})
+        res.render('admin/editUser',{user: user[0], csrfToken: req.csrfToken()});
     })
 }
 module.exports.deleteUser = (req,res) =>{
@@ -166,7 +168,7 @@ module.exports.viewEditPost = (req,res) =>{
         if(err){
             return res.status(500).json({ error: err.message });
         }
-        res.render('admin/editPost',{post:post[0]})
+        res.render('admin/editPost',{post:post[0], csrfToken: req.csrfToken()});
     })
 
 }

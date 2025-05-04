@@ -134,7 +134,7 @@ app.use(cors({
 // Rate limiting
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,  // 10 minutes
-  max: 10,                  // limit to 10 login attempts
+  max: 12,                  // limit to 10 login attempts
   message: 'Bạn đã nhập sai quá nhiều lần. Hãy thử lại sau 10 phút.'
 });
 

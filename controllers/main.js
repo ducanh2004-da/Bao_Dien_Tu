@@ -90,6 +90,7 @@ module.exports = {
                             res.render("vwUser/home", {
                                 layout: "main",
                                 title: "Trang chủ",
+                                csrfToken: req.csrfToken(),
                                 notification: notification,
                                 categories: filteredCategories,
                                 highlightedPosts,
@@ -144,6 +145,7 @@ module.exports = {
                             res.render("vwUser/home", {
                                 layout: "main",
                                 title: "Trang chủ",
+                                csrfToken: req.csrfToken(),
                                 notification: notification,
                                 categories: filteredCategories,
                                 highlightedPosts,
@@ -226,6 +228,7 @@ module.exports = {
                                     res.render("vwPost/post-detail", {
                                         layout: "main",
                                         title: post.title,
+                                        csrfToken: req.csrfToken(),
                                         post: post, // Single post data
                                         categories: filteredCategories, // Hierarchical categories
                                         postCategories: cats, // Category information
@@ -304,6 +307,7 @@ module.exports = {
                             layout: "main",
                             user: req.session.user,
                             title: category[0].name,
+                            csrfToken: req.csrfToken(),
                             categories: filteredCategories,    // Hierarchical categories
                             posts,
                             hotPosts,
@@ -345,6 +349,7 @@ module.exports = {
                             layout: "main",
                             user: req.session.user,
                             title: category[0].name,
+                            csrfToken: req.csrfToken(),
                             categories: filteredCategories,    // Hierarchical categories
                             posts,
                             hotPosts,
@@ -424,6 +429,7 @@ module.exports = {
                         layout: "main",
                         posts: results,
                         user: req.session.user,
+                        csrfToken: req.csrfToken(),
                         message: "Không tìm thấy kết quả phù hợp",
                     });
                 }
@@ -476,6 +482,7 @@ module.exports = {
                         posts: results,
                         user: req.session.user,
                         currentPage: page,
+                        csrfToken: req.csrfToken(),
                         categories: filteredCategories,
                         totalPages,
                         pages,
@@ -496,6 +503,7 @@ module.exports = {
                         layout: "main",
                         posts: results,
                         user: req.session.user,
+                        csrfToken: req.csrfToken(),
                         message: "Không tìm thấy kết quả phù hợp",
                     });
                 }
@@ -551,6 +559,7 @@ module.exports = {
                         totalPages,
                         pages,
                         query,
+                        csrfToken: req.csrfToken(),
                         message: "Tìm thấy " + nRows + " kết quả phù hợp",
                     });
                 });
@@ -572,6 +581,7 @@ module.exports = {
                     layout: "main",
                     title: "Đăng ký gói dịch vụ",
                     user,
+                    csrfToken: req.csrfToken(),
                     isUser,
                     isSubscriber,
                 });
@@ -590,6 +600,7 @@ module.exports = {
                         user,
                         subscription: subscription[0],
                         isSubscriber,
+                        csrfToken: req.csrfToken(),
                         daysLeft,
                         almostExpired: daysLeft <= 3,
                     });
@@ -713,6 +724,7 @@ module.exports.showTag = (req,res) =>{
             posts,
             currentPage: page,
             totalPages,
+            csrfToken: req.csrfToken(),
             pages: Array.from({ length: totalPages }, (_, i) => ({ value: i + 1 })),
             query: tag, // Truyền query để sử dụng trong View
         });
