@@ -15,6 +15,8 @@
     </a>
     <h1 class="form-header">Thêm Danh Mục Mới</h1>
     <form action="/admin/category/create" method="POST">
+    <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="form-group mb-3">
             <label for="categoryName">Tên Danh Mục</label>
             <input type="text" class="form-control" id="categoryName" name="name" placeholder="Nhập tên danh mục" required>

@@ -162,6 +162,8 @@
                             </p>
                             {{#if user}}
                                 <form action="" method="POST" id="like-form">
+                                    <!-- Chèn CSRF token -->
+                                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                     <button style="all: unset;" type="submit">
                                         <a class='like-button text-decoration-none {{#if isLiked}}liked{{/if}}'>
                                         <span class='like-icon'>

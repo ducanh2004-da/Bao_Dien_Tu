@@ -87,6 +87,8 @@
     <!-- Form Container -->
     <div class="container-fluid bg-light p-4 rounded-lg shadow-lg my-4">
         <form action="/editor/article-update" method="POST" id="review-form">
+            <!-- CSRF Token -->
+            <input type="hidden" name="_csrf" value="{{csrfToken}}"/>
             <!-- Post ID -->
             <input type="hidden" name="post-id" value="{{article.id}}" readonly/>
             <!-- Title Input -->
@@ -145,6 +147,8 @@
             </div>
         </form>
         <form action="/editor/post/{{article.id}}/accept" method="POST">
+        <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button style="margin-left:40%;" type="submit" class="btn btn-success btn-lg d-flex align-items-center gap-2">
             <i class="fas fa-check"></i> Duyệt luôn(không lên lịch)
         </button>
@@ -180,6 +184,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form action="/editor/post/{{article.id}}/schedule" method="POST">
+      <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-body">
           <div class="form-group">
             <label for="publish_date">Chọn thời gian đăng bài:</label>

@@ -32,6 +32,7 @@ module.exports = {
                 layout: "main",
                 title: "Đăng bài viết",
                 user: req.session.user,
+                csrfToken: req.csrfToken(),
                 categories: filteredCategories,
             });
         });
@@ -136,60 +137,35 @@ module.exports = {
     },
 
     submitArticle: (req, res) => {
-        writerModel.getNextId("posts", (err, nextId) => {
-            if (err) {
-                console.error("Lỗi khi lấy ID tiếp theo:", err);
-                return res.status(500).send("Lỗi khi lấy ID tiếp theo");
-            }
-    
-            const storage = multer.diskStorage({
-                destination: function (req, file, cb) {
-                    const folderPath = `./public/posts/imgs/${nextId}`;
-                    if (!fs.existsSync(folderPath)) {
-                        fs.mkdirSync(folderPath, { recursive: true });
-                    }
-                    cb(null, folderPath);
-                },
-                filename: function (req, file, cb) {
-                    cb(null, "thumbnail" + path.extname(file.originalname));
-                },
-            });
-    
-            const upload = multer({ storage }).single("thumbnail");
-    
-            upload(req, res, (err) => {
-                if (err) {
-                    console.error("Lỗi khi upload ảnh:", err);
-                    return res.status(500).send("Lỗi khi upload ảnh");
-                }
-    
-                const { title, abstract, content, category, tags } = req.body;
-                const is_premium = req.body.is_premium === "on" ? 1 : 0;
-    
-                // Check if the categories are passed as an array
-                const categories = Array.isArray(category) ? category : [category];
+        const { title, abstract, content, category, tags } = req.body;
+  const thumbnailPath = req.file.path; // đã được multer lưu
+  const is_premium = req.body.is_premium === 'on' ? 1 : 0;
+  const categories = Array.isArray(category)
+  ? category.map(id => parseInt(id, 10))
+  : [parseInt(category, 10)];              // :contentReference[oaicite:7]{index=7}
 
-                writerModel.insertArticle(
-                    {
-                        title: title,
-                        categories: categories, // Pass multiple categories here
-                        abstract: abstract,
-                        content: content,
-                        userId: req.session.user.id,
-                        is_premium: is_premium,
-                        tags: tags,
-                    },
-                    (insertErr, result) => {
-                        if (insertErr) {
-                            console.error("Lỗi khi thêm bài viết:", insertErr);
-                            return res.status(500).send("Lỗi khi thêm bài viết");
-                        }
-    
-                        res.redirect(`/writer/my-articles`);
-                    }
-                );
-            });
-        });
+// 2) Chia tags (nếu là chuỗi “tag1,tag2”) thành mảng
+const tagsArray = typeof tags === 'string'
+  ? tags.split(',').map(tag => tag.trim())  // :contentReference[oaicite:8]{index=8}
+  : tags;                                    // nếu đã là mảng
+
+  // Chèn bài vào DB, cùng đường dẫn thumbnail
+  writerModel.insertArticle({
+    title,
+    abstract,
+    content,
+    categories,
+    tags: tagsArray,
+    is_premium,
+    userId: req.session.user.id,
+    thumbnail: thumbnailPath
+  }, (err, result) => {
+    if (err) {
+      console.error('Lỗi khi thêm bài viết:', err);
+      return res.status(500).send('Lỗi khi thêm bài viết');
+    }
+    res.redirect('/writer/my-articles');
+  });
     },
     
 

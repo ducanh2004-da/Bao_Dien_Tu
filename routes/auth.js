@@ -1,17 +1,20 @@
 // import express from "express";
 const express = require('express');
 const passport = require('passport');
+const csurf      = require('csurf');
 const { validatePost } = require('../validators/validators');
 
 const router = express.Router();
 const AuthController = require('../controllers/auth');
+// 1) Khởi tạo csurf middleware chỉ cho các route này
+const csrfProtection = csurf({ cookie: true });
 
-router.get('/',AuthController.showForm);
-router.post('/register',validatePost,AuthController.Register);
-router.post('/login',validatePost,AuthController.Login);
-router.post('/login-writer',validatePost,AuthController.LoginWriter);
-router.post('/login-editor',validatePost,AuthController.LoginEditor);
-router.post('/login-admin',validatePost,AuthController.LoginAdmin);
+router.get('/',csrfProtection, AuthController.showForm);
+router.post('/register', csrfProtection, validatePost,AuthController.Register);
+router.post('/login', csrfProtection, validatePost,AuthController.Login);
+router.post('/login-writer', csrfProtection, validatePost,AuthController.LoginWriter);
+router.post('/login-editor', csrfProtection, validatePost,AuthController.LoginEditor);
+router.post('/login-admin', csrfProtection, validatePost,AuthController.LoginAdmin);
 // Google Auth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/api' }),
@@ -48,18 +51,18 @@ function redirectUserByRole(role, res) {
 
 //OTP
 router.route('/forgot-password')
-    .get(AuthController.showForgotForm)
-    .post(AuthController.sendOtp)
+    .get( csrfProtection,AuthController.showForgotForm)
+    .post(csrfProtection,AuthController.sendOtp)
 
 router.route('/reset-password')
-    .get(AuthController.showResetForm)
-    .post(AuthController.resetPass)
+    .get(csrfProtection,AuthController.showResetForm)
+    .post(csrfProtection,AuthController.resetPass)
 
 router.route('/verify-otp')
-    .get((req,res) => {
+    .get(csrfProtection, (req,res) => {
         res.render('checkOtp');
         })
-    .post(AuthController.checkOtp)
+    .post(csrfProtection, AuthController.checkOtp)
 
 router.get('/logout', AuthController.Logout);
 

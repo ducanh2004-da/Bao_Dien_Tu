@@ -166,6 +166,8 @@
 
 <main class="container my-4">
     <form action="/writer/fix-article/submit?id={{article.id}}" method="POST" enctype="multipart/form-data" id="edit-article-form">
+    <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <div class="form-group">
         <label for="title">Tiêu đề bài viết</label>
         <input type="text" class="form-control" id="title" name="title" value="{{article.title}}" required/>

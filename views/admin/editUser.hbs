@@ -15,6 +15,9 @@
     </a>
     <h1 class="form-header">Thay đổi vai trò</h1>
     <form action="/admin/user/{{user.id}}/edit" method="POST">
+        <!-- Chèn CSRF token -->
+        <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="form-group mb-3">
             <label for="userRole">Vai trò</label>
             <input type="text" class="form-control" value="{{user.role}}" id="userRole" name="role" placeholder="Nhập vai trò" required>

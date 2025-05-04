@@ -29,6 +29,8 @@
             <p class="text-danger">Bạn không phải là premium subscriber.</p>
             <p class="text-muted">Đăng ký ngay để mở khóa các tính năng và nội dung cao cấp.</p>
             <form action="/main/subscribe/" method="POST">
+                <!-- Chèn CSRF token -->
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <button class="btn btn-primary">Đăng ký ngay</button>
             </form>
         {{/if}}

@@ -13,7 +13,19 @@ const userSchema = Joi.object({
   otp_expires_at: Joi.date().iso().optional(),
   _csrf: Joi.string().required()
 });
-
+// Schema cho Post (Article)
+const articleSchema = Joi.object({
+  title: Joi.string().min(3).max(255).required(),
+  abstract: Joi.string().max(500).required(),
+  content: Joi.string().required(),
+  category: Joi.array().items(Joi.number().integer()).required(),
+  tags: Joi.array().items(Joi.string()).optional(),
+  is_premium: Joi.boolean().optional(),
+  userId: Joi.number().integer().optional(),
+  thumbnail: Joi.string().optional(),
+  _csrf: Joi.string().required(),
+  author_name: Joi.string().max(100).optional().trim().escapeHTML()
+})
 // Schema cho search query (tìm kiếm nội dung)
 const searchQuerySchema = customJoi.object({
   q: customJoi.string()
@@ -61,6 +73,18 @@ const validatePost = (req, res, next) => {
   next();
 };
 
+// Middleware validate cho POST tạo bài viết
+const validateArticlePost = (req, res, next) => {
+  const { error } = articleSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).render('error/joi', {
+      message: 'Dữ liệu không hợp lệ',
+      details: error.details.map(err => err.message)
+    });
+  }
+  next();
+};
+
 // Middleware validate cho search route
 const validateSearch = (req, res, next) => {
   const { error } = searchQuerySchema.validate(req.query, { abortEarly: false });
@@ -88,5 +112,6 @@ const validatePage = (req, res, next) => {
 module.exports = {
   validatePost,
   validateSearch,
-  validatePage
+  validatePage,
+  validateArticlePost
 };

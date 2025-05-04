@@ -29,6 +29,8 @@
                 <a href="/admin/user/{{users.id}}/delay" class="btn btn-success">Gia hạn tài khoản</a>
             {{/ifEquals}}
         <form action="/admin/user/{{users.id}}/delete" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+            <!-- Chèn CSRF token -->
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <button type="submit" class="btn btn-delete">Xóa Người Dùng</button>
         </form>
     </div>

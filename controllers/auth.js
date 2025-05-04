@@ -16,7 +16,7 @@ function generateOtp() {
 }
 
 module.exports.showForm = (req, res) => {
-  res.render("account/form", { layout: false });
+  res.render("account/form", { layout: false, csrfToken: req.csrfToken()  });
 };
 module.exports.Register = (req, res) => {
   const users = req.body;
@@ -173,6 +173,7 @@ module.exports.sendOtp = async (req, res) => {
         console.log("Email sent: " + info.response);
         res.render("account/checkOtp", {
           message: "OTP đã được gửi đến email của bạn",
+          csrfToken: req.csrfToken() 
         });
       } catch (emailError) {
         console.log(emailError);
@@ -189,7 +190,7 @@ module.exports.sendOtp = async (req, res) => {
 
 module.exports.showResetForm = (req, res) => {
   const token = req.query.token;
-  res.render("account/resetPass", { token });
+  res.render("account/resetPass", { csrfToken: req.csrfToken(), token });
 };
 
 // kiểm tra mã OTP

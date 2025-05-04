@@ -14,6 +14,8 @@
     <div class="card shadow-lg p-4">
         <h1 class="text-center text-primary mb-4">Chỉnh sửa bài viết</h1>
         <form action="/admin/post/{{post.id}}/edit" method="POST">
+        <!-- Chèn CSRF token -->
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <!-- Tiêu đề bài viết -->
             <div class="form-group mb-3">
                 <label for="title" class="form-label fw-bold">Tiêu đề bài viết</label>

@@ -1,23 +1,27 @@
+require('dotenv').config();
+
 const express = require("express");
-const { engine } = require("express-handlebars");
-const hbs_sections = require("express-handlebars-sections");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const passport = require("passport");
 const session = require("express-session");
 const flash = require("connect-flash");
 const bodyParser = require("body-parser");
-const numeral = require("numeral");
 const path = require("path");
-const app = express();
 const cors = require('cors');
 const csurf = require('csurf');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const authMiddleware = require('./middlewares/auth.js')
-const { updateScheduledPosts } = require('./middlewares/publishPost.js');
+const upload = require('multer')();
 
-// Routes
+// Initialize Passport strategies
+require('./config/passport');
+
+// Custom middlewares
+const authMiddleware         = require('./middlewares/auth');
+const { updateScheduledPosts } = require('./middlewares/publishPost');
+
+// Route imports
 const mainRoutes = require("./routes/main");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
@@ -25,306 +29,287 @@ const editorRoutes = require("./routes/editor.js");
 const homeRoutes = require("./routes/home.js");
 const writerRoutes = require("./routes/writer.js");
 
-require("./config/passport"); // Passport configuration should be required here
-
-dotenv.config(); // Load environment variables from .env file
+const app = express();
 const PORT = process.env.PORT || 5000;
 
-//check time and publish post
+//====================
+// Publish scheduled posts on startup
+//====================
 updateScheduledPosts();
 
-// // Middleware setup
+//====================
+// Security & performance middleware
+//====================
+// Set various HTTP headers to secure app
+app.use(helmet());
+app.use(
+        helmet.contentSecurityPolicy({
+          directives: {
+            defaultSrc: ["'self'"],
+            // Cho phép script từ cùng origin, các CDN phổ biến, và (nếu cần) inline scripts
+            scriptSrc: [
+              "'self'",
+              "https://cdnjs.cloudflare.com",
+              "https://cdn.jsdelivr.net",
+              // Nếu có các domain khác (ví dụ Google APIs), thêm vào đây:
+              // "https://accounts.google.com",
+              "'unsafe-inline'"
+            ],
+            // Cho phép style từ cùng origin, CDN Google Fonts, và inline styles (nếu bạn dùng <style> hoặc style="" trong HTML)
+            styleSrc: [
+              "'self'",
+              "https://fonts.googleapis.com",
+              "https://cdnjs.cloudflare.com",
+              "https://cdn.jsdelivr.net",
+              "'unsafe-inline'"
+            ],
+            // Cho phép font từ cùng origin, Google Fonts, hoặc data URI
+            fontSrc: [
+              "'self'",
+              "https://fonts.gstatic.com",
+              "data:"
+            ],
+            // Cho phép hình ảnh từ cùng origin hoặc data URI
+            imgSrc: [
+              "'self'",
+              "data:"
+            ],
+            // Cho phép AJAX/WebSocket về cùng origin (thêm domain API nếu có)
+            connectSrc: [
+              "'self'"
+            ],
+            // Chặn mọi object/embed
+            objectSrc: ["'none'"],
+            // Ngăn clickjacking
+            frameAncestors: ["'self'"],
+            // Giới hạn nơi form có thể submit đến
+            formAction: ["'self'"],
+            // Chỉ cho phép base URI là chính origin
+            baseUri: ["'self'"]
+          }
+        })
+      );
 
-//ngăn chặn request từ các trang web khác
-const allowedOrigins = [
-    'http://localhost:8000',
-  'http://localhost:3000',
-  'http://127.0.0.1:5500'
-];
-app.use(cors({
-    origin: (incomingOrigin, callback) => {
-        console.log('[CORS] incomingOrigin =', incomingOrigin);
-         // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
-    if (!incomingOrigin || incomingOrigin === 'null') {
-        return callback(null, true);
-      }
-  
-      // 2) Nếu Origin nằm trong whitelist, cho qua
-      if (allowedOrigins.includes(incomingOrigin)) {
-        return callback(null, true);
-      }
-  
-      // 3) Còn lại, block
-      callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
-// tránh xài helmet vì có thể gây lỗi form đăng nhập (nếu bị lỗi thì đổi Port khác trong file .env)
-// app.use(helmet()); 
 //thiết lập HTTP Strict Transport Security (HSTS) để bảo vệ truy cập trang web qua HTTPS
 // app.use(helmet.hsts({
-//     maxAge: 31536000,  //1 năm
-//     includeSubDomains: false, // Chưa áp dụng cho subdomain nếu chưa sẵn sàng 
-//     preload: false            // Không đăng ký preload nếu chưa hoàn toàn chuyển đổi HTTPS hoặc có subdomain chưa hỗ trợ HTTPS
+//     maxAge: 31536000,  //1 năm
+//     includeSubDomains: false, // Chưa áp dụng cho subdomain nếu chưa sẵn sàng 
+//     preload: false            // Không đăng ký preload nếu chưa hoàn toàn chuyển đổi HTTPS hoặc có subdomain chưa hỗ trợ HTTPS
 // }));
 // Thiết lập giới hạn request
 // const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 phút
-//     max: 700, // Giới hạn mỗi IP chỉ được 700 requests trong 15 phút
-//     message: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
-//     headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
+//     windowMs: 15 * 60 * 1000, // 15 phút
+//     max: 700, // Giới hạn mỗi IP chỉ được 700 requests trong 15 phút
+//     message: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+//     headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
 // });
+
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:8000',
+  'http://localhost:3000',
+  'http://127.0.0.1:5500',
+];
+app.use(cors({
+        origin: (incomingOrigin, callback) => {
+            console.log('[CORS] incomingOrigin =', incomingOrigin);
+             // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
+        if (!incomingOrigin || incomingOrigin === 'null') {
+            return callback(null, true);
+          }
+      
+          // 2) Nếu Origin nằm trong whitelist, cho qua
+          if (allowedOrigins.includes(incomingOrigin)) {
+            return callback(null, true);
+          }
+      
+          // 3) Còn lại, block
+          callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    }));
+
+// Rate limiting
 const loginLimiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 phút
-    max: 10, // Chỉ cho phép 10 lần thử đăng nhập mỗi 10 phút(ko hiểu sao bị mất 2 lần :"(( )
-    message: "Bạn đã nhập sai quá nhiều lần. Hãy thử lại sau 10 phút.",
+  windowMs: 10 * 60 * 1000,  // 10 minutes
+  max: 10,                  // limit to 10 login attempts
+  message: 'Bạn đã nhập sai quá nhiều lần. Hãy thử lại sau 10 phút.'
 });
-// Áp dụng rate limiting cho tất cả các routes để tránh tấn công DDoS
-// app.use(limiter);
 
-// CSP (Content Security Policy) để ngăn chặn tấn công XSS
-// 1) Bật Helmet mặc định (hỗ trợ nhiều header bảo mật khác)
-app.use(helmet());
-// 2) Cấu hình CSP chi tiết
-// app.use(
-//     helmet.contentSecurityPolicy({
-//         directives: {
-//             defaultSrc: ["'self'"],
-//             scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-//             styleSrc: ["'self'", "'unsafe-inline'"],
-//             imgSrc: ["'self'", "data:", "https://example.com"], // Thay thế bằng nguồn hình ảnh của bạn
-//             connectSrc: ["'self'", "https://api.example.com"], // Thay thế bằng nguồn kết nối của bạn
-//             fontSrc: ["'self'", "https://fonts.googleapis.com"],
-//             objectSrc: ["'none'"],
-//             upgradeInsecureRequests: [],
-//         },
-//         reportOnly: false, // Chỉ báo cáo vi phạm CSP mà không chặn
-//         setAllHeaders: false, // Không thiết lập tất cả các header CSP cho mọi yêu cầu
-//     }))
-app.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"],
-        // Cho phép script từ cùng origin, các CDN phổ biến, và (nếu cần) inline scripts
-        scriptSrc: [
-          "'self'",
-          "https://cdnjs.cloudflare.com",
-          "https://cdn.jsdelivr.net",
-          // Nếu có các domain khác (ví dụ Google APIs), thêm vào đây:
-          // "https://accounts.google.com",
-          "'unsafe-inline'"
-        ],
-        // Cho phép style từ cùng origin, CDN Google Fonts, và inline styles (nếu bạn dùng <style> hoặc style="" trong HTML)
-        styleSrc: [
-          "'self'",
-          "https://fonts.googleapis.com",
-          "https://cdnjs.cloudflare.com",
-          "https://cdn.jsdelivr.net",
-          "'unsafe-inline'"
-        ],
-        // Cho phép font từ cùng origin, Google Fonts, hoặc data URI
-        fontSrc: [
-          "'self'",
-          "https://fonts.gstatic.com",
-          "data:"
-        ],
-        // Cho phép hình ảnh từ cùng origin hoặc data URI
-        imgSrc: [
-          "'self'",
-          "data:"
-        ],
-        // Cho phép AJAX/WebSocket về cùng origin (thêm domain API nếu có)
-        connectSrc: [
-          "'self'"
-        ],
-        // Chặn mọi object/embed
-        objectSrc: ["'none'"],
-        // Ngăn clickjacking
-        frameAncestors: ["'self'"],
-        // Giới hạn nơi form có thể submit đến
-        formAction: ["'self'"],
-        // Chỉ cho phép base URI là chính origin
-        baseUri: ["'self'"]
-      }
-    })
-  );
-// Anti-clickjacking Header
+// Anti-clickjacking
 app.use((req, res, next) => {
-    res.setHeader("X-Frame-Options", "DENY");
-    next();
-  });
-
-// Set up Handlebars view engine
-app.engine(
-    "hbs",
-    engine({
-        extname: ".hbs",
-        layoutsDir: path.join(__dirname, "/views/layouts"),
-        helpers: {
-            format_number(value) {
-                return numeral(value).format("0,0") + "d"; // Format number with commas and suffix 'd'
-            },
-            eq(a, b) {
-                return a === b;
-            },
-            ifEquals(a, b, options) {
-                if (a === b) {
-                  return options.fn(this);
-                }
-                return options.inverse(this);
-              },
-            length(array) {
-                return array.length;
-            },
-            ifCond(v1, operator, v2) {
-                switch (operator) {
-                    case "==":
-                        return parseInt(v1) === parseInt(v2);
-                    case "===":
-                        return v1 === v2;
-                    case "!=":
-                        return parseInt(v1) !== parseInt(v2);
-                    case "!==":
-                        return v1 !== v2;
-                    case "<":
-                        return parseInt(v1) < parseInt(v2);
-                    case "<=":
-                        console.log(parseInt(v1), parseInt(v2));
-                        console.log(parseInt(v1) <= parseInt(v2));
-                        return parseInt(v1) <= parseInt(v2);
-                    case ">":
-                        return parseInt(v1) > parseInt(v2);
-                    case ">=":
-                        return parseInt(v1) >= parseInt(v2);
-                    case "&&":
-                        return v1 && v2;
-                    case "||":
-                        return v1 || v2;
-                    default:
-                        return false;
-                }
-            },
-            // Helper 'or' để kiểm tra phép toán 'hoặc'
-            or(v1, v2) {
-                return v1 || v2;  // Trả về kết quả boolean thay vì options.fn()
-            },
-            math(v1, operator, v2) {
-                switch (operator) {
-                    case "+":
-                        return parseInt(v1) + parseInt(v2);
-                    case "-":
-                        return parseInt(v1) - parseInt(v2);
-                    case "*":
-                        return parseInt(v1) * parseInt(v2);
-                    case "/":
-                        return parseInt(v1) / parseInt(v2);
-                    case "%":
-                        return parseInt(v1) % parseInt(v2);
-                    default:
-                        return NaN;
-                }
-            },
-            includes(list, value, ...keys) {
-
-                // Filter out Handlebars metadata
-                keys = keys.filter(key => typeof key === "string");
-
-                if (!Array.isArray(list) || typeof value !== "object") {
-                    return false;
-                }
-
-                return keys.length === 0
-                                    ? list.some(item =>
-                                        Object.keys(value).every(key => item[key] === value[key])
-                                    )
-                                    : list.some(item =>
-                                        keys.every(key => item[key] === value[key])
-                                    );
-            },
-            section: hbs_sections(),
-        },
-    })
-);
-app.set("view engine", "hbs");
-app.set("views", path.join(__dirname, "views")); // Use path.join for cross-platform compatibility
-app.use("/public", express.static("public"));
-// // Static files (CSS, JS, Images)
-app.use(express.static(path.join(__dirname, "public")));
-// // Use cookie-parser middleware
-app.use(cookieParser());
-// // Session setup (Express session with flash messages)
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "keyboard_cat", // Use environment variable for session secret
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: false,
-      httpOnly: true, // Chỉ cho phép truy cập cookie từ server
-      sameSite: 'lax', // Ngăn chặn CSRF (Cross-Site Request Forgery)
-      maxAge: 1000 * 60 * 60, // 1 giờ
-    }, // Đặt secure thành true nếu sử dụng HTTPS
-  })
-);
-
-// 2) Phân tích body để đọc form POST
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-// // Passport initialization
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.json());
-// // Flash messages middleware
-app.use(flash());
-app.use((req, res, next) => {
-  res.locals.success_msg = req.flash("success_msg");
-  res.locals.error_msg = req.flash("error_msg");
-  res.locals.error = req.flash("error");
+  res.setHeader('X-Frame-Options', 'DENY');
   next();
 });
 
-// 3) Khởi tạo CSRF protection, lưu token vào cookie
-const csrfProtection = csurf({ cookie: true });
-// 4) Sử dụng middleware cho tất cả các route GET/POST
-app.use(csrfProtection);
-// 5) Truyền token vào template mỗi khi render form
+//====================
+// Body parsing
+//====================
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+//====================
+// Static files
+//====================
+app.use("/public", express.static("public"));
+// // Static files (CSS, JS, Images)
+app.use(express.static(path.join(__dirname, "public")));
+
+//====================
+// Template engine (Handlebars)
+//====================
+const { engine } = require('express-handlebars');
+const hbs_sections = require('express-handlebars-sections');
+const numeral = require('numeral');
+
+app.engine('hbs', engine({
+  extname: '.hbs',
+  layoutsDir: path.join(__dirname, "/views/layouts"),
+  helpers: {
+    format_number: v => numeral(v).format('0,0') + 'd',
+    eq: (a, b) => a === b,
+    ifEquals(a,b,opts) { return a===b?opts.fn(this):opts.inverse(this); },
+    length: a => Array.isArray(a)?a.length:0,
+    ifCond(v1, operator, v2) {
+         switch (operator) {
+          case "==":
+            return parseInt(v1) === parseInt(v2);
+          case "===":
+            return v1 === v2;
+          case "!=":
+            return parseInt(v1) !== parseInt(v2);
+          case "!==":
+            return v1 !== v2;
+          case "<":
+            return parseInt(v1) < parseInt(v2);
+          case "<=":
+            console.log(parseInt(v1), parseInt(v2));
+            console.log(parseInt(v1) <= parseInt(v2));
+            return parseInt(v1) <= parseInt(v2);
+          case ">":
+            return parseInt(v1) > parseInt(v2);
+          case ">=":
+            return parseInt(v1) >= parseInt(v2);
+          case "&&":
+            return v1 && v2;
+          case "||":
+            return v1 || v2;
+          default:
+            return false;
+    }},
+    or: (v1,v2) => v1||v2,
+    math(v1, operator, v2) {
+                        switch (operator) {
+                            case "+":
+                                return parseInt(v1) + parseInt(v2);
+                            case "-":
+                                return parseInt(v1) - parseInt(v2);
+                            case "*":
+                                return parseInt(v1) * parseInt(v2);
+                            case "/":
+                                return parseInt(v1) / parseInt(v2);
+                            case "%":
+                                return parseInt(v1) % parseInt(v2);
+                            default:
+                                return NaN;
+                        }
+                    },
+        includes(list, value, ...keys) {
+                            // Filter out Handlebars metadata
+                            keys = keys.filter(key => typeof key === "string");
+                            if (!Array.isArray(list) || typeof value !== "object") {
+                                return false;
+                            }
+                           return keys.length === 0
+                                                ? list.some(item =>
+                                                    Object.keys(value).every(key => item[key] === value[key])
+                                                )
+                                                : list.some(item =>
+                                                    keys.every(key => item[key] === value[key])
+                                                );
+                        },
+    section: hbs_sections()
+  }
+}));
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+//====================
+// Cookies, Session, Passport, Flash
+//====================
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'keyboard_cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false, httpOnly: true, sameSite: 'lax', maxAge: 3600000 } // 1 hour, Đặt secure thành true nếu sử dụng HTTPS
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+// Flash & user data for views
 app.use((req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
-  next();
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg   = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  res.locals.user = req.user || null;
+  next();
 });
 
-// Redirect based on user role
+//====================
+// CSRF protection
+//====================
+// Parse tất cả multipart/form-data cho mọi route (không tối ưu nếu nhiều route không cần file)
+//  app.use(upload.any()); // Sử dụng multer để parse multipart/form-data
+// Parse application/x-www-form-urlencoded và application/json cho mọi route
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// const csrfProtection = csurf({ cookie: true });
+// app.use(csrfProtection);
+// app.use((req, res, next) => {
+//   res.locals.csrfToken = req.csrfToken();
+//   next();
+// });
+
+//====================
+// Routes
+//====================
 app.get("/", (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/home");
-    } else if (req.session.user.role === "admin") {
-        return res.redirect("/admin");
-    } else if (req.session.user.role === "editor") {
-        return res.redirect("/editor");
-    } else if (req.session.user.role === "writer") {
-        return res.redirect("/writer");
-    } else {
-        return res.redirect("/main");
-    }
-});
+        if (!req.session.user) {
+            return res.redirect("/home");
+        } else if (req.session.user.role === "admin") {
+            return res.redirect("/admin");
+        } else if (req.session.user.role === "editor") {
+            return res.redirect("/editor");
+        } else if (req.session.user.role === "writer") {
+            return res.redirect("/writer");
+        } else {
+            return res.redirect("/main");
+        }
+    });
 
-// Define routes
-app.use("/main", authMiddleware.isSubscriber, mainRoutes);
-app.use("/writer", authMiddleware.isWriter, writerRoutes);
-app.use("/editor", authMiddleware.isEditor, editorRoutes);
-app.use("/home", homeRoutes);
-app.use("/api",loginLimiter, authRoutes);
-app.use("/admin", authMiddleware.isAdmin, adminRoutes);
+app.use('/api', loginLimiter, authRoutes);
+app.use('/home', homeRoutes);
+app.use('/main', authMiddleware.isSubscriber, mainRoutes);
+app.use('/writer', authMiddleware.isWriter, writerRoutes);
+app.use('/editor', authMiddleware.isEditor, editorRoutes);
+app.use('/admin', authMiddleware.isAdmin, adminRoutes);
 
+// 404 & error handler
 app.use((err, req, res, next) => {
-    console.error('Lỗi xảy ra:', err); // Ghi nhật ký lỗi đầy đủ để dễ gỡ lỗi
-    res.status(404).render('404', { error: 'Có lỗi xảy ra, vui lòng thử lại sau.' });
-});
+    if (err.code === 'EBADCSRFTOKEN') {
+        console.log('>>> csrf secret cookie:', req.cookies._csrf);
+        console.log('>>> token client gửi:', req.body._csrf);
+        return res.status(403).send('CSRF token invalid');
+      }
+        console.error('Lỗi xảy ra:', err); // Ghi nhật ký lỗi đầy đủ để dễ gỡ lỗi
+        res.status(404).render('404', { error: 'Có lỗi xảy ra, vui lòng thử lại sau.' });
+    });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${PORT}`);
-});
+//====================
+// Server start
+//====================
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
