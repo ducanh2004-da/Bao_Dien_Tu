@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const passport = require("passport");
 const session = require("express-session");
 const flash = require("connect-flash");
+const crypto = require('crypto');
 const bodyParser = require("body-parser");
 const path = require("path");
 const cors = require('cors');
@@ -40,55 +41,54 @@ updateScheduledPosts();
 //====================
 // Security & performance middleware
 //====================
-// Set various HTTP headers to secure app
-app.use(helmet());
+app.use((req, res, next) => {
+  res.locals.nonce = require('crypto').randomBytes(32).toString('hex');
+  next();
+});
+// CSP (Chính sách bảo mật nội dung) để ngăn chặn các cuộc tấn công XSS (Cross-Site Scripting)
+// và các cuộc tấn công khác bằng cách chỉ cho phép tải nội dung từ các nguồn đáng tin cậy       
 app.use(
-        helmet.contentSecurityPolicy({
-          directives: {
-            defaultSrc: ["'self'"],
-            // Cho phép script từ cùng origin, các CDN phổ biến, và (nếu cần) inline scripts
-            scriptSrc: [
-              "'self'",
-              "https://cdnjs.cloudflare.com",
-              "https://cdn.jsdelivr.net",
-              // Nếu có các domain khác (ví dụ Google APIs), thêm vào đây:
-              // "https://accounts.google.com",
-              "'unsafe-inline'"
-            ],
-            // Cho phép style từ cùng origin, CDN Google Fonts, và inline styles (nếu bạn dùng <style> hoặc style="" trong HTML)
-            styleSrc: [
-              "'self'",
-              "https://fonts.googleapis.com",
-              "https://cdnjs.cloudflare.com",
-              "https://cdn.jsdelivr.net",
-              "'unsafe-inline'"
-            ],
-            // Cho phép font từ cùng origin, Google Fonts, hoặc data URI
-            fontSrc: [
-              "'self'",
-              "https://fonts.gstatic.com",
-              "data:"
-            ],
-            // Cho phép hình ảnh từ cùng origin hoặc data URI
-            imgSrc: [
-              "'self'",
-              "data:"
-            ],
-            // Cho phép AJAX/WebSocket về cùng origin (thêm domain API nếu có)
-            connectSrc: [
-              "'self'"
-            ],
-            // Chặn mọi object/embed
-            objectSrc: ["'none'"],
-            // Ngăn clickjacking
-            frameAncestors: ["'self'"],
-            // Giới hạn nơi form có thể submit đến
-            formAction: ["'self'"],
-            // Chỉ cho phép base URI là chính origin
-            baseUri: ["'self'"]
-          }
-        })
-      );
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        "https://code.jquery.com",
+        "https://unpkg.com",
+        (req, res) => `'nonce-${res.locals.nonce}'`,
+      ],
+      styleSrc: [
+        "'self'",
+        "https://fonts.googleapis.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        (req, res) => `'nonce-${res.locals.nonce}'`,
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net"
+      ],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://trusted-cdn.com" // Thay bằng domain thực tế của bạn
+      ],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],  // Đã sửa tên directive
+      formAction: ["'self'"],      // Đã sửa tên directive
+      baseUri: ["'self'"],
+      scriptSrcAttr: ["'none'"],
+      styleSrcAttr: ["'none'"]
+    },
+    reportOnly: false,
+    setAllHeaders: true
+  })
+);
 
 //thiết lập HTTP Strict Transport Security (HSTS) để bảo vệ truy cập trang web qua HTTPS
 // app.use(helmet.hsts({
@@ -97,12 +97,14 @@ app.use(
 //     preload: false            // Không đăng ký preload nếu chưa hoàn toàn chuyển đổi HTTPS hoặc có subdomain chưa hỗ trợ HTTPS
 // }));
 // Thiết lập giới hạn request
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 phút
-//     max: 700, // Giới hạn mỗi IP chỉ được 700 requests trong 15 phút
-//     message: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
-//     headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
-// });
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 phút
+    max: 400, // Giới hạn mỗi IP chỉ được 700 requests trong 15 phút
+    message: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+    headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
+});
+// Áp dụng rate limiting cho tất cả các routes để tránh tấn công DDoS
+app.use(limiter);
 
 // CORS configuration
 const allowedOrigins = [
@@ -110,27 +112,28 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5500',
 ];
-app.use(cors({
-        origin: (incomingOrigin, callback) => {
-            console.log('[CORS] incomingOrigin =', incomingOrigin);
-             // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
-        if (!incomingOrigin || incomingOrigin === 'null') {
-            return callback(null, true);
-          }
-      
-          // 2) Nếu Origin nằm trong whitelist, cho qua
-          if (allowedOrigins.includes(incomingOrigin)) {
-            return callback(null, true);
-          }
-      
-          // 3) Còn lại, block
-          callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
-        },
+// app.use(cors({
+  const apiCorsOptions = {
+    //     origin: (incomingOrigin, callback) => {
+    //         console.log('[CORS] incomingOrigin =', incomingOrigin);
+    //          // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
+    //     if (!incomingOrigin || incomingOrigin === 'null') {
+    //         return callback(null, true);
+    //       }
+    //   
+    //       // 2) Nếu Origin nằm trong whitelist, cho qua
+    //       if (allowedOrigins.includes(incomingOrigin)) {
+    //         return callback(null, true);
+    //       }
+    //   
+    //       // 3) Còn lại, block
+    //       callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
+    //     },
+        origin: allowedOrigins,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-    }));
-
+    };
 // Rate limiting
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,  // 10 minutes
@@ -156,6 +159,7 @@ app.use(express.json());
 app.use("/public", express.static("public"));
 // // Static files (CSS, JS, Images)
 app.use(express.static(path.join(__dirname, "public")));
+
 
 //====================
 // Template engine (Handlebars)
@@ -267,7 +271,13 @@ app.use((req, res, next) => {
 // Parse application/x-www-form-urlencoded và application/json cho mọi route
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
-// const csrfProtection = csurf({ cookie: true });
+// const csrfProtection = csurf({
+//   cookie: {
+//     httpOnly: true,         // Bật HttpOnly
+//     sameSite: 'Strict',         // SameSite Strict
+//     secure: process.env.NODE_ENV === 'production', // Secure cookie trong production
+//   }
+// });
 // app.use(csrfProtection);
 // app.use((req, res, next) => {
 //   res.locals.csrfToken = req.csrfToken();
@@ -291,9 +301,9 @@ app.get("/", (req, res) => {
         }
     });
 
-app.use('/api', loginLimiter, authRoutes);
+app.use('/api',cors(apiCorsOptions), loginLimiter, authRoutes);
 app.use('/home', homeRoutes);
-app.use('/main', authMiddleware.isSubscriber, mainRoutes);
+app.use('/main',cors(apiCorsOptions), authMiddleware.isSubscriber, mainRoutes);
 app.use('/writer', authMiddleware.isWriter, writerRoutes);
 app.use('/editor', authMiddleware.isEditor, editorRoutes);
 app.use('/admin', authMiddleware.isAdmin, adminRoutes);

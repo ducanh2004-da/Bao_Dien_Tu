@@ -9,7 +9,13 @@ const authMiddleware = require("../middlewares/auth");
 const writerModel = require("../models/writer");
 const {validateArticlePost} = require('../validators/validators');
 
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({
+  cookie: { 
+    httpOnly: true,
+    sameSite: 'strict', // Dấu phẩy ở cuối
+    secure: process.env.NODE_ENV === 'production' // Không có dấu phẩy ở cuối
+  }
+});
 
 // Middleware lấy nextId, gắn vào req.nextId
 function attachNextId(req, res, next) {

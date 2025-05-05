@@ -1,5 +1,5 @@
 {{#section 'css'}}
-    <style>
+    <style nonce="{{nonce}}">
         p {
             margin: 0;
         }
@@ -7,7 +7,7 @@
 {{/section}}
 
 {{#section 'js'}}
-    <script>
+    <script nonce="{{nonce}}">
         // Submit Rejection
         function submitRejection(articleId) {
             const reason = document.getElementById('reject-reason').value;
@@ -68,7 +68,7 @@
     </script>
 {{/section}}
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <!-- Sidebar -->
 
 <div class="sidebar-overlay" id="sidebar">

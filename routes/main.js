@@ -8,7 +8,13 @@ const { upload } = require('../cloudinary/Cloud');
 const router = express.Router();
 const MainController = require('../controllers/main');
 
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({
+  cookie: { 
+    httpOnly: true,
+    sameSite: 'strict', // Dấu phẩy ở cuối
+    secure: process.env.NODE_ENV === 'production' // Không có dấu phẩy ở cuối
+  }
+});
 
 router.get('/', csrfProtection, MainController.showMainPage);
 router.get('/post/:id', csrfProtection, MainController.showDetail);

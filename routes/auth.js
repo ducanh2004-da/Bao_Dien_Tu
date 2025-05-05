@@ -7,7 +7,13 @@ const { validatePost } = require('../validators/validators');
 const router = express.Router();
 const AuthController = require('../controllers/auth');
 // 1) Khởi tạo csurf middleware chỉ cho các route này
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({
+    cookie: { 
+        httpOnly: true,
+        sameSite: 'strict', // Dấu phẩy ở cuối
+        secure: process.env.NODE_ENV === 'production' // Không có dấu phẩy ở cuối
+      }
+});
 
 router.get('/',csrfProtection, AuthController.showForm);
 router.post('/register', csrfProtection, validatePost,AuthController.Register);

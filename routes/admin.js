@@ -3,7 +3,13 @@ const router = express.Router();
 const csurf = require('csurf');
 const AdminController = require('../controllers/admin');
 
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,         // Bật HttpOnly
+    sameSite: 'Strict',      // SameSite cookie
+    secure: process.env.NODE_ENV === 'production', // Secure cookie trong production
+  }
+});
 
 router.get('/',csrfProtection, AdminController.showAll);
 router.get('/post/detail', AdminController.viewPost);
