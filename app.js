@@ -15,6 +15,12 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const upload = require('multer')();
 
+//====================
+// Load environment variables for https
+//====================
+const fs      = require('fs');
+const https   = require('https');
+
 // Initialize Passport strategies
 require('./config/passport');
 
@@ -32,6 +38,11 @@ const writerRoutes = require("./routes/writer.js");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const options = {
+  key:  fs.readFileSync(process.env.SSL_KEY),
+  cert: fs.readFileSync(process.env.SSL_CERT)
+};
 
 //====================
 // Publish scheduled posts on startup
@@ -322,4 +333,10 @@ app.use((err, req, res, next) => {
 //====================
 // Server start
 //====================
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+// app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+https.createServer(options, app)
+  .listen(3443, () => {
+    console.log('HTTPS Server running at https://localhost:3443');
+  });
+
+
