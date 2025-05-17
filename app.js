@@ -42,6 +42,8 @@ updateScheduledPosts();
 //====================
 // Set various HTTP headers to secure app
 app.use(helmet());
+// Cấu hình riêng cho X-XSS-Protection
+app.use(helmet.xssFilter());
 app.use(
         helmet.contentSecurityPolicy({
           directives: {
@@ -104,6 +106,17 @@ app.use(
 //     headers: true, // Trả về headers cho biết còn bao nhiêu request có thể gửi
 // });
 
+// Middleware để kiểm soát các phương thức HTTP
+app.use((req, res, next) => {
+  const allowedMethods = ['GET', 'POST', 'PUT', 'DELETE'];
+  
+  if (!allowedMethods.includes(req.method)) {
+    return res.status(405).send('Phương thức không được hỗ trợ');
+  }
+  
+  next();
+});
+
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:8000',
@@ -111,24 +124,24 @@ const allowedOrigins = [
   'http://127.0.0.1:5500',
 ];
 app.use(cors({
-        origin: (incomingOrigin, callback) => {
-            console.log('[CORS] incomingOrigin =', incomingOrigin);
-             // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
-        if (!incomingOrigin || incomingOrigin === 'null') {
-            return callback(null, true);
-          }
-      
-          // 2) Nếu Origin nằm trong whitelist, cho qua
-          if (allowedOrigins.includes(incomingOrigin)) {
-            return callback(null, true);
-          }
-      
-          // 3) Còn lại, block
-          callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
-        },
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+        origin: (incomingOrigin, callback) => {
+            console.log('[CORS] incomingOrigin =', incomingOrigin);
+             // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
+        if (!incomingOrigin || incomingOrigin === 'null') {
+            return callback(null, true);
+          }
+      
+          // 2) Nếu Origin nằm trong whitelist, cho qua
+          if (allowedOrigins.includes(incomingOrigin)) {
+            return callback(null, true);
+          }
+      
+          // 3) Còn lại, block
+          callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Loại bỏ OPTIONS nếu không cần thiết
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     }));
 
 // Rate limiting
@@ -244,7 +257,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard_cat',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false, httpOnly: true, sameSite: 'lax', maxAge: 3600000 } // 1 hour, Đặt secure thành true nếu sử dụng HTTPS
+  cookie: {
+    httpOnly: true,      // Ngăn JavaScript truy cập cookie
+    secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS trong môi trường production
+    sameSite: 'strict',  // Ngăn trình duyệt gửi cookie trong các request cross-site
+    maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày)
+  }// 1 hour, Đặt secure thành true nếu sử dụng HTTPS
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -308,8 +326,59 @@ app.use((err, req, res, next) => {
         console.error('Lỗi xảy ra:', err); // Ghi nhật ký lỗi đầy đủ để dễ gỡ lỗi
         res.status(404).render('404', { error: 'Có lỗi xảy ra, vui lòng thử lại sau.' });
     });
-
+    
+    app.use((req, res, next) => {
+      res.status(404).render('error/404', {
+        layout: false,
+        message: 'Trang bạn yêu cầu không tồn tại'
+      });
+    });
+    
+    // Middleware xử lý lỗi chung
+    app.use((err, req, res, next) => {
+      console.error(err);
+      
+      // Xác định mã lỗi HTTP
+      const statusCode = err.status || 500;
+      
+      // Xác định thông báo lỗi dựa trên môi trường
+      let errorMessage = 'Đã xảy ra lỗi khi xử lý yêu cầu của bạn';
+      
+      // Nếu là lỗi CSRF
+      if (err.code === 'EBADCSRFTOKEN') {
+        statusCode = 403;
+        errorMessage = 'Phiên làm việc của bạn đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.';
+      }
+      
+      // Nếu là lỗi validation từ Joi
+      if (err.isJoi) {
+        return res.status(400).render('error/joi', {
+          layout: false,
+          message: 'Dữ liệu không hợp lệ',
+          details: err.details.map(detail => detail.message)
+        });
+      }
+      
+      // Trong môi trường development, có thể hiển thị thêm thông tin
+      if (process.env.NODE_ENV === 'development') {
+        return res.status(statusCode).render('error/error', {
+          layout: false,
+          message: errorMessage,
+          error: err
+        });
+      }
+      
+      // Trong môi trường production, chỉ hiển thị thông báo chung
+      res.status(statusCode).render('error/error', {
+        layout: false,
+        message: errorMessage,
+        error: {}
+      });
+    });
 //====================
 // Server start
 //====================
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+
+
+
