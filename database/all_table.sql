@@ -1,8 +1,8 @@
 ﻿-- Create the database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS baodientu;
+CREATE DATABASE IF NOT EXISTS baodientu1;
 
 -- Use the database
-USE baodientu;
+USE baodientu1;
 
 -- Create the `users` table
 CREATE TABLE users (

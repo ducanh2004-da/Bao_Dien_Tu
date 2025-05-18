@@ -68,36 +68,40 @@ app.use(
         "https://cdn.jsdelivr.net",
         "https://code.jquery.com",
         "https://unpkg.com",
+        "https://cdn.tiny.cloud",
         (req, res) => `'nonce-${res.locals.nonce}'`,
       ],
       styleSrc: [
         "'self'",
+        "'unsafe-inline'", // Sometimes needed for certain styles
         "https://fonts.googleapis.com",
         "https://cdnjs.cloudflare.com",
         "https://cdn.jsdelivr.net",
-        (req, res) => `'nonce-${res.locals.nonce}'`,
       ],
       fontSrc: [
         "'self'",
         "https://fonts.gstatic.com",
         "https://cdnjs.cloudflare.com",
-        "https://cdn.jsdelivr.net"
+        "https://cdn.jsdelivr.net",
+        "data:",
       ],
       imgSrc: [
         "'self'",
         "data:",
-        "https://trusted-cdn.com" // Thay bằng domain thực tế của bạn
+        "https://res.cloudinary.com", // For your Cloudinary images
+        "https://*.cloudinary.com", 
       ],
-      connectSrc: ["'self'"],
+      connectSrc: [
+        "'self'",
+        "https://cdn.tiny.cloud", // For TinyMCE
+      ],
       objectSrc: ["'none'"],
-      frameAncestors: ["'none'"],  // Đã sửa tên directive
-      formAction: ["'self'"],      // Đã sửa tên directive
+      frameAncestors: ["'none'"],
+      formAction: ["'self'"],
       baseUri: ["'self'"],
       scriptSrcAttr: ["'none'"],
-      styleSrcAttr: ["'none'"]
-    },
-    reportOnly: false,
-    setAllHeaders: true
+      styleSrcAttr: ["'unsafe-inline'"]
+    }
   })
 );
 app.use(helmet.xssFilter());
