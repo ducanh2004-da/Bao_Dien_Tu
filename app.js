@@ -139,50 +139,26 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5500',
 ];
-// app.use(cors({
-  // const apiCorsOptions = {
-  //   //     origin: (incomingOrigin, callback) => {
-  //   //         console.log('[CORS] incomingOrigin =', incomingOrigin);
-  //   //          // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
-  //   //     if (!incomingOrigin || incomingOrigin === 'null') {
-  //   //         return callback(null, true);
-  //   //       }
-  //   //   
-  //   //       // 2) Nếu Origin nằm trong whitelist, cho qua
-  //   //       if (allowedOrigins.includes(incomingOrigin)) {
-  //   //         return callback(null, true);
-  //   //       }
-  //   //   
-  //   //       // 3) Còn lại, block
-  //   //       callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
-  //   //     },
-  //       origin: allowedOrigins,
-  //       credentials: true,
-  //       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  //       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-  //   };
 
-  // app.use(cors({
-    const apiCorsOptions = {
-        origin: (incomingOrigin, callback) => {
-            console.log('[CORS] incomingOrigin =', incomingOrigin);
-             // 1) Nếu không có Origin header hoặc Origin === 'null', cho qua luôn
-        if (!incomingOrigin || incomingOrigin === 'null') {
-            return callback(null, true);
-          }
-      
-          // 2) Nếu Origin nằm trong whitelist, cho qua
-          if (allowedOrigins.includes(incomingOrigin)) {
-            return callback(null, true);
-          }
-      
-          // 3) Còn lại, block
-          callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
-        },
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Loại bỏ OPTIONS nếu không cần thiết
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-    };
+// Replace or add this near the top of your middleware configurations, before route definitions
+const corsMiddleware = (req, res, next) => {
+  // Default policy - restrict CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://localhost:3443');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204); // No content needed for OPTIONS
+  }
+  
+  next();
+};
+
+// Apply the CORS middleware globally
+app.use(corsMiddleware);
+
 // Rate limiting
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,  // 10 minutes
@@ -355,7 +331,17 @@ app.get("/", (req, res) => {
         }
     });
 
-app.use('/api',cors(apiCorsOptions), loginLimiter, authRoutes);
+// Then use the specific CORS configuration only for API routes that need it
+// Update your existing API routes to use this configuration:
+app.use('/api', (req, res, next) => {
+  // For API routes, check against allowedOrigins
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  next();
+}, loginLimiter, authRoutes);
+
 app.use('/home', homeRoutes);
 app.use('/main',cors(apiCorsOptions), authMiddleware.isSubscriber, mainRoutes);
 app.use('/writer', authMiddleware.isWriter, writerRoutes);
