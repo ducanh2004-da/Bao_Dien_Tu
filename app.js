@@ -295,7 +295,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     httpOnly: true,      // Ngăn JavaScript truy cập cookie
-    secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS trong môi trường production
+    secure: true, // Chỉ gửi qua HTTPS trong môi trường production
     sameSite: 'strict',  // Ngăn trình duyệt gửi cookie trong các request cross-site
     maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày)
   }// 1 hour, Đặt secure thành true nếu sử dụng HTTPS 
