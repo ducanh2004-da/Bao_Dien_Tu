@@ -14,6 +14,7 @@ const csurf = require('csurf');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const upload = require('multer')();
+const MySQLStore = require('express-mysql-session')(session);
 
 //====================
 // Load environment variables for https
@@ -283,11 +284,33 @@ app.set('views', path.join(__dirname, 'views'));
 //====================
 // Cookies, Session, Passport, Flash
 //====================
+const sessionStore = new MySQLStore({
+  host: process.env.DB_HOST,
+  port: 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  createDatabaseTable: true, // Auto-create sessions table if it doesn't exist
+  clearExpired: true,        // Automatically clear expired sessions
+  checkExpirationInterval: 900000, // How frequently to check for expired sessions (15 minutes)
+  expiration: 86400000,      // Session expiration (24 hours)
+  schema: {
+    tableName: 'sessions',
+    columnNames: {
+      session_id: 'session_id',
+      expires: 'expires',
+      data: 'data'
+    }
+  }
+});
+
 app.use(cookieParser());
 app.use(session({
+  key: 'session_cookie_name',
   secret: process.env.SESSION_SECRET || 'keyboard_cat',
+  store: sessionStore,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     httpOnly: true,      // Ngăn JavaScript truy cập cookie
     secure: true, // Chỉ gửi qua HTTPS trong môi trường production
@@ -346,6 +369,21 @@ app.get("/", (req, res) => {
         }
     });
 
+// First, add this definition after your allowedOrigins definition (around line 140)
+const apiCorsOptions = {
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
+
 // Then use the specific CORS configuration only for API routes that need it
 // Update your existing API routes to use this configuration:
 app.use('/api', (req, res, next) => {
@@ -358,7 +396,7 @@ app.use('/api', (req, res, next) => {
 }, loginLimiter, authRoutes);
 
 app.use('/home', homeRoutes);
-app.use('/main',cors(apiCorsOptions), authMiddleware.isSubscriber, mainRoutes);
+app.use('/main', cors(apiCorsOptions), authMiddleware.isSubscriber, mainRoutes);
 app.use('/writer', authMiddleware.isWriter, writerRoutes);
 app.use('/editor', authMiddleware.isEditor, editorRoutes);
 app.use('/admin', authMiddleware.isAdmin, adminRoutes);
