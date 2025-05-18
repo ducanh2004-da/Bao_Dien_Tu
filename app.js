@@ -173,18 +173,33 @@ app.use((req, res, next) => {
 });
 
 //====================
-// Body parsing
+// Static files with enhanced security
 //====================
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+// Configure static file serving with improved security options
+const staticOptions = {
+  etag: false,                // Disable ETag generation
+  lastModified: false,        // Disable Last-Modified header
+  setHeaders: (res, path) => {
+    // Set Cache-Control header based on file type
+    if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.ico')) {
+      // Cache images for 1 week (604800 seconds)
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    } else if (path.endsWith('.css') || path.endsWith('.js')) {
+      // Cache CSS and JS for 1 day (86400 seconds)
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    } else {
+      // Set a default cache policy
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+    
+    // Remove headers that might leak timestamps
+    res.removeHeader('Last-Modified');
+  }
+};
 
-//====================
-// Static files
-//====================
-app.use("/public", express.static("public"));
-// // Static files (CSS, JS, Images)
-app.use(express.static(path.join(__dirname, "public")));
-
+// Apply these options to your static file middleware
+app.use("/public", express.static("public", staticOptions));
+app.use(express.static(path.join(__dirname, "public"), staticOptions));
 
 //====================
 // Template engine (Handlebars)
